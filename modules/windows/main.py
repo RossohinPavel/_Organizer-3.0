@@ -9,6 +9,12 @@ class Main(source.tk.Tk):
         self.show_orders_files_information()
         self.show_processing_line()
         self.show_other_line()
+        self.bind('<Control-KeyPress>', self.russian_hotkeys)
+
+    @staticmethod
+    def russian_hotkeys(event):
+        if event.keycode == 86 and event.keysym == '??':
+            event.widget.event_generate('<<Paste>>')
 
     def set_main_graph_settings(self):
         """Основные настройки окна, положения и размера."""
@@ -125,4 +131,6 @@ class Main(source.tk.Tk):
     def show_information_frame(self):
         """Отрисовка фрейма отображения информации о заказах"""
         information_frame = source.tk.Frame(master=self, width=269, height=220, bg='yellow')
+        entry = source.tk.Entry(master=information_frame)
+        entry.pack()
         information_frame.grid(row=12, column=7, columnspan=5, sticky='NSEW')

@@ -4,7 +4,6 @@ from tkinter import messagebox as tkmb
 from tkinter import filedialog as tkfd
 from tkinter import colorchooser as tkcc
 
-
 class MyButton(tk.Button):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, relief=tk.FLAT, fg="#eee", bg="#454545", **kwargs)
