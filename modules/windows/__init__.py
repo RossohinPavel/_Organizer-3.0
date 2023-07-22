@@ -1,0 +1,1 @@
+from modules.windows.main import Main as Main

@@ -10,9 +10,9 @@ def func(func):
     value = 0
     while start:
         print(f'I\'am second thread. Value = {value}')
-        time.sleep(2)
         value += 1
         func(text=value)
+        time.sleep(2)
 
 
 root = tk.Tk()
