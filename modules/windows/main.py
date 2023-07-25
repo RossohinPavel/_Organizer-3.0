@@ -1,4 +1,5 @@
 import modules.windows.source as source
+from modules.windows.library import LibraryWindow
 
 
 class Main(source.tk.Tk):
@@ -29,7 +30,7 @@ class Main(source.tk.Tk):
         """Отрисовка и инициализация менюшек"""
         main_menu = source.tk.Menu()
         main_menu.add_command(label="Настройки", command=lambda: print('None'))
-        main_menu.add_command(label='Библиотека', command=lambda: print('None'))
+        main_menu.add_command(label='Библиотека', command=lambda: LibraryWindow(self))
         main_menu.add_command(label='Информация', command=lambda: print('None'))
         self.config(menu=main_menu)
 
@@ -102,11 +103,9 @@ class Main(source.tk.Tk):
         fb_and_pb_btn.pack()
         alb_and_jur_btn = source.CellTwoButton(master=button_frame, bt_l_name='Альбомы', bt_r_name='Журналы')
         alb_and_jur_btn.pack()
-        canv_and_rdm_btn = source.CellTwoButton(master=button_frame, bt_l_name='Холсты', bt_r_name='Роддом')
-        canv_and_rdm_btn.pack()
-        bup_and_repl_btn = source.CellTwoButton(master=button_frame, bt_l_name='Бакап', bt_r_name='Замена')
-        bup_and_repl_btn.pack()
-        button_frame.grid(row=8, column=0, columnspan=6, sticky='NSEW')
+        canv_and_add_btn = source.CellTwoButton(master=button_frame, bt_l_name='Холсты', bt_r_name='Дополнительно')
+        canv_and_add_btn.pack()
+        button_frame.grid(row=8, column=0, columnspan=6, sticky='NSEW', pady=16)
         self.show_separator(row=8, column=6, sticky='NS')
         self.show_separator(row=9, column=0, columnspan=7, sticky='EW')
 
