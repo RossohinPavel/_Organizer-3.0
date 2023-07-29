@@ -1,5 +1,4 @@
 import modules.windows.source as source
-from modules.library.products import Product as Product
 
 
 class LibraryWindow(source.ChildWindow):
@@ -10,6 +9,30 @@ class LibraryWindow(source.ChildWindow):
         self.show_main_widget()
         self.resizable(False, False)
         self.to_parent_center()
+        self.library = parent_root.library
+        self.set_treeview_values()
+
+    def set_treeview_values(self):
+        """Метод для установки значений в тривью"""
+        key_index = 1
+        for key, values in self.library.get_product_headers().items():
+            self.tree.insert('', source.tk.END, iid=key_index, text=self.library.product.translator(key))
+            for index, value in enumerate(values):
+                self.tree.insert(key_index, source.tk.END, iid=int(f'{key_index}{index}'), text=value, tags=key)
+            key_index += 1
+
+    def clear_treeview(self):
+        """Очитска тривью от содержимого"""
+        for i in self.tree.get_children(''):
+            self.tree.delete(i)
+
+    def get_treeview_values(self) -> tuple | None:
+        """Метод для получения данных из виджета. Возвращает кортеж (название таблицы в бд, имя)"""
+        index = self.tree.selection()
+        if not index or len(index[0]) == 1:
+            return
+        item = self.tree.item(index[0])
+        return item['tags'][0], item['text']
 
     def show_main_widget(self):
         """Отрисовка виджетов основного меню библиотеки"""
@@ -46,7 +69,14 @@ class LibraryWindow(source.ChildWindow):
         ChangeLibWindow(self)
 
     def init_delete_from_lib(self):
-        pass
+        """Удаление продукта по выбору в тривью из библиотеки"""
+        values = self.get_treeview_values()
+        if not values:
+            return
+        self.library.delete(*values)
+        self.clear_treeview()
+        self.set_treeview_values()
+        source.tkmb.showinfo(title="Удаление продукта", message=f'{values[1]}\nУспешно удален из библиотеки')
 
 
 class AssistWindow(source.ChildWindow):
@@ -66,7 +96,7 @@ class AssistWindow(source.ChildWindow):
         """Отрисовка комбобокса. Возвращает ссылку на его объект"""
         label = source.ttk.Label(self, text='Выберите категорию')
         label.pack()
-        combobox = source.ttk.Combobox(self, state='readonly', width=40, values=Product._rnames)
+        combobox = source.ttk.Combobox(self, state='readonly', width=40)
         combobox.pack()
         separator = source.tk.Canvas(self, width=496, height=1, bg='black')
         separator.pack()

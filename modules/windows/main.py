@@ -1,4 +1,5 @@
 import modules.windows.source as source
+from modules.library import Library
 from modules.windows.library import LibraryWindow
 
 
@@ -11,6 +12,7 @@ class Main(source.tk.Tk):
         self.show_processing_line()
         self.show_other_line()
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
+        self.library = Library()    # Инициализируем библиотеку
 
     @staticmethod
     def russian_hotkeys(event):

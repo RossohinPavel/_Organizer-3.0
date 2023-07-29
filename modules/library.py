@@ -166,11 +166,9 @@ class Library:
 
     def get_product_headers(self) -> dict:
         """Метод возвращает из базы данных имена всех продуктов. Формирует словарь: {тип: (имя1, имя2, ...)}"""
-        self.__cursor.execute("SELECT name FROM sqlite_sequence")
-        category_lst = tuple(x[0] for x in self.__cursor.fetchall())
         dct = {}
-        for category in category_lst:
-            self.__cursor.execute(f"SELECT full_name FROM {category}",)
+        for category in self.product._categories:
+            self.__cursor.execute(f"SELECT full_name FROM {category}")
             dct.update({category: tuple(x[0] for x in self.__cursor.fetchall())})
         return dct
 
