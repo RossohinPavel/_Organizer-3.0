@@ -19,7 +19,7 @@ class SettingsWindow(source.ChildWindow):
         """Отрисовка виджетов для настройки глубины проверки лога"""
         r1 = 'Рекомендуемы значения для глубины проверки: 1 - 2 папки\n'
         r2 = 'При необходимости, захватит заказы с прошлого дня\n'
-        r3 = 'Можно задать значения больше, но после первого\nсканирования рекомендуется вернуть значения по умолчанию.\n'
+        r3 = 'Можно задать больше, но после первого\nсканирования рекомендуется вернуть значения по умолчанию.\n'
         r4 = 'В особенности, это актуально для автоматического режима.'
 
         def get_entry_value():
@@ -46,22 +46,31 @@ class SettingsWindow(source.ChildWindow):
     def show_log_widgets(self, row=4):
         """Сборная ф-я для отрисовки виджетов управления логом"""
         self.show_log_mode_widgets(row)
-        self.show_orders_complete_check_widgets(row+2)
         self.show_separator(row+3)
 
     def show_log_mode_widgets(self, row):
         """Отрисовка виджетов управления режимом записи лога"""
+        def check_autolog(): check_btn.config(state='normal' if self.settings.autolog else 'disabled')
+        def select_cb(): self.settings.orders_complete_check = self.__dict__['check_complete'].get()
+
+        def select_rb():
+            self.settings.autolog = self.__dict__['log_mode'].get()
+            check_autolog()
+
         label = source.ttk.Label(master=self, text='Режим записи лога')
         label.grid(row=row, column=0, sticky='W')
         self.__dict__['log_mode'] = source.tk.BooleanVar(master=self, value=self.settings.autolog)
-        radio1 = source.ttk.Radiobutton(master=self, text='Автоматический', value=True, variable=self.__dict__['log_mode'])
+        self.__dict__['check_complete'] = source.tk.BooleanVar(master=self, value=self.settings.orders_complete_check)
+        radio1 = source.ttk.Radiobutton(master=self, text='Автоматический', command=select_rb,
+                                        value=True, variable=self.__dict__['log_mode'])
         radio1.grid(row=row+1, column=0, sticky='W')
-        radio2 = source.ttk.Radiobutton(master=self, text='Ручной', value=False, variable=self.__dict__['log_mode'])
+        radio2 = source.ttk.Radiobutton(master=self, text='Ручной', command=select_rb,
+                                        value=False, variable=self.__dict__['log_mode'])
         radio2.grid(row=row+1, column=1, sticky='W')
-
-    def show_orders_complete_check_widgets(self, row):
-        check_btn = source.ttk.Checkbutton(master=self, text='Проверка целостоности заказов')
-        check_btn.grid(row=row, column=0, sticky='W', columnspan=2)
+        check_btn = source.ttk.Checkbutton(master=self, text='Проверка целостоности заказов', command=select_cb,
+                                           variable=self.__dict__['check_complete'])
+        check_btn.grid(row=row+2, column=0, sticky='W', columnspan=2)
+        check_autolog()
 
     def show_directory_widgets(self, row=8):
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
@@ -86,22 +95,3 @@ class SettingsWindow(source.ChildWindow):
         """Отрисовка кнопки закрытия"""
         button = source.MyButton(master=self, text='Закрыть', command=self.destroy)
         button.grid(row=row, column=1, padx=1, pady=1, sticky='EW')
-
-    # def show_autolog_widget(self):
-    #     """Функция отрисовки виджета управления Автологом"""
-    #     def update_label_info():
-    #         autolog = self.parent_root.app_settings.read('autolog')
-    #         autolog_label.config(text='Автолог: Активен' if autolog else 'Автолог: Отключен')
-    #         autolog_init_bt.config(text='Отключить' if autolog else 'Включить')
-    #
-    #     def init_autolog():
-    #         Source.tkmb.showinfo('Автолог', 'Функция автолога отключена.\nПожалуйста, обновляйте лог вручную.')
-    #
-    #     frame = Source.tk.Frame(self)
-    #     autolog_label = Source.ttk.Label(frame)
-    #     autolog_label.pack(side=Source.tk.LEFT, pady=2, padx=2)
-    #     autolog_init_bt = Source.MyButton(frame, command=init_autolog, width=12)
-    #     autolog_init_bt.pack(side=Source.tk.RIGHT, padx=2, pady=2)
-    #     update_label_info()
-    #     frame.pack(fill=Source.tk.X)
-    #
