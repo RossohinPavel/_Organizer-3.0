@@ -35,21 +35,21 @@ class CellTwoButton(tk.Frame):
 class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
     def __init__(self, parent_root):
-        self.parent_root = parent_root
         super().__init__(master=parent_root)
-        self.geometry(f"+{self.parent_root.winfo_x()}+{self.parent_root.winfo_y()}")    # Предустановка в NW угол
+        self.settings = parent_root.settings    # Сохраняем ссылку на настройки
+        self.main()
+        self.resizable(False, False)
+        self.to_parent_center()
         self.focus_set()
         self.grab_set()
+
+    def main(self):
+        """Абстрактная ф-я для сборки отрисовки виджетов наследуемых окон"""
+        pass
 
     def to_parent_center(self):
         """Центрирование относительно родительского окна"""
         self.update_idletasks()
-        parent_width = self.parent_root.winfo_width()  # Получаем размер родительского окна
-        parent_height = self.parent_root.winfo_height()
-        parent_place_x = self.parent_root.winfo_x()  # Получаем положение родительского окна
-        parent_place_y = self.parent_root.winfo_y()
-        child_width = self.winfo_width()  # Размер дочернего окна
-        child_height = self.winfo_height()
-        place_x = ((parent_width - child_width) // 2) + parent_place_x
-        place_y = ((parent_height - child_height) // 2) + parent_place_y
+        place_x = ((self.master.winfo_width() - self.winfo_width()) // 2) + self.master.winfo_x()
+        place_y = ((self.master.winfo_height() - self.winfo_height()) // 2) + self.master.winfo_y()
         self.geometry(f"+{place_x}+{place_y}")

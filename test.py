@@ -1,33 +1,28 @@
-import tkinter as tk
-import threading as th
-import time
+from tkinter import *
+from tkinter import ttk
 
+root = Tk()
+root.title("METANIT.COM")
+root.geometry("250x200")
 
-start = True
+position = {"padx": 6, "pady": 6, "anchor": NW}
 
-def func(func):
-    global start
-    value = 0
-    while start:
-        value += 1
-        func(text=value)
-        time.sleep(2)
+python = "Python"
+java = "Java"
+javascript = "JavaScript"
 
+lang = StringVar(value=java)  # по умолчанию будет выбран элемент с value=java
 
-def create_child():
-    child = tk.Toplevel(root)
-    child.focus_set()
-    child.grab_set()
+header = ttk.Label(textvariable=lang)
+header.pack(**position)
 
+python_btn = ttk.Radiobutton(text=python, value=python, variable=lang)
+python_btn.pack(**position)
 
-root = tk.Tk()
-text = tk.Label(master=root, text='Some text')
-text.place(x=1, y=1)
-button = tk.Button(master=root, text='Create_child_window', command=create_child)
-button.place(x=1, y=22)
+javascript_btn = ttk.Radiobutton(text=javascript, value=javascript, variable=lang)
+javascript_btn.pack(**position)
 
-if __name__ == '__main__':
-    thr = th.Thread(target=func, args=(text.config, ))
-    thr.start()
-    root.mainloop()
-    start = False
+java_btn = ttk.Radiobutton(text=java, value=java, variable=lang)
+java_btn.pack(**position)
+
+root.mainloop()

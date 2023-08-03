@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from modules.library import Library as Lib
+from old_modules.library import Library as Lib
 
 
 def insert_test_rows():

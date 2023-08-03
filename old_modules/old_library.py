@@ -57,10 +57,8 @@ class Product:
         obj._category = cls.translator(product_name, always_eng=True)
         return obj
 
-    def __str__(self):
-        return self._category
-
     def __init__(self, *args, **kwargs):
+        print(dir(self))
         self.full_name = ''  # Обязательный и одинаковый для всех продуктов атрибут
         func_dct = {'segment': self.__get_segment,
                     'short_name': self.__get_short_name,
@@ -227,6 +225,6 @@ class Library:
 
 
 if __name__ == '__main__':
-    import modules.tests as tst
+    import old_modules.tests._old_tests as tst
 
     tst.product_test(Product)

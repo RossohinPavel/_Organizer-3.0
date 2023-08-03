@@ -1,1 +1,1 @@
-from modules.windows.main import Main as Main
+from modules.windows.main import MainWindow
