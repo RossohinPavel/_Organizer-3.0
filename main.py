@@ -11,7 +11,8 @@ def init_autolog(app_stg):
 
 if __name__ == '__main__':
     settings = modules.Settings()
-    root = modules.MainWindow(settings)
+    library = modules.Library()
+    root = modules.MainWindow(settings, library)
     if settings.autolog:
         autolog_thread = threading.Thread(target=init_autolog, args=(settings, ))
         autolog_thread.start()

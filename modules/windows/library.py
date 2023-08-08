@@ -6,6 +6,7 @@ class LibraryWindow(source.ChildWindow):
     def main(self):
         self.title('Библиотека')
         self.show_main_widget()
+        self.set_treeview_values()
 
     def show_main_widget(self):
         """Отрисовка виджетов основного меню библиотеки"""
@@ -31,3 +32,12 @@ class LibraryWindow(source.ChildWindow):
         y_leveler.grid(row=5, column=2)
         close_btn = source.MyButton(self, text='Закрыть', command=self.destroy)
         close_btn.grid(row=6, column=2, sticky='EW', rowspan=2, padx=2, pady=2)
+
+    def set_treeview_values(self):
+        """Метод для установки значений в тривью"""
+        key_index = 1
+        for key, values in self.library.get_product_headers().items():
+            self.tree.insert('', source.tk.END, iid=key_index, text=key)
+            for index, value in enumerate(values):
+                self.tree.insert(key_index, source.tk.END, iid=int(f'{key_index}{index}'), text=value, tags=key)
+            key_index += 1

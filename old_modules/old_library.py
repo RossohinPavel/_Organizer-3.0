@@ -2,31 +2,6 @@ import sqlite3
 
 
 class Library:
-    """Класс для работы с базой данных библиотеки продуктов"""
-    __instance = None
-    __db = None
-    __cursor = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-            cls.__db = sqlite3.connect('data/library.db')
-            cls.__cursor = cls.__db.cursor()
-        return cls.__instance
-
-    def __del__(self):
-        Library.__cursor = None
-        Library.__db.close()
-        Library.__instance = None
-
-    def get_product_headers(self) -> dict:
-        """Метод возвращает из базы данных имена всех продуктов. Формирует словарь: {тип: (имя1, имя2, ...)}"""
-        dct = {}
-        for category in self.product._categories:
-            self.__cursor.execute(f"SELECT full_name FROM {category}")
-            dct.update({category: tuple(x[0] for x in self.__cursor.fetchall())})
-        return dct
-
     def get_product_values(self, category: str, full_name: str) -> dict:
         """
         Метод для получения данных из бд в виде словаря

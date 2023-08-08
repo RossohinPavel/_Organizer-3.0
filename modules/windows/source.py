@@ -37,6 +37,7 @@ class ChildWindow(tk.Toplevel):
     def __init__(self, parent_root):
         super().__init__(master=parent_root)
         self.settings = parent_root.settings    # Сохраняем ссылку на настройки
+        self.library = parent_root.library      # Сохраняем ссылку на библиотеку
         self.main()             # Абстрактная ф-я, которая собирает все виджеты дочернего окна
         self.resizable(False, False)
         self.to_parent_center()

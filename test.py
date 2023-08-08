@@ -1,28 +1,20 @@
-from tkinter import *
-from tkinter import ttk
+import random
 
-root = Tk()
-root.title("METANIT.COM")
-root.geometry("250x200")
 
-position = {"padx": 6, "pady": 6, "anchor": NW}
+def test_decorator(check=False):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            res = func(*args, **kwargs)
+            if check:
+                res *= 2
+            return res
+        return wrapper
+    return decorator
 
-python = "Python"
-java = "Java"
-javascript = "JavaScript"
 
-lang = StringVar(value=java)  # по умолчанию будет выбран элемент с value=java
+@test_decorator(True)
+def test_func(some_param):
+    return some_param
 
-header = ttk.Label(textvariable=lang)
-header.pack(**position)
 
-python_btn = ttk.Radiobutton(text=python, value=python, variable=lang)
-python_btn.pack(**position)
-
-javascript_btn = ttk.Radiobutton(text=javascript, value=javascript, variable=lang)
-javascript_btn.pack(**position)
-
-java_btn = ttk.Radiobutton(text=java, value=java, variable=lang)
-java_btn.pack(**position)
-
-root.mainloop()
+print(test_func(4))

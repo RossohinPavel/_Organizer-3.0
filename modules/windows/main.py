@@ -5,16 +5,16 @@ from modules.windows.library import LibraryWindow
 
 class MainWindow(source.tk.Tk):
     """Основное окно приложения"""
-    def __init__(self, settings: object):
+    def __init__(self, settings: object, library: object):
         super().__init__()
         self.settings = settings
+        self.library = library
         self.set_main_graph_settings()
         self.show_menus()
     #     self.show_orders_files_information()
     #     self.show_processing_line()
     #     self.show_other_line()
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
-    #     self.library = Library()    # Инициализируем библиотеку
 
     @staticmethod
     def russian_hotkeys(event):

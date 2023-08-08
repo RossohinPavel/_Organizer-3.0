@@ -1,6 +1,43 @@
-__all__ = ()
+__all__ = ('Library', )
+import sqlite3
 
-import tests
+
+class Library:
+    """Класс для работы с базой данных библиотеки продуктов."""
+    __instance = None
+    __cache = {}
+    __db = 'data/library.db'
+    __timeout = 10
+
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
+    @staticmethod
+    def __safe_connect(do_commit=False):
+        """Декоратор для безопасного подключения к БД"""
+        def decorator(func):
+            def wrapper(instance, *args, **kwargs):
+                with sqlite3.connect(Library.__db, timeout=Library.__timeout) as connect:
+                    cursor = connect.cursor()
+                    res = func(instance, cursor, *args, **kwargs)
+                    if do_commit:
+                        connect.commit()
+                    return res
+
+            wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
+            return wrapper
+        return decorator
+
+    @__safe_connect()
+    def get_product_headers(self, cursor) -> dict:
+        """Метод возвращает из базы данных имена всех продуктов.\nФормирует словарь: {тип: (имя1, имя2, ...)}"""
+        dct = {}
+        for category in ProductGenerator.get_categories():
+            cursor.execute(f"SELECT full_name FROM {category}")
+            dct.update({ProductGenerator.translator(category): tuple(x[0] for x in cursor.fetchall())})
+        return dct
 
 
 class ProductGenerator:
@@ -182,6 +219,7 @@ class Product(dict):
             self['page_print_mat'] = page_print_mat
 
     def __set_photobook_canal(self, default_values):
+        """Функция для наделения бланка соответствующим категории кортежем каналов печати частей фотокниг"""
         if self.__class__.__name__ != 'Photobook':
             return
         cover_canal = page_canal = None
@@ -193,6 +231,7 @@ class Product(dict):
         self['page_canal'] = page_canal
 
     def __set_decoding_attrs(self, default_values):
+        """Функция для наделения бланка соответствующим категории атрибутами раскодировки альбомов"""
         if self.__class__.__name__ != 'Album':
             return
         dc_break = dc_overlap = dc_top_indent = dc_left_indent = None
@@ -214,4 +253,6 @@ class Subproduct(Product): pass
 
 
 if __name__ == '__main__':
+    print(dir(Library))
+    Library._Library__db = f'../{Library._Library__db}'
     tests.product_test(ProductGenerator)

@@ -2,15 +2,6 @@ import modules.windows.source as source
 
 
 class LibraryWindow(source.ChildWindow):
-    def set_treeview_values(self):
-        """Метод для установки значений в тривью"""
-        key_index = 1
-        for key, values in self.library.get_product_headers().items():
-            self.tree.insert('', source.tk.END, iid=key_index, text=self.library.product.translator(key))
-            for index, value in enumerate(values):
-                self.tree.insert(key_index, source.tk.END, iid=int(f'{key_index}{index}'), text=value, tags=key)
-            key_index += 1
-
     def clear_treeview(self):
         """Очитска тривью от содержимого"""
         for i in self.tree.get_children(''):
