@@ -17,9 +17,9 @@ class SettingsWindow(source.ChildWindow):
 
     def show_log_check_depth_widgets(self, row=0):
         """Отрисовка виджетов для настройки глубины проверки лога"""
-        r1 = 'Рекомендуемы значения для глубины проверки: 1 - 2 папки\n'
+        r1 = 'Рекомендуемые значения для глубины проверки: 1 - 2 папки\n'
         r2 = 'При необходимости, захватит заказы с прошлого дня\n'
-        r3 = 'Можно задать больше, но после первого\nсканирования рекомендуется вернуть значения по умолчанию.\n'
+        r3 = 'Можно задать больше, но после первого сканирования\nрекомендуется вернуть значения по умолчанию.\n'
         r4 = 'В особенности, это актуально для автоматического режима.'
 
         def get_entry_value():
@@ -40,7 +40,7 @@ class SettingsWindow(source.ChildWindow):
         button = source.MyButton(master=self, text='Задать', command=get_entry_value)
         button.grid(row=row+1, column=1, sticky='EW', padx=1)
         info_label = source.ttk.Label(master=self, text=r1 + r2 + r3 + r4)
-        info_label.grid(row=row+2, column=0, columnspan=2)
+        info_label.grid(row=row+2, column=0, columnspan=2, sticky='W')
         self.show_separator(row=row+3)
 
     def show_log_widgets(self, row=4):

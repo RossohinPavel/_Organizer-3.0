@@ -1,5 +1,6 @@
 import modules.windows.source as source
 from modules.windows.settings import SettingsWindow
+from modules.windows.library import LibraryWindow
 
 
 class MainWindow(source.tk.Tk):
@@ -33,7 +34,7 @@ class MainWindow(source.tk.Tk):
         """Отрисовка и инициализация менюшек"""
         main_menu = source.tk.Menu()
         main_menu.add_command(label="Настройки", command=lambda: SettingsWindow(self))
-        main_menu.add_command(label='Библиотека', command=lambda: print('None'))
+        main_menu.add_command(label='Библиотека', command=lambda: LibraryWindow(self))
         main_menu.add_command(label='Информация', command=lambda: print('None'))
         self.config(menu=main_menu)
 
