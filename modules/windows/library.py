@@ -52,15 +52,13 @@ class LibraryWindow(source.ChildWindow):
         :param module: 'add', 'copy', 'change' или 'delete'
         :return: Функцию, соответствующую module
         """
-        funcs = {'add': lambda *args: print(args), 'copy': lambda *args: print(args),
-                 'change': lambda *args: print(args), 'delete': self.__delete_from_lib}
-
         def wrapper():
             index = self.tree.selection()
             if not index or module != 'add' and len(index[0]) < 2:
                 source.tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
                 return
-            funcs[module](*self.convert_item(module, self.tree.item(index[0])))
+            args = self.convert_item(module, self.tree.item(index[0]))
+            AssistWindow(self, module, *args) if module != 'delete' else self.__delete_from_lib(*args)
             self.clear_treeview()
             self.set_treeview_values()
         return wrapper
@@ -82,10 +80,116 @@ class LibraryWindow(source.ChildWindow):
 
 
 class AssistWindow(source.ChildWindow):
+    """Конструктор вспомогательных окон библиотеки"""
+    __FRAMES = {'full_name': ('entry', 'Введите полное имя продукта', 2, 0, {'width': 80}),
+                'segment': ('radio', 'Выберите сегмент продукции', 2, 41),
+                'short_name': ('combo', 'Выберите короткое имя', 2, 82),
+                'product_format': ('combo', 'Выберите формат продукта', 2, 123),
+                'book_option': ('radio', 'Выберите опции сборки книги', 250, 82),
+                'lamination': ('radio', 'Выберите ламинацию для продукта', 250, 41),
+                'cover_type': ('radio', 'Выберите тип обложки', 2, 169),
+                'carton_length': ('entry', 'Укажите ДЛИННУ и ВЫСОТУ картонки', 252, 169, {'width': 18}),
+                'carton_height': ('entry', None, 372, 169, {'width': 18}),
+                'cover_clapan': ('combo', 'Укажите значения КЛАПАНА и ШАРНИРА', 252, 210, {'width': 15}),
+                'cover_joint': ('combo', None, 372, 210, {'width': 15}),
+                'cover_print_mat': ('combo', 'Выберите печатный материал обложки', 2, 255),
+                'page_print_mat': ('combo', 'Выберите печатный материал разворотов', 250, 255),
+                'cover_canal': ('combo', "Выберите 'канал' обложки", 2, 300),
+                'page_canal': ('combo', "Выберите 'канал' разворотов", 250, 300),
+                'dc_top_indent': ('entry', 'Введите значение отступа СВЕРХУ в мм', 2, 300),
+                'dc_left_indent': ('entry', 'Введите значение отступа СЛЕВА в мм', 2, 341),
+                'dc_overlap': ('entry', 'НАХЛЕСТ для переплета в мм', 250, 300),
+                'dc_break': ('check', 'Раскодировка с разрывом', 250, 355)
+                }
+
+    def __init__(self, parent_root, module, category, product=''):
+        self.module = module
+        self.category = category
+        self.product = product
+        self.prd_dct = None
+        super().__init__(parent_root)
+
     def main(self):
-        pass
+        self.prd_dct = self.library.product_gen(self.category, True)
+        self.show_header()
+        self.show_main_widgets()
+        self.show_buttons()
 
+    def show_header(self):
+        """Изменение заголовка окна и отрисовка головного виджета"""
+        st = {'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module]
+        self.title(st)
+        frame = source.tk.Frame(self)
+        label1 = source.ttk.Label(frame, text=st + ' в категорию:' if self.module != 'change' else st + ' в категории:')
+        label1.pack(side='left', padx=2, pady=2)
+        label2 = source.ttk.Label(frame, text=self.category, relief='solid', justify='center')
+        label2.pack(side='right', padx=2, pady=2, ipadx=2, ipady=2)
+        frame.pack()
+        separator = source.tk.Frame(self, width=487, height=1, bg='black')
+        separator.pack(padx=2)
 
-class AddToLibWindow(AssistWindow):
-    pass
+    def show_main_widgets(self):
+        """Отображает менюшки на self.product_menus_frame согласно выбранному продукту"""
+        frame = source.tk.Frame(self, height=385)
+        funcs = {'entry': self.__show_entry_frame, 'radio': self.__show_radio_frame,
+                 'combo': self.__show_combobox_frame, 'check': self.__show_check_frame}
+        for x, y in ((0, 167), (0, 254), (0, 299)):       # Рисуем разделители для отделения тематических блоков
+            separator = source.tk.Frame(frame, width=496, height=1, bg='black')
+            separator.place(x=x, y=y)
+        for key, values in self.prd_dct.items():
+            current_frame, *args = self.__FRAMES[key]
+            kwargs = {'values': values}
+            if isinstance(args[-1], dict):
+                kwargs.update(args[-1])
+                args = args[:-1]
+            funcs[current_frame](key, frame, *args, **kwargs)
+        frame.pack(expand=True, fill='both')
 
+    def show_buttons(self):
+        """Функция для отрисовки кнопок"""
+        frame = source.tk.Frame(self, width=487, height=30)
+        func_button = source.MyButton(frame, text='text', width=30, command=None)
+        func_button.place(x=140, y=2)
+        close_button = source.MyButton(frame, text='Закрыть', width=10, command=self.destroy)
+        close_button.place(x=407, y=2)
+        frame.pack()
+
+    @staticmethod
+    def __show_label(container, text, x, y):
+        """Конструктор текстового лейбла"""
+        if text:
+            label = source.ttk.Label(master=container, text=text)
+            label.place(x=x, y=y)
+
+    def __show_entry_frame(self, key, container, text, x, y, **kwargs):
+        """Конструктор фрейма для отрисовки Entry виджета"""
+        self.__show_label(container, text, x, y)
+        self.prd_dct[key] = source.tk.StringVar(master=container)
+        entry = source.ttk.Entry(master=container, width=kwargs.get('width', 39), textvariable=self.prd_dct[key],
+                                 state='disabled' if key == 'full_name' and self.module == 'change' else 'normal')
+        entry.place(x=x, y=y+20)
+
+    def __show_radio_frame(self, key, container, text, x, y, **kwargs):
+        """Конструктор для отрисовки Радио-баттон-фреймов"""
+        self.__show_label(container, text, x, y)
+        self.prd_dct[key] = source.tk.StringVar(master=container, value=kwargs['values'][0])
+        indent = {'segment': ((0, 20), (80, 20)), 'cover_type': ((0, 20), (0, 40), (0, 60), (80, 20), (80, 40)),
+                  'book_option': ((0, 20), (50, 20), (100, 20)), 'lamination': ((0, 20), (50, 20), (100, 20))}[key]
+        for i, name in enumerate(kwargs['values']):
+            i_x, i_y = indent[i]
+            x_pos, y_pos = x + i_x, y + i_y
+            radio = source.ttk.Radiobutton(master=container, text=name, value=name, variable=self.prd_dct[key])
+            radio.place(x=x_pos, y=y_pos)
+
+    def __show_combobox_frame(self, key, container, text, x, y, **kwargs):
+        """Конструктор фрейма для отрисовки Комбобокс виджета"""
+        self.__show_label(container, text, x, y)
+        self.prd_dct[key] = source.ttk.Combobox(master=container, width=kwargs.get('width', 36),
+                                                state='readonly', values=kwargs['values'])
+        self.prd_dct[key].place(x=x, y=y+20)
+
+    def __show_check_frame(self, key, container, text, x, y, **kwargs):
+        """Конструктор для отрисовки чек фреймов"""
+        self.prd_dct[key] = source.tk.BooleanVar(master=container)
+        check_btn = source.ttk.Checkbutton(master=container, text=text, variable=self.prd_dct[key])
+        check_btn.place(x=x, y=y)

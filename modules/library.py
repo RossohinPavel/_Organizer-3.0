@@ -187,7 +187,7 @@ class Product(dict):
         cover_canal = page_canal = None
         if default_values:
             cover_canal = ('160', '161', '162', '163', '164', '165', '166', '204', '205', '214', '240', '242', '243',
-                           '245', '266', '36', 'ORAJET', 'POLI')
+                           '245', '266', '36', 'POLI')
             page_canal = ('201', '214', '203', '204', '205', '207', '275', '274', '276', '271')
         self['cover_canal'] = cover_canal
         self['page_canal'] = page_canal
@@ -246,7 +246,6 @@ class Library:
     @classmethod
     def __cache_clearing(cls, full_name: str):
         """Очищаем кэш от изменившихся или удаленных из БД продуктов"""
-        print('сработал метод очистки кэша')
         if full_name in cls.__cache:
             del cls.__cache[full_name]
 
