@@ -1,6 +1,3 @@
-import sqlite3
-
-
 class Library:
     def get_product_values(self, category: str, full_name: str) -> dict:
         """
@@ -44,13 +41,4 @@ class Library:
         """
         sql_req = ', '.join(f'{k} = \"{v}\"' if type(v) == str else f'{k} = {v}' for k, v in values.items())
         self.__cursor.execute(f'UPDATE {category} SET {sql_req} WHERE full_name=\'{full_name}\'')
-        self.__db.commit()
-
-    def delete(self, category: str, full_name: str):
-        """
-        Метод для удаления продукта из библиотеки.
-        :param category: Категория продукта / название таблицы
-        :param full_name: Имя продукта
-        """
-        self.__cursor.execute(f'DELETE FROM {category} WHERE full_name=\'{full_name}\'')
         self.__db.commit()

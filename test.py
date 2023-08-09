@@ -1,18 +1,22 @@
 import random
 
 
-def test_decorator(check=False):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            res = func(*args, **kwargs)
-            if check:
-                res *= 2
-            return res
-        return wrapper
-    return decorator
+def dec1(func):
+    def wrapper(param):
+        print('Вызов декоратора 1: я проверяю кеш')
+        return func(param)
+    return wrapper
 
 
-@test_decorator(True)
+def dec2(func):
+    def wrapper(param):
+        print('Вызов декоратора 2Ж я подключаюсь к базе данных')
+        return func(param)
+    return wrapper
+
+
+@dec1
+@dec2
 def test_func(some_param):
     return some_param
 

@@ -2,44 +2,6 @@ __all__ = ('Library', )
 import sqlite3
 
 
-class Library:
-    """Класс для работы с базой данных библиотеки продуктов."""
-    __instance = None
-    __cache = {}
-    __db = 'data/library.db'
-    __timeout = 10
-
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
-
-    @staticmethod
-    def __safe_connect(do_commit=False):
-        """Декоратор для безопасного подключения к БД"""
-        def decorator(func):
-            def wrapper(instance, *args, **kwargs):
-                with sqlite3.connect(Library.__db, timeout=Library.__timeout) as connect:
-                    cursor = connect.cursor()
-                    res = func(instance, cursor, *args, **kwargs)
-                    if do_commit:
-                        connect.commit()
-                    return res
-
-            wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
-            return wrapper
-        return decorator
-
-    @__safe_connect()
-    def get_product_headers(self, cursor) -> dict:
-        """Метод возвращает из базы данных имена всех продуктов.\nФормирует словарь: {тип: (имя1, имя2, ...)}"""
-        dct = {}
-        for category in ProductGenerator.get_categories():
-            cursor.execute(f"SELECT full_name FROM {category}")
-            dct.update({ProductGenerator.translator(category): tuple(x[0] for x in cursor.fetchall())})
-        return dct
-
-
 class ProductGenerator:
     """Генерирует бланк (на основе dict) соответствующий той или иной категории продукта, которая была указана при
     инициализации.
@@ -252,7 +214,65 @@ class Canvas(Product): pass
 class Subproduct(Product): pass
 
 
-if __name__ == '__main__':
-    print(dir(Library))
-    Library._Library__db = f'../{Library._Library__db}'
-    tests.product_test(ProductGenerator)
+class Library:
+    """Класс для работы с базой данных библиотеки продуктов."""
+    __instance = None
+    __cache = {}
+    __db = 'data/library.db'
+    __timeout = 10
+    product_gen = ProductGenerator
+
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
+    @staticmethod
+    def __safe_connect(do_commit=False):
+        """Декоратор для безопасного подключения к БД"""
+        def decorator(func):
+            def wrapper(instance, *args, **kwargs):
+                with sqlite3.connect(Library.__db, timeout=Library.__timeout) as connect:
+                    cursor = connect.cursor()
+                    res = func(instance, cursor, *args, **kwargs)
+                    if do_commit:
+                        connect.commit()
+                    return res
+
+            wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
+            return wrapper
+        return decorator
+
+    @classmethod
+    def __cache_clearing(cls, full_name: str):
+        """Очищаем кэш от изменившихся или удаленных из БД продуктов"""
+        print('сработал метод очистки кэша')
+        if full_name in cls.__cache:
+            del cls.__cache[full_name]
+
+    @__safe_connect()
+    def get_product_headers(self, cursor) -> dict:
+        """Метод возвращает из базы данных имена всех продуктов.\nФормирует словарь: {тип: (имя1, имя2, ...)}"""
+        dct = {}
+        for category in self.product_gen.get_categories():
+            cursor.execute(f"SELECT full_name FROM {category}")
+            dct.update({ProductGenerator.translator(category): tuple(x[0] for x in cursor.fetchall())})
+        return dct
+
+    @__safe_connect(True)
+    def delete(self, cursor, category: str, full_name: str):
+        """
+        Метод для удаления продукта из библиотеки.
+        :param cursor: Ссылка на объект cursor базы данных
+        :param category: Категория продукта / название таблицы
+        :param full_name: Имя продукта
+        """
+        cursor.execute(f'DELETE FROM {self.product_gen.translator(category, True)} WHERE full_name=\'{full_name}\'')
+        self.__cache_clearing(full_name)
+
+
+
+# if __name__ == '__main__':
+#     print(dir(Library))
+#     Library._Library__db = f'../{Library._Library__db}'
+#     tests.product_test(ProductGenerator)
