@@ -1,17 +1,15 @@
 import sqlite3
 import os
-from old_modules.library import Library as Lib
+from modules.library import Library as Lib
 
 
 def insert_test_rows():
     with sqlite3.connect('../data/library.db') as lib:
         cursor = lib.cursor()
-        for category in Lib.product._categories:
+        for category in Lib.product_gen.get_categories():
             keys = []
             values = []
-            for k, v in Lib.product(category).__dict__.items():
-                if k.startswith('_'):
-                    continue
+            for k, v in Lib.product_gen(category, True).items():
                 if k == 'full_name':
                     v = f'{category}_test'
                 if type(v) == tuple:

@@ -56,9 +56,12 @@ class Product(dict):
         self.__set_photobook_canal(default_values)
         self.__set_decoding_attrs(default_values)
 
+    def category(self) -> str:
+        """Возвращает сроку - категорию продукта"""
+        return self.__class__.__name__
+
     def __str__(self) -> str:
-        class_name = self.__class__.__name__ + '{'
-        return class_name + f'\n{" " * len(class_name)}'.join(f'{k}: {v}' for k, v in self.items()) + '}'
+        return self.category() + '{' + f'\n{" " * len(self.category())}'.join(f'{k}: {v}' for k, v in self.items()) + '}'
 
     def __set_full_name(self, default_values):
         """Установка полного имени продукта"""
@@ -243,22 +246,40 @@ class Library:
             return wrapper
         return decorator
 
+    @staticmethod
+    def __cached(cache):
+        """Декоратор для кэширования возврата значений из БД"""
+        def decorator(func):
+            def wrapper(instance, category, full_name):
+                if full_name not in cache:
+                    cache[full_name] = func(instance, category, full_name)
+                return cache[full_name]
+            wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
+            return wrapper
+        return decorator
+
     @classmethod
-    def __cache_clearing(cls, full_name: str):
+    def __cache_clearing(cls, *args):
         """Очищаем кэш от изменившихся или удаленных из БД продуктов"""
-        if full_name in cls.__cache:
-            del cls.__cache[full_name]
+        for name in args:
+            if name in cls.__cache:
+                del cls.__cache[name]
 
-    @__safe_connect()
-    def get_product_headers(self, cursor) -> dict:
+    def get_product_headers(self) -> dict:
         """Метод возвращает из базы данных имена всех продуктов.\nФормирует словарь: {тип: (имя1, имя2, ...)}"""
-        dct = {}
-        for category in self.product_gen.get_categories():
-            cursor.execute(f"SELECT full_name FROM {category}")
-            dct.update({ProductGenerator.translator(category): tuple(x[0] for x in cursor.fetchall())})
-        return dct
+        missing = tuple(cat for cat in self.product_gen.get_categories() if cat not in self.__cache)
+        if missing:
+            self.__update_cache_with_product_headers(missing)   # Аргумент курсор подставит декоратор
+        return {k: self.__cache[k] for k in self.product_gen.get_categories()}
 
-    @__safe_connect(True)
+    @__safe_connect(do_commit=False)
+    def __update_cache_with_product_headers(self, cursor, missing):
+        """Вспомогательная ф-я для get_product_headers.\nНаполняет кэш заголовками, если их нет в нем"""
+        for category in missing:
+            cursor.execute(f"SELECT full_name FROM {category}")
+            self.__cache.update({category: tuple(x[0] for x in cursor.fetchall())})
+
+    @__safe_connect(do_commit=True)
     def delete(self, cursor, category: str, full_name: str):
         """
         Метод для удаления продукта из библиотеки.
@@ -267,11 +288,59 @@ class Library:
         :param full_name: Имя продукта
         """
         cursor.execute(f'DELETE FROM {self.product_gen.translator(category, True)} WHERE full_name=\'{full_name}\'')
-        self.__cache_clearing(full_name)
+        self.__cache_clearing(category, full_name)
 
+    @__cached(__cache)
+    @__safe_connect(do_commit=False)
+    def get_product_values(self, cursor, category: str, full_name: str) -> dict:
+        """
+        Метод для получения данных из бд в виде словаря
+        :param cursor: Ссылка на объект cursor базы данных
+        :param category: Категория продукта / название таблицы
+        :param full_name: Имя продукта
+        """
+        keys = tuple(self.product_gen(category).keys())
+        sql_req = ', '.join(f'\"{x}\"' for x in keys)
+        cursor.execute(f'SELECT {sql_req} FROM {self.product_gen.translator(category)} WHERE full_name=\'{full_name}\'')
+        values = cursor.fetchone()
+        return {keys[i]: values[i] for i in range(len(keys))}
+
+    @__safe_connect(do_commit=False)
+    def check_unique(self, cursor, category: str, full_name: str) -> bool:
+        """
+        Метод для проверки продукта на дубликат.
+        :param cursor: Ссылка на объект cursor базы данных
+        :param category: Категория продукта / название таблицы
+        :param full_name: Имя продукта
+        :return: True если продукта нет в бд и False, если есть.
+        """
+        cursor.execute(f'SELECT * FROM {category} WHERE full_name=\'{full_name}\'')
+        return not cursor.fetchone()
+
+    @__safe_connect(do_commit=True)
+    def change(self, cursor, prd_dct: dict):
+        """
+        Внесение изменений в ячейку
+        :param cursor:  сылка на объект cursor базы данных
+        :param prd_dct: Словарь с параметрами продукта
+        """
+        sql_req = ', '.join(f'{k} = \"{v}\"' if type(v) == str else f'{k} = {v}' for k, v in prd_dct.items())
+        cursor.execute(f'UPDATE {prd_dct.category()} SET {sql_req} WHERE full_name=\'{prd_dct["full_name"]}\'')
+        self.__cache_clearing(prd_dct["full_name"])
+
+    @__safe_connect(do_commit=True)
+    def add(self, cursor, prd_dct: dict):
+        """
+        Метод добавления продукта в библиотеку
+        :param cursor:  сылка на объект cursor базы данных
+        :param product_dict: Словарь с сформированными значениями
+        """
+        keys = ', '.join(f'{x}' for x in prd_dct.keys())
+        values = ', '.join(f'\'{x}\'' if type(x) == str else f'{x}' for x in prd_dct.values())
+        cursor.execute(f'INSERT INTO {prd_dct.category()} ({keys}) VALUES ({values})')
+        self.__cache_clearing(prd_dct.category())
 
 
 # if __name__ == '__main__':
-#     print(dir(Library))
 #     Library._Library__db = f'../{Library._Library__db}'
-#     tests.product_test(ProductGenerator)
+
