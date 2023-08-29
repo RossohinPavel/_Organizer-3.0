@@ -1,20 +1,21 @@
 import modules
-import threading
+import threading as th
 import time
 
 
-def init_autolog(app_stg):
-    while app_stg.is_alive:
-        print('i am autolog')
-        time.sleep(2)
+def init_autolog():
+    while settings.is_alive:
+        monitor.run()
+        time.sleep(4)
 
 
 if __name__ == '__main__':
     settings = modules.Settings()
     library = modules.Library()
-    root = modules.MainWindow(settings, library)
+    monitor = modules.Monitor(settings)
+    root = modules.MainWindow(settings, library, monitor)
     if settings.autolog:
-        autolog_thread = threading.Thread(target=init_autolog, args=(settings, ))
-        autolog_thread.start()
+        th1 = th.Thread(target=init_autolog)
+        th1.start()
     root.mainloop()
     settings.is_alive = False
