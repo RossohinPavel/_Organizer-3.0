@@ -50,12 +50,10 @@ class SettingsWindow(source.ChildWindow):
 
     def show_log_mode_widgets(self, row):
         """Отрисовка виджетов управления режимом записи лога"""
-        def check_autolog(): check_btn.config(state='normal' if self.settings.autolog else 'disabled')
         def select_cb(): self.settings.orders_complete_check = self.__dict__['check_complete'].get()
 
         def select_rb():
             self.settings.autolog = self.__dict__['log_mode'].get()
-            check_autolog()
 
         label = source.ttk.Label(master=self, text='Режим записи лога')
         label.grid(row=row, column=0, sticky='W')
@@ -70,7 +68,6 @@ class SettingsWindow(source.ChildWindow):
         check_btn = source.ttk.Checkbutton(master=self, text='Проверка целостоности заказов', command=select_cb,
                                            variable=self.__dict__['check_complete'])
         check_btn.grid(row=row+2, column=0, sticky='W', columnspan=2)
-        check_autolog()
 
     def show_directory_widgets(self, row=8):
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""

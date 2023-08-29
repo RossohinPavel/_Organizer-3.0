@@ -1,24 +1,11 @@
-import random
+import tkinter as tk
 
 
-def dec1(func):
-    def wrapper(param):
-        print('Вызов декоратора 1: я проверяю кеш')
-        return func(param)
-    return wrapper
+root = tk.Tk()
+root.geometry('100x100')
+
+txt = tk.Label(master=root, text='text')
+txt.pack(anchor='center', expand=1)
 
 
-def dec2(func):
-    def wrapper(param):
-        print('Вызов декоратора 2Ж я подключаюсь к базе данных')
-        return func(param)
-    return wrapper
-
-
-@dec1
-@dec2
-def test_func(some_param):
-    return some_param
-
-
-print(test_func(4))
+root.mainloop()
