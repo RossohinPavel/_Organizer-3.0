@@ -2,83 +2,103 @@ import threading
 import time
 
 
-class Task:
-    def __init__(self, func, args=None, kwargs=None):
-        self.func = func
-        self.args = args if args else ()
-        self.kwargs = kwargs if kwargs else {}
+class Task(threading.Thread):
+    def __init__(self, group=None, target=None, name=None, parallels=True, callback=None, args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+        super().__init__(group=group, target=target, name=name, args=args, kwargs=kwargs)
+        self.parallels = parallels
+        self.callback = callback
         self.status = 'created'
-        self._thread = None
+
+    def __run_callback(self):
+        if self.callback:
+            self.callback()
 
     def run(self):
-        if self._thread is None:
-            self.status = 'in_progress'
-            self._thread = threading.Thread(target=self.func, args=self.args, kwargs=self.kwargs)
-            self._thread.start()
-        self.after_run()
-
-    def after_run(self): pass
-
-    def __bool__(self):
-        return self.status != 'finished'
-
-
-class ParallelTask(Task):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__delay = 5
-        self.__timer = self.__delay
-
-    def after_run(self):
-        if self.__timer > 0:
-            self.__timer -= 1
-        elif self.__timer <= 0 and not self._thread.is_alive():
-            self._thread = None
-            self.__timer = self.__delay
-
-
-class ConsistentTask(Task):
-    def after_run(self):
-        if not self._thread.is_alive():
-            self.status = 'finished'
-
+        self.status = 'in_progress'
+        self.__run_callback()
+        super().run()
+        self.__run_callback()
+        self.status = 'finished'
+        
 
 class IPlanner:
-    __alive = False
+    __instance = None
+    __alive = True
+    __lock = False
+    __main_thread = None
+    __queue = []
+    __loop = []
 
-    def __init__(self):
-        self._queue = []
-        self.__thread = threading.Thread(target=self.__run_main_thread)
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+            cls.__main_thread = threading.Thread(target=cls.__run_main_thread)
+            cls.__main_thread.start()
+        return cls.__instance
 
-    def __run_main_thread(self):
-        while self.__alive:
-            for task in self._queue:
-                task.run()
-                if not task:
-                    self._queue.remove(task)
-            time.sleep(1)
+    @classmethod
+    def __run_main_thread(cls):
+        while cls.__alive:
+            start = time.time()
+            cls.__check_loop_tasks()
+            cls.__init_queue_tasks()
+            cls.__clear_queue()
+            time.sleep(1 - (time.time() - start))
 
-    def reg(self, func, args=None, kwargs=None, parallels=False):
-        if parallels:
-            self._queue.append(ParallelTask(func, args, kwargs))
-        else:
-            self._queue.append(ConsistentTask(func, args, kwargs))
-        if not self.__alive:
-            self.__alive = True
-            self.__thread.start()
+    @classmethod
+    def _lock_cb(cls):
+        cls.__lock = not cls.__lock
+        
+    @classmethod
+    def __check_loop_tasks(cls):
+        pass
 
-    def kill(self):
-        self.__alive = False
+    @classmethod
+    def __init_queue_tasks(cls):
+        for task in cls.__queue:
+            if task.status == 'created' and (task.parallels or (not task.parallels and not cls.__lock)):
+                task.start()
+                    
+    @classmethod
+    def __clear_queue(cls):
+        print(cls.__queue)
+        if not cls.__queue:
+            return
+        ind = 0
+        while ind < len(cls.__queue):
+            if cls.__queue[ind].status == 'finished':
+                del cls.__queue[ind]
+            else:
+                ind += 1
 
+    @classmethod
+    def kill(cls):
+        print(cls.__queue)
+        cls.__alive = False
+
+    @classmethod
+    def reg_task(cls, func, parallels=True, args=(), kwargs=None):
+        callback = None
+        if not parallels:
+            callback = IPlanner._lock_cb
+        cls.__queue.append(Task(target=func, parallels=parallels, callback=callback, args=args, kwargs=kwargs))
+
+    @classmethod
+    def reg_loop(self, func, timer=0, args=None, kwargs=None, parallels=True):
+        pass
+
+def test_func():
+    print('start')
+    time.sleep(2)
+    print('end')
 
 planer = IPlanner()
-
-planer.reg(print, ('Я принтуюсь каждые 5 секунд', ), parallels=True)
-planer.reg(print, ('Я должен принтануться всего 1 раз', ))
+time.sleep(1)
+planer.reg_task(func=print, args=('\n1 time print', ))
+planer.reg_task(func=test_func, parallels=False)
+planer.reg_task(func=print, args=('\n1 time print', ))
+planer.reg_task(func=test_func, parallels=False)
 time.sleep(10)
-planer.reg(print, ('Я должен принтануться всего 1 раз', ))
-print(planer._queue)
-time.sleep(5)
-print(planer._queue)
-time.sleep(6)
 planer.kill()
