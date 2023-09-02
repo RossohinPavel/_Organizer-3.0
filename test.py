@@ -2,26 +2,8 @@ import threading
 import time
 
 
-class Task(threading.Thread):
-    def __init__(self, group=None, target=None, name=None, parallels=True, callback=None, args=(), kwargs=None):
-        if kwargs is None:
-            kwargs = {}
-        super().__init__(group=group, target=target, name=name, args=args, kwargs=kwargs)
-        self.parallels = parallels
-        self.callback = callback
-        self.status = 'created'
+__all__ = ('IPlanner', 'CallBack')
 
-    def __run_callback(self):
-        if self.callback:
-            self.callback()
-
-    def run(self):
-        self.status = 'in_progress'
-        self.__run_callback()
-        super().run()
-        self.__run_callback()
-        self.status = 'finished'
-        
 
 class IPlanner:
     __instance = None
@@ -50,10 +32,21 @@ class IPlanner:
     @classmethod
     def _lock_cb(cls):
         cls.__lock = not cls.__lock
+
+
+    @staticmethod
+    def __check_callbacks(callbacks):
+        if not isinstance(callbacks, tuple):
+            callbacks = (callbacks, )
+        for call in callbacks:
+            if not isinstance(call, CallBack):
+                raise Exception(f'Функция {call} не обернута в CallBack')
+        return callbacks
         
     @classmethod
     def __check_loop_tasks(cls):
-        pass
+        for loop in cls.__loop:
+            loop()
 
     @classmethod
     def __init_queue_tasks(cls):
@@ -63,7 +56,6 @@ class IPlanner:
                     
     @classmethod
     def __clear_queue(cls):
-        print(cls.__queue)
         if not cls.__queue:
             return
         ind = 0
@@ -75,30 +67,76 @@ class IPlanner:
 
     @classmethod
     def kill(cls):
-        print(cls.__queue)
         cls.__alive = False
 
     @classmethod
-    def reg_task(cls, func, parallels=True, args=(), kwargs=None):
-        callback = None
+    def reg_task(cls, func, parallels=True, callbacks=(), args=(), kwargs=None):
+        if kwargs is None:
+            kwargs = {}
+        callbacks = cls.__check_callbacks(callbacks)
         if not parallels:
-            callback = IPlanner._lock_cb
-        cls.__queue.append(Task(target=func, parallels=parallels, callback=callback, args=args, kwargs=kwargs))
+            callbacks = (CallBack(cls._lock_cb), *callbacks)
+        cls.__queue.append(Task(target=func, args=args, kwargs=kwargs, parallels=parallels, callbacks=callbacks))
 
     @classmethod
-    def reg_loop(self, func, timer=0, args=None, kwargs=None, parallels=True):
-        pass
+    def reg_loop(cls, func, timer=0, parallels=True,  callbacks=(), args=(), kwargs=None):
+        cls.__loop.append(Loop(func, timer, parallels, callbacks, args, kwargs))        
 
-def test_func():
-    print('start')
-    time.sleep(2)
-    print('end')
 
-planer = IPlanner()
-time.sleep(1)
-planer.reg_task(func=print, args=('\n1 time print', ))
-planer.reg_task(func=test_func, parallels=False)
-planer.reg_task(func=print, args=('\n1 time print', ))
-planer.reg_task(func=test_func, parallels=False)
-time.sleep(10)
-planer.kill()
+class CallBack:
+    __slots__ = 'func', 'pos', 'args', 'kwargs'
+    
+    def __init__(self, func, pos='both', args=(), kwargs=None):
+        self.func = func
+        self.pos = self.__get_position(pos)
+        self.args = args
+        self.kwargs = kwargs if kwargs else {}
+
+    @staticmethod
+    def __get_position(pos):
+        if pos not in ('both', 'before', 'after'):
+            pos = ()
+        return ('before', 'after') if pos == 'both' else (pos, )
+
+    def __call__(self, pos):
+        if pos in self.pos:
+            self.func(*self.args, **self.kwargs)
+
+
+class Loop:
+    __reg_func = IPlanner.reg_task
+    __slots__ = ('func', 'timer', '__delay', 'parallels', 'callbacks', 'args', 'kwargs')
+    
+    def __init__(self, func, timer, parallels, callbacks, args, kwargs):
+        self.func = func
+        self.timer = timer
+        self.__delay = 0
+        self.parallels = parallels
+        self.callbacks = callbacks
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self):
+        if self.__delay == 0:
+            self.__delay = self.timer
+            self.__reg_func(self.func, self.parallels, self.callbacks, self.args, self.kwargs)
+        self.__delay -= 1
+
+
+class Task(threading.Thread):
+    def __init__(self, target, args, kwargs, parallels, callbacks, group=None, name=None):
+        super().__init__(group=group, target=target, name=name, args=args, kwargs=kwargs)
+        self.parallels = parallels
+        self.status = 'created'
+        self.callback = callbacks
+        
+    def __run_callback(self, pos):
+        for call in self.callback:
+            call(pos)
+
+    def run(self):
+        self.status = 'in_progress'
+        self.__run_callback('before')
+        super().run()
+        self.__run_callback('after')
+        self.status = 'finished'
