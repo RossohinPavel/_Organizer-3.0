@@ -4,7 +4,6 @@ import pickle
 
 class Settings:
     """Предоставляет доступ к настройкам и сохраняет их текущие значения:
-    - is_alive - Используется вторым потоком для проверки существования основного
     - autolog - Инициализация записи лога файлов в автоматическом режиме
     - log_check_depth - Глубина проверки лога в днях (папках)
     - orders_complete_check - При автоматическом логе, проверка целостности заказа (копирование файлов)
@@ -16,7 +15,6 @@ class Settings:
     __instance = None
     __stored = {'autolog': False, 'log_check_depth': 1, 'orders_complete_check': False,
                 'z_disc': '', 'o_disc': '', 't_disc': ''}
-    __operational = {'is_alive': True}
 
     def __new__(cls):
         if cls.__instance is None:
@@ -39,15 +37,11 @@ class Settings:
     def __getattr__(self, item):
         if item in self.__stored:
             return self.__stored[item]
-        if item in self.__operational:
-            return self.__operational[item]
         raise AttributeError(f'Атрибута {item} нет в настройках')
 
     def __setattr__(self, key, value):
         if not isinstance(value, type(getattr(self, key))):
             raise ValueError(f'Неправильный тип устанавливаемого значения {value} для атрибута {key}')
-        if key in self.__operational:
-            self.__operational[key] = value
         if key in self.__stored:
             self.__stored[key] = value
             self.__update_settings()
