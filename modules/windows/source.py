@@ -13,7 +13,7 @@ class MyButton(tk.Button):
 class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
     def __init__(self, parent_root):
-        self.modules = parent_root.modules  # Сохраняем ссылку на модули программы
+        self.app_m = parent_root.app_m  # Сохраняем ссылку на модули программы
         super().__init__(master=parent_root)
         self.main()             # Абстрактная ф-я, которая собирает все виджеты дочернего окна
         self.resizable(False, False)

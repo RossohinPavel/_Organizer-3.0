@@ -1,5 +1,5 @@
-import threading
-import time
+from threading import Thread, Lock
+from time import time as t_time, sleep as t_sleep
 
 
 __all__ = ('IPlanner', )
@@ -9,7 +9,7 @@ class IPlanner:
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
     __instance = None
     __loops = []
-    __lock = threading.Lock()
+    __lock = Lock()
 
     def __new__(cls):
         if cls.__instance is None:
@@ -33,7 +33,7 @@ class IPlanner:
         :param args: Именованные аргументы к функции
         :param kwargs: Позиционные аргументы к функции
         """
-        thread = threading.Thread(target=cls.__get_task(func), args=args, kwargs=kwargs)
+        thread = Thread(target=cls.__get_task(func), args=args, kwargs=kwargs)
         thread.start()
 
     @classmethod
@@ -71,13 +71,13 @@ class Loop:
 
     def __init_loop(self):
         """Отправляет в очередь функцию из цикла. Засыпает, если функция завершила свою работу раньше задержки"""
-        delay = self.delay - (time.time() - self.start)
+        delay = self.delay - (t_time() - self.start)
         if delay > 0:
-            time.sleep(delay)
-        self.start = time.time()
+            t_sleep(delay)
+        self.start = t_time()
         self.__reg_func(self.func, self.args, self.kwargs)
 
     def __run_thread(self):
         """Запускает демонический поток выполнения"""
-        demon_thread = threading.Thread(target=self.__init_loop, daemon=True)
+        demon_thread = Thread(target=self.__init_loop, daemon=True)
         demon_thread.start()

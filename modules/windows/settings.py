@@ -12,8 +12,7 @@ class SettingsWindow(source.ChildWindow):
 
     def show_separator(self, row=0):
         """Вспомогательная ф-я для отрисовки разделителя фреймов"""
-        separator = source.tk.Frame(master=self, background='black', height=1)
-        separator.grid(row=row, column=0, columnspan=2, sticky='EW', pady=1, padx=1)
+        source.tk.Frame(master=self, background='black', height=1).grid(row=row, column=0, columnspan=2, sticky='EW', pady=1, padx=1)
 
     def show_log_check_depth_widgets(self, row=0):
         """Отрисовка виджетов для настройки глубины проверки лога"""
@@ -25,12 +24,12 @@ class SettingsWindow(source.ChildWindow):
         def get_entry_value():
             value = entry_var.get()
             if value.isdigit():
-                self.modules['settings'].log_check_depth = int(value)
+                self.app_m.stg.log_check_depth = int(value)
                 update_label()
             entry.delete(0, source.tk.END)
 
         def update_label():
-            label.config(text=f'Глубина проверки лога: {self.modules["settings"].log_check_depth} папок (дней)')
+            label.config(text=f'Глубина проверки лога: {self.app_m.stg.log_check_depth} папок (дней)')
 
         label = source.ttk.Label(master=self)
         label.grid(row=row, column=0, columnspan=2, sticky='W')
@@ -52,11 +51,10 @@ class SettingsWindow(source.ChildWindow):
 
     def show_log_mode_widgets(self, row):
         """Отрисовка виджетов управления режимом записи лога"""
-        def select_rb(): self.modules['settings'].autolog = self.__dict__['log_mode'].get()
+        def select_rb(): self.app_m.stg.autolog = self.__dict__['log_mode'].get()
 
-        label = source.ttk.Label(master=self, text='Режим записи лога')
-        label.grid(row=row, column=0, sticky='W')
-        self.__dict__['log_mode'] = source.tk.BooleanVar(master=self, value=self.modules['settings'].autolog)
+        source.ttk.Label(master=self, text='Режим записи лога').grid(row=row, column=0, sticky='W')
+        self.__dict__['log_mode'] = source.tk.BooleanVar(master=self, value=self.app_m.stg.autolog)
         radio1 = source.ttk.Radiobutton(master=self, text='Автоматический', command=select_rb,
                                         value=True, variable=self.__dict__['log_mode'])
         radio1.grid(row=row+1, column=0, sticky='W')
@@ -65,13 +63,13 @@ class SettingsWindow(source.ChildWindow):
         radio2.grid(row=row+1, column=1, sticky='W')
 
     def show_order_complete_widget(self, row):
-        def select_cb(): self.modules['settings'].orders_complete_check = self.__dict__['check_complete'].get()
+        def select_cb():
+            self.app_m.stg.orders_complete_check = self.__dict__['check_complete'].get()
 
-        self.__dict__['check_complete'] = source.tk.BooleanVar(master=self,
-                                                               value=self.modules['settings'].orders_complete_check)
-        check_btn = source.ttk.Checkbutton(master=self, text='Проверка целостоности заказов', command=select_cb,
-                                           variable=self.__dict__['check_complete'])
-        check_btn.grid(row=row + 2, column=0, sticky='W', columnspan=2)
+        self.__dict__['check_complete'] = source.tk.BooleanVar(master=self, value=self.app_m.stg.orders_complete_check)
+        source.ttk.Checkbutton(master=self, text='Проверка целостоности заказов', command=select_cb,
+                               variable=self.__dict__['check_complete']
+                               ).grid(row=row + 2, column=0, sticky='W', columnspan=2)
 
     def show_directory_widgets(self, row=8):
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
@@ -81,18 +79,17 @@ class SettingsWindow(source.ChildWindow):
 
     def show_directory_frame(self, text, stg_attr, row, column):
         """Отрисовка виджетов управления рабочими папками"""
-        def update_directory():
-            path = source.tkfd.askdirectory(parent=self, initialdir=getattr(self.modules['settings'], stg_attr), title=f'Выберите: {text}')
+        def update_dir():
+            path = source.tkfd.askdirectory(parent=self, initialdir=getattr(self.app_m.stg, stg_attr), title=f'Выберите: {text}')
             if path:
-                setattr(self.modules['settings'], stg_attr, path)
-                button.config(text=getattr(self.modules['settings'], stg_attr))
+                setattr(self.app_m.stg, stg_attr, path)
+                button.config(text=getattr(self.app_m.stg, stg_attr))
 
         label = source.ttk.Label(master=self, text=text)
         label.grid(row=row, column=column, sticky='W')
-        button = source.MyButton(master=self, width=24, text=getattr(self.modules['settings'], stg_attr), command=update_directory)
+        button = source.MyButton(master=self, width=24, text=getattr(self.app_m.stg, stg_attr), command=update_dir)
         button.grid(row=row+1, column=column, padx=1, pady=1)
 
     def show_close_button(self, row=12):
         """Отрисовка кнопки закрытия"""
-        button = source.MyButton(master=self, text='Закрыть', command=self.destroy)
-        button.grid(row=row, column=1, padx=1, pady=1, sticky='EW')
+        source.MyButton(master=self, text='Закрыть', command=self.destroy).grid(row=row, column=1, padx=1, pady=1, sticky='EW')

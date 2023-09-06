@@ -37,8 +37,8 @@ class LibraryWindow(source.ChildWindow):
     def set_treeview_values(self):
         """Метод для установки значений в тривью"""
         key_index = 1
-        for key, values in self.modules['library'].get_product_headers().items():
-            key = self.modules['library'].product_gen.translator(key)
+        for key, values in self.app_m.lbr.get_product_headers().items():
+            key = self.app_m.lbr.product_gen.translator(key)
             self.tree.insert('', 'end', iid=str(key_index), text=key)
             for index, value in enumerate(values):
                 self.tree.insert(str(key_index), source.tk.END, iid=f'{key_index}{index}', text=value, tags=key)
@@ -82,7 +82,7 @@ class LibraryWindow(source.ChildWindow):
 
     def __delete_from_lib(self, category: str, full_name: str):
         """Удаление продукта по выбору в тривью из библиотеки"""
-        self.modules['library'].delete(category, full_name)
+        self.app_m.lbr.delete(category, full_name)
         source.tkmb.showinfo(parent=self, title="Удаление продукта",
                              message=f'{full_name}\nУспешно удален из библиотеки')
 
@@ -119,7 +119,7 @@ class AssistWindow(source.ChildWindow):
         super().__init__(parent_root)
 
     def main(self):
-        self.product_dict = self.modules['library'].product_gen(self.category, True)
+        self.product_dict = self.app_m.lbr.product_gen(self.category, True)
         self.show_header()
         self.show_main_widgets()
         if self.module != 'add':
@@ -208,7 +208,7 @@ class AssistWindow(source.ChildWindow):
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
-        for key, value in self.modules['library'].get_product_values(self.category, self.product).items():
+        for key, value in self.app_m.lbr.get_product_values(self.category, self.product).items():
             self.product_vars[key].set(value)
 
     def get_values_from_widgets(self) -> bool:
@@ -228,15 +228,15 @@ class AssistWindow(source.ChildWindow):
     def write_to_library(self):
         if not self.get_values_from_widgets():
             return
-        if self.module != 'change' and not self.modules['library'].check_unique(self.product_dict.category(), self.product_dict['full_name']):
+        if self.module != 'change' and not self.app_m.lbr.check_unique(self.product_dict.category(), self.product_dict['full_name']):
             source.tkmb.showwarning(parent=self, title='Проверка на дубликат',
                                     message=f'Добавляемый продукт:\n{self.product_dict["full_name"]}\nуже есть в библиотеке')
             return
         if self.module == 'change':
-            self.modules['library'].change(self.product_dict)
+            self.app_m.lbr.change(self.product_dict)
             source.tkmb.showinfo(parent=self, title='Изменение продукта',
                                  message=f'Данне успешно обновлены для:\n{self.product_dict["full_name"]}')
         else:
-            self.modules['library'].add(self.product_dict)
+            self.app_m.lbr.add(self.product_dict)
             source.tkmb.showinfo(parent=self, title='Добавление  продукта',
                                  message=f'Продукт:\n{self.product_dict["full_name"]}\nуспешно добавлен в библиотеку')
