@@ -1,17 +1,18 @@
 import sqlite3
 import os
-from modules.library import Library as Lib
+from modules.library.products import *
 
 
 def insert_test_rows():
+    categories = ('Album', 'Canvas', 'Journal', 'Layflat', 'Photobook', 'Photofolder',  'Subproduct')
     with sqlite3.connect('../data/library.db') as lib:
         cursor = lib.cursor()
-        for category in Lib.product_gen.get_categories():
+        for category in categories:
             keys = []
             values = []
-            for k, v in Lib.product_gen(category, True).items():
+            for k, v in eval(f'{category}(True)').__dict__.items():
                 if k == 'full_name':
-                    v = f'{category}_test'
+                    v = f'{category}_test_2'
                 if type(v) == tuple:
                     v = v[0]
                 keys.append(f'\"{k}\"')

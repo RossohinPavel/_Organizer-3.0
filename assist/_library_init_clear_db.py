@@ -1,16 +1,14 @@
 import sqlite3
-from old_modules.library import Library as Lib
+from modules.library.productgen import ProductGenerator as PG
 
 
 def create_clear_db():
     with sqlite3.connect('../data/library.db') as lib:
         cursor = lib.cursor()
-        product = Lib.product
-        for category in product._categories:
+        for category in PG.get_categories():
             descr = ''
-            for k, v in product(category).__dict__.items():
-                if k.startswith('_'):
-                    continue
+            for k, v in PG(category, True).__dict__.items():
+                print(k, v)
                 if type(v) == tuple:
                     v = v[0]
                 row = f'{k} {"INTEGER" if type(v) == int else "TEXT"}'

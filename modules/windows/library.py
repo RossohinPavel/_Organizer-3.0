@@ -3,7 +3,6 @@ import modules.windows.source as source
 
 class LibraryWindow(source.ChildWindow):
     """Окно управления библиотекой"""
-
     def main(self):
         self.title('Библиотека')
         self.show_main_widget()
@@ -37,11 +36,11 @@ class LibraryWindow(source.ChildWindow):
     def set_treeview_values(self):
         """Метод для установки значений в тривью"""
         key_index = 1
-        for key, values in self.app_m.lbr.get_product_headers().items():
-            key = self.app_m.lbr.product_gen.translator(key)
-            self.tree.insert('', 'end', iid=str(key_index), text=key)
-            for index, value in enumerate(values):
-                self.tree.insert(str(key_index), source.tk.END, iid=f'{key_index}{index}', text=value, tags=key)
+        for cat, lst in self.app_m.lbr.get_product_headers().items():
+            tag, header = cat.split('=')
+            self.tree.insert('', 'end', iid=str(key_index), text=header, tags=tag)
+            for index, value in enumerate(lst):
+                self.tree.insert(str(key_index), 'end', iid=f'{key_index}{index}', text=value, tags=tag)
             key_index += 1
 
     def clear_treeview(self):
@@ -54,31 +53,20 @@ class LibraryWindow(source.ChildWindow):
         :param module: 'add', 'copy', 'change' или 'delete'
         :return: Функцию, соответствующую module
         """
-
         def wrapper():
             index = self.tree.selection()
             if not index or module != 'add' and len(index[0]) < 2:
                 source.tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
                 return
-            args = self.convert_item(module, self.tree.item(index[0]))
+            item = self.tree.item(index[0])
+            args = item['tags'][0], item['text']
             if module != 'delete':
                 self.wait_window(AssistWindow(self, module, *args))
             else:
                 self.__delete_from_lib(*args)
             self.clear_treeview()
             self.set_treeview_values()
-
         return wrapper
-
-    @staticmethod
-    def convert_item(module: str, item: dict) -> tuple:
-        """Вспомогательная функция, формирующая нужный для объекта module аргумент"""
-        args = (item['text'],)
-        if module == 'add' and item['tags']:
-            args = (' '.join(item['tags']),)
-        if module != 'add':
-            args = (' '.join(item['tags']),) + args
-        return args
 
     def __delete_from_lib(self, category: str, full_name: str):
         """Удаление продукта по выбору в тривью из библиотеки"""
@@ -106,54 +94,42 @@ class AssistWindow(source.ChildWindow):
                 'page_canal': ('combo', "Выберите 'канал' разворотов", 250, 300),
                 'dc_top_indent': ('entry', 'Введите значение отступа СВЕРХУ в мм', 2, 300),
                 'dc_left_indent': ('entry', 'Введите значение отступа СЛЕВА в мм', 2, 341),
-                'dc_overlap': ('entry', 'НАХЛЕСТ для переплета в мм', 250, 300),
+                'dc_overlap': ('entry', 'НАХЛЕСТ для переплета в мм', 249, 300),
                 'dc_break': ('check', 'Раскодировка с разрывом', 250, 355)
                 }
 
-    def __init__(self, parent_root, module, category, product=''):
+    def __init__(self, parent_root, module, category, product):
         self.module = module
         self.category = category
         self.product = product
         self.product_vars = {}  # Словарь для хранения переменных виджетов
-        self.product_dict = None  # Переменная для хранения словаря продукта
+        self.product_obj = None
         super().__init__(parent_root)
 
     def main(self):
-        self.product_dict = self.app_m.lbr.product_gen(self.category, True)
-        self.show_header()
+        self.title({'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module])
+        self.product_obj = self.app_m.lbr.get_blank(self.category)
         self.show_main_widgets()
         if self.module != 'add':
             self.insert_values_from_lib()
         self.show_buttons()
 
-    def show_header(self):
-        """Изменение заголовка окна и отрисовка головного виджета"""
-        st = {'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module]
-        self.title(st)
-        frame = source.tk.Frame(self)
-        label1 = source.ttk.Label(frame, text=st + ' в категорию:' if self.module != 'change' else st + ' в категории:')
-        label1.pack(side='left', padx=2, pady=2)
-        label2 = source.ttk.Label(frame, text=self.category, relief='solid', justify='center')
-        label2.pack(side='right', padx=2, pady=2, ipadx=2, ipady=2)
-        frame.pack()
-        separator = source.tk.Frame(self, width=487, height=1, bg='black')
-        separator.pack(padx=2)
-
     def show_main_widgets(self):
         """Отображает менюшки на self.product_menus_frame согласно выбранному продукту"""
-        frame = source.tk.Frame(self, height=385)
+        frame = source.tk.Frame(self, height=385, width=490)
         funcs = {'entry': self.__show_entry_frame, 'radio': self.__show_radio_frame,
                  'combo': self.__show_combobox_frame, 'check': self.__show_check_frame}
         for x, y in ((0, 167), (0, 254), (0, 299)):  # Рисуем разделители для отделения тематических блоков
             separator = source.tk.Frame(frame, width=496, height=1, bg='black')
             separator.place(x=x, y=y)
-        for key, values in self.product_dict.items():
-            current_frame, *args = self.__FRAMES[key]
-            kwargs = {'values': values}
-            if isinstance(args[-1], dict):
-                kwargs.update(args[-1])
-                args = args[:-1]
-            funcs[current_frame](key, frame, *args, **kwargs)
+        for frm in self.__FRAMES:
+            if frm in self.product_obj.__dict__:
+                current_frame, *args = self.__FRAMES[frm]
+                kwargs = {'values': self.product_obj.__dict__[frm]}
+                if isinstance(args[-1], dict):
+                    kwargs.update(args[-1])
+                    args = args[:-1]
+                funcs[current_frame](frm, frame, *args, **kwargs)
         frame.pack(expand=True, fill='both')
 
     def show_buttons(self):
@@ -208,11 +184,11 @@ class AssistWindow(source.ChildWindow):
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
-        for key, value in self.app_m.lbr.get_product_values(self.category, self.product).items():
+        for key, value in self.app_m.lbr.get(self.product).__dict__.items():
             self.product_vars[key].set(value)
 
     def get_values_from_widgets(self) -> bool:
-        """Метод для получения информации из менюшек и установки их в словарь product_dict
+        """Метод для получения информации из менюшек и установки их в product_obj
         Возвращает True если все значения были заполнены, False в противном случае"""
         numbered_var = ('carton_length', 'carton_height', 'cover_clapan', 'cover_joint', 'dc_top_indent',
                         'dc_left_indent', 'dc_overlap', 'dc_break')
@@ -222,21 +198,18 @@ class AssistWindow(source.ChildWindow):
                 return False
             if key in numbered_var:
                 value = int(value) if value.isdigit() else 0
-            self.product_dict[key] = value
+            self.product_obj.__dict__[key] = value
         return True
 
     def write_to_library(self):
         if not self.get_values_from_widgets():
             return
-        if self.module != 'change' and not self.app_m.lbr.check_unique(self.product_dict.category(), self.product_dict['full_name']):
-            source.tkmb.showwarning(parent=self, title='Проверка на дубликат',
-                                    message=f'Добавляемый продукт:\n{self.product_dict["full_name"]}\nуже есть в библиотеке')
+        if self.module != 'change' and not self.app_m.lbr.check_unique(self.product_obj):
+            source.tkmb.showwarning(parent=self, title='Проверка на дубликат', message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
             return
         if self.module == 'change':
-            self.app_m.lbr.change(self.product_dict)
-            source.tkmb.showinfo(parent=self, title='Изменение продукта',
-                                 message=f'Данне успешно обновлены для:\n{self.product_dict["full_name"]}')
+            self.app_m.lbr.change(self.product_obj)
+            source.tkmb.showinfo(parent=self, title='Изменение продукта', message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
         else:
-            self.app_m.lbr.add(self.product_dict)
-            source.tkmb.showinfo(parent=self, title='Добавление  продукта',
-                                 message=f'Продукт:\n{self.product_dict["full_name"]}\nуспешно добавлен в библиотеку')
+            self.app_m.lbr.add(self.product_obj)
+            source.tkmb.showinfo(parent=self, title='Добавление  продукта', message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')
