@@ -1,12 +1,12 @@
 from threading import Thread, Lock
 from time import time as t_time, sleep as t_sleep
-from modules.appmanager import AppManagerW
+from modules.app_manager import AppManager
 
 
 __all__ = ('IPlanner', )
 
 
-class IPlanner(AppManagerW):
+class IPlanner(AppManager):
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
     __loops = []
     __lock = Lock()
@@ -15,8 +15,12 @@ class IPlanner(AppManagerW):
     def __get_task(cls, func) -> callable:
         """Декоратор, возвращающий ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args, **kwargs):
+            num = cls.app_m.TxtVars.tasks_queue.get()
+            cls.app_m.TxtVars.tasks_queue.set(num + 1)
             with cls.__lock:
                 func(*args, **kwargs)
+            num = cls.app_m.TxtVars.tasks_queue.get()
+            cls.app_m.TxtVars.tasks_queue.set(num - 1)
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 

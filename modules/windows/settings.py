@@ -6,7 +6,7 @@ class SettingsWindow(source.ChildWindow):
     def main(self):
         self.title('Настройки')
         self.show_log_check_depth_widgets()
-        self.show_log_widgets()
+        self.show_mode_widgets()
         self.show_directory_widgets()
         self.show_close_button()
 
@@ -43,33 +43,23 @@ class SettingsWindow(source.ChildWindow):
         info_label.grid(row=row+2, column=0, columnspan=2, sticky='W')
         self.show_separator(row=row+3)
 
-    def show_log_widgets(self, row=4):
-        """Сборная ф-я для отрисовки виджетов управления логом"""
-        self.show_log_mode_widgets(row)
-        self.show_order_complete_widget(row)
+    def show_mode_widgets(self, row=4):
+        """Сборная ф-я для отрисовки виджетов управления режимов работы программы"""
+        def select_cb(var_name):
+            setattr(self.app_m.Settings, var_name, self.__dict__[var_name].get())
+            source.tkmb.showinfo(parent=self, title="Изменение настроек",
+                                 message="Для вступления настроек в силу нужно перезагрузить программу")
+
+        source.ttk.Label(master=self, text='Режимы работы программы').grid(row=row, column=0, sticky='W')
+        self.__dict__['autolog'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.autolog)
+        chbtn1 = source.ttk.Checkbutton(master=self, text='Автоматическое слежение за заказами',
+                                        variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
+        chbtn1.grid(row=row + 1, column=0, sticky='W', columnspan=2)
+        self.__dict__['autofile'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.autofile)
+        chbtn2 = source.ttk.Checkbutton(master=self, text='Автоматическое копирование на диск О',
+                                        variable=self.__dict__['autofile'], command=lambda: select_cb('autofile'))
+        chbtn2.grid(row=row + 2, column=0, sticky='W', columnspan=2)
         self.show_separator(row+3)
-
-    def show_log_mode_widgets(self, row):
-        """Отрисовка виджетов управления режимом записи лога"""
-        def select_rb(): self.app_m.Settings.autolog = self.__dict__['log_mode'].get()
-
-        source.ttk.Label(master=self, text='Режим записи лога').grid(row=row, column=0, sticky='W')
-        self.__dict__['log_mode'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.autolog)
-        radio1 = source.ttk.Radiobutton(master=self, text='Автоматический', command=select_rb,
-                                        value=True, variable=self.__dict__['log_mode'])
-        radio1.grid(row=row+1, column=0, sticky='W')
-        radio2 = source.ttk.Radiobutton(master=self, text='Ручной', command=select_rb,
-                                        value=False, variable=self.__dict__['log_mode'])
-        radio2.grid(row=row+1, column=1, sticky='W')
-
-    def show_order_complete_widget(self, row):
-        def select_cb():
-            self.app_m.Settings.orders_complete_check = self.__dict__['check_complete'].get()
-
-        self.__dict__['check_complete'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.orders_complete_check)
-        source.ttk.Checkbutton(master=self, text='Проверка целостоности заказов', command=select_cb,
-                               variable=self.__dict__['check_complete']
-                               ).grid(row=row + 2, column=0, sticky='W', columnspan=2)
 
     def show_directory_widgets(self, row=8):
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""

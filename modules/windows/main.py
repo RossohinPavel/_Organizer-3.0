@@ -1,7 +1,7 @@
 import modules.windows.source as source
 from modules.windows.settings import SettingsWindow
 from modules.windows.library import LibraryWindow
-from modules.appmanager import *
+from modules.app_manager import *
 
 
 class MainWindow(AppManagerR, source.tk.Tk):
@@ -110,7 +110,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
     def show_add_btn_list(self):
         add_menu = source.tk.Menu(tearoff=0)
-        add_menu.add_command(label="Обновить БД", command=lambda: self.app_m.mnt.run())
+        add_menu.add_command(label="Обновить БД", command=self.app_m.OrdersTracker.run)
         add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty())
 
     @staticmethod

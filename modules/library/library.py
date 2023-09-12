@@ -1,7 +1,7 @@
 import sqlite3
 from functools import lru_cache
 from modules.library.products import *
-from modules.appmanager import AppManagerW
+from modules.app_manager import AppManagerW
 
 
 __all__ = ('Library', )

@@ -1,5 +1,5 @@
 import re
-from modules.appmanager import AppManagerW
+from modules.app_manager import AppManagerW
 
 
 __all__ = ('Constants', )

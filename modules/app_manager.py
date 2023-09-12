@@ -1,4 +1,4 @@
-__all__ = ('AppManagerR', 'AppManagerW')
+__all__ = ('AppManagerR', 'AppManagerW', 'AppManager')
 
 
 class Storage:
@@ -34,3 +34,9 @@ class AppManagerW:
         if cls.__name__ not in storage:
             setattr(storage, cls.__name__, super().__new__(cls))
         return getattr(storage, cls.__name__)
+
+
+class AppManager(AppManagerR, AppManagerW):
+    """Абстрактный класс, предостовляющий наследникам как доступ к хранилищу модулей приложения, так и записывающий
+    модуль в это хранилище"""
+    pass
