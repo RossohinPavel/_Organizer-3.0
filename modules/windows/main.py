@@ -1,32 +1,31 @@
 import modules.windows.source as source
 from modules.windows.settings import SettingsWindow
 from modules.windows.library import LibraryWindow
-from modules.common import MyDict
+from modules.appmanager import *
 
 
-class MainWindow(source.tk.Tk):
+class MainWindow(AppManagerR, source.tk.Tk):
     """Основное окно приложения"""
-    def __init__(self, app_m):
+    def __init__(self):
         super().__init__()
-        self.app_m = app_m
         self.set_main_graph_settings()
         self.show_menus()
         self.show_mw_headers()
         self.show_processing_line()
         self.show_common_line()
+
+    def set_main_graph_settings(self):
+        """Основные настройки окна, положения и размера."""
+        self.title('Органайзер 3_0 PRE ALPHA')
+        width, height = 530, 420
+        self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
+        self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
 
     @staticmethod
     def russian_hotkeys(event):
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
-
-    def set_main_graph_settings(self):
-        """Основные настройки окна, положения и размера."""
-        self.title('Органайзер 3_0 BETA')
-        width, height = 530, 420
-        self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
-        self.resizable(False, False)
 
     def show_menus(self):
         """Отрисовка и инициализация менюшек"""
@@ -36,43 +35,45 @@ class MainWindow(source.tk.Tk):
         main_menu.add_command(label='Информация', command=lambda: print('None'))
         self.config(menu=main_menu)
 
-    def show_separator(self): source.tk.Frame(master=self, bg='black', width=1, height=1).pack(fill='x')
-
     def show_mw_headers(self):
+        TxtVars()   # инициализация объекта для хранения текстовых переменных.
         self.show_difficult_lbl()
-        self.show_processing_lbl()
-        self.show_file_and_queue_lbl()
+        self.show_log_and_tracker_frame()
+        self.show_queue_lbl()
+
+    def show_separator(self):
+        source.tk.Frame(master=self, bg='black', width=1, height=1).pack(fill='x')
 
     def show_difficult_lbl(self):
         """Отрисовка индекса сложности"""
         self.show_separator()
-        mnt_difficult = source.tk.StringVar(master=self, value='Индекс сложности')
-        source.tk.Label(master=self, textvariable=mnt_difficult).pack(fill='x')
-        self.app_m.txt_vars.mnt_difficult = mnt_difficult
+        var = source.tk.StringVar(master=self, value='Индекс сложности')
+        self.app_m.TxtVars.difficult = var
+        source.tk.Label(master=self, textvariable=var).pack(fill='x')
 
-    def show_processing_lbl(self):
+    def show_log_and_tracker_frame(self):
         """Отрисовка статуса процесса выполнения лога"""
         self.show_separator()
-        mnt_status = source.tk.StringVar(master=self, value='Статус выполнения')
-        source.tk.Label(master=self, textvariable=mnt_status).pack(fill='x')
-        self.app_m.txt_vars.mnt_status = mnt_status
+        frame = source.tk.Frame(master=self, height=20)
+        frame.pack(fill='both')
+        source.ttk.Label(master=frame, text='Трекер заказов:').place(x=0, y=0)
+        source.ttk.Label(master=frame, text='Трекер файлов:').place(x=265, y=0)
+        orders_trk = source.tk.StringVar(master=self, value='Выключен')
+        source.ttk.Label(master=frame, textvariable=orders_trk).place(x=90, y=0)
+        files_trk = source.tk.StringVar(master=self, value='Выключен')
+        source.ttk.Label(master=frame, textvariable=files_trk).place(x=355, y=0)
+        self.app_m.TxtVars.orders_trk = orders_trk
+        self.app_m.TxtVars.files_trk = files_trk
 
-    def show_file_and_queue_lbl(self):
+    def show_queue_lbl(self):
         """Отрисовка виджета статуса трекера файлов"""
         self.show_separator()
-        frame = source.tk.Frame(master=self, bg='black')
+        frame = source.tk.Frame(master=self, height=20)
         frame.pack(fill='both')
-        left_frame = source.tk.Frame(master=frame, height=20)
-        left_frame.pack(side='left', fill='both', expand=True)
-        righ_frame = source.tk.Frame(master=frame, height=20)
-        righ_frame.pack(side='right', fill='both', expand=True)
-        file_tracker = source.tk.StringVar(master=frame, value='Трекер файлов выключен')
-        self.app_m.txt_vars.file_tracker = file_tracker
-        source.ttk.Label(master=left_frame, textvariable=file_tracker).place(x=0, y=0)
-        queue = source.tk.IntVar(master=frame, value=0)
-        self.app_m.txt_vars.queue = queue
-        source.ttk.Label(master=righ_frame, text='Задач в очереди:').place(x=0, y=0)
-        source.ttk.Label(master=righ_frame, textvariable=queue).place(x=96, y=0)
+        source.ttk.Label(master=frame, text='Задач в очереди:').place(x=265, y=0)
+        tasks_queue = source.tk.IntVar(master=self, value=0)
+        source.ttk.Label(master=frame, textvariable=tasks_queue).place(x=361, y=0)
+        self.app_m.TxtVars.tasks_queue = tasks_queue
 
     def show_label(self, text, bg=None):
         """Конструктор для отрисовка заголовка"""
@@ -140,3 +141,11 @@ class MainWindow(source.tk.Tk):
     def show_information_frame(frame):
         """Отрисовка фрейма отображения информации о заказах"""
         source.tk.Frame(master=frame, width=268, height=218, bg='yellow').pack(side='right')
+
+
+class TxtVars(AppManagerW):
+    def __getattr__(self, item):
+        return self.__dict__[item]
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value

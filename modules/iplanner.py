@@ -1,20 +1,15 @@
 from threading import Thread, Lock
 from time import time as t_time, sleep as t_sleep
+from modules.appmanager import AppManagerW
 
 
 __all__ = ('IPlanner', )
 
 
-class IPlanner:
+class IPlanner(AppManagerW):
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
-    __instance = None
     __loops = []
     __lock = Lock()
-
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
 
     @classmethod
     def __get_task(cls, func) -> callable:
@@ -27,22 +22,27 @@ class IPlanner:
 
     @classmethod
     def create_task(cls, func: callable, args: tuple = (), kwargs: dict | None = None):
-        """
-        Создание задачи. Задача поставлена в очередь вызовов. Если очередь пуста, задача будет выполнена немедленно
+        """Создание задачи. Задача будет поставлена в очередь вызовов. Если очередь пуста, задача запустится немедленно.
         :param func: Cсылка на функцию
         :param args: Именованные аргументы к функции
-        :param kwargs: Позиционные аргументы к функции
-        """
-        thread = Thread(target=cls.__get_task(func), args=args, kwargs=kwargs)
-        thread.start()
+        :param kwargs: Позиционные аргументы к функции"""
+        Thread(target=cls.__get_task(func), args=args, kwargs=kwargs).start()
+
+    @classmethod
+    def create_parallel_task(cls, func: callable, args: tuple = (), kwargs: dict | None = None):
+        """Создание параллельной задачи, которая не зависит от очереди вызовов. Задача демоническая, т.е. будет прервана
+        с окончанием основной программы.
+        :param func: Cсылка на функцию
+        :param args: Именованные аргументы к функции
+        :param kwargs: Позиционные аргументы к функции"""
+        Thread(target=func, args=args, kwargs=kwargs, daemon=True).start()
 
     @classmethod
     def create_loop(cls, func: callable, delay: int | float = 2, args: tuple = (), kwargs: dict | None = None):
-        """
-        Создание цикла, который будет регистрировать задачи в планировщики спустя задержку.
+        """Создание цикла, который будет регистрировать задачи в планировщике спустя задержку.
         Регистрация 1 задачи происходит немедленно. Последующие - по мере выполнения предыдущих.
         :param func: Ссылка на функцию
-        :param delay: Задержка (в секундах), спустя которую необходимо повторять цилк
+        :param delay: Задержка (в секундах), спустя которую необходимо повторять цикл
         :param args: Именованные аргументы к функции
         :param kwargs: Позиционные аргументы к функции
         """

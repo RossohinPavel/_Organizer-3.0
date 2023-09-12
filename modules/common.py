@@ -2,7 +2,7 @@ import re
 from modules.appmanager import AppManagerW
 
 
-__all__ = ('Constants', 'MyDict')
+__all__ = ('Constants', )
 
 
 class Constants(AppManagerW):
@@ -19,8 +19,3 @@ class Constants(AppManagerW):
     def check_order(cls, value):
         """Проверка переданной строки (value) на соответсвие паттерну заказа"""
         return re.fullmatch(cls.__order, value)
-
-
-class MyDict(dict):
-    __getattribute__ = dict.get
-    __setattr__ = dict.__setitem__

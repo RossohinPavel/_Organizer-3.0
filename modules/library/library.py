@@ -1,20 +1,16 @@
 import sqlite3
 from functools import lru_cache
 from modules.library.products import *
+from modules.appmanager import AppManagerW
+
 
 __all__ = ('Library', )
 
 
-class Library:
-    __instance = None
+class Library(AppManagerW):
     __db = 'data/library.db'
     __timeout = 10
     __categories = ('Album', 'Canvas', 'Journal', 'Layflat', 'Photobook', 'Photofolder',  'Subproduct')
-
-    def __new__(cls):
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
 
     @staticmethod
     def __safe_connect(do_commit=False):

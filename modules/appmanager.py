@@ -1,4 +1,4 @@
-__all__ = ('AppManager', 'AppManagerW')
+__all__ = ('AppManagerR', 'AppManagerW')
 
 
 class Storage:
@@ -14,23 +14,23 @@ class Storage:
         return self.__dict__[item]
 
     def __setattr__(self, attr_name, obj):
-        if not isinstance(obj, AppManager | dict):
-            raise AttributeError(f'{obj} не является объектом-наследником класса AppManager или dict')
+        if not isinstance(obj, AppManagerW | AppManagerR):
+            raise AttributeError(f'{obj} не является объектом-наследником классов AppManager')
         self.__dict__[attr_name] = obj
 
     def __contains__(self, item):
         return item in self.__dict__
 
 
-class AppManager:
-    """Абстрактный класс, предостовляющий наследникам доступ к хранилищу модулей приложения"""
+class AppManagerR:
+    """Абстрактный класс, предостовляющий наследникам доступ к хранилищу модулей приложения по переменной app_m"""
     app_m = Storage()
 
 
-class AppManagerW(AppManager):
-    """Абстрактный класс, предостовляющий наследникам доступ к хранилищу модулей приложения. При создании объекта
-    записывает его в хранилище. По факту - реализует моносостояние."""
+class AppManagerW:
+    """Абстрактный класс, при создании объекта записывает его в хранилище. По факту - реализует моносостояние."""
     def __new__(cls, *args, **kwargs):
-        if cls.__name__ not in cls.app_m:
-            setattr(cls.app_m, cls.__name__, super().__new__(cls))
-        return getattr(cls.app_m, cls.__name__)
+        storage = Storage()
+        if cls.__name__ not in storage:
+            setattr(storage, cls.__name__, super().__new__(cls))
+        return getattr(storage, cls.__name__)
