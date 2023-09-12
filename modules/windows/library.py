@@ -36,7 +36,7 @@ class LibraryWindow(source.ChildWindow):
     def set_treeview_values(self):
         """Метод для установки значений в тривью"""
         key_index = 1
-        for cat, lst in self.app_m.lbr.get_product_headers().items():
+        for cat, lst in self.app_m.Library.get_product_headers().items():
             tag, header = cat.split('=')
             self.tree.insert('', 'end', iid=str(key_index), text=header, tags=tag)
             for index, value in enumerate(lst):
@@ -70,7 +70,7 @@ class LibraryWindow(source.ChildWindow):
 
     def __delete_from_lib(self, category: str, full_name: str):
         """Удаление продукта по выбору в тривью из библиотеки"""
-        self.app_m.lbr.delete(category, full_name)
+        self.app_m.Library.delete(category, full_name)
         source.tkmb.showinfo(parent=self, title="Удаление продукта",
                              message=f'{full_name}\nУспешно удален из библиотеки')
 
@@ -108,7 +108,7 @@ class AssistWindow(source.ChildWindow):
 
     def main(self):
         self.title({'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module])
-        self.product_obj = self.app_m.lbr.get_blank(self.category)
+        self.product_obj = self.app_m.Library.get_blank(self.category)
         self.show_main_widgets()
         if self.module != 'add':
             self.insert_values_from_lib()
@@ -184,7 +184,7 @@ class AssistWindow(source.ChildWindow):
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
-        for key, value in self.app_m.lbr.get(self.product).__dict__.items():
+        for key, value in self.app_m.Library.get(self.product).__dict__.items():
             self.product_vars[key].set(value)
 
     def get_values_from_widgets(self) -> bool:
@@ -204,12 +204,12 @@ class AssistWindow(source.ChildWindow):
     def write_to_library(self):
         if not self.get_values_from_widgets():
             return
-        if self.module != 'change' and not self.app_m.lbr.check_unique(self.product_obj):
+        if self.module != 'change' and not self.app_m.Library.check_unique(self.product_obj):
             source.tkmb.showwarning(parent=self, title='Проверка на дубликат', message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
             return
         if self.module == 'change':
-            self.app_m.lbr.change(self.product_obj)
+            self.app_m.Library.change(self.product_obj)
             source.tkmb.showinfo(parent=self, title='Изменение продукта', message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
         else:
-            self.app_m.lbr.add(self.product_obj)
+            self.app_m.Library.add(self.product_obj)
             source.tkmb.showinfo(parent=self, title='Добавление  продукта', message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')
