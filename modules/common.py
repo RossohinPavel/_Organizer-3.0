@@ -1,7 +1,11 @@
 import re
+from modules.appmanager import AppManagerW
 
 
-class Constants:
+__all__ = ('Constants', 'MyDict')
+
+
+class Constants(AppManagerW):
     """Класс, который содержит в себе постоянные, использующиеся для проверки в различных частях приложения"""
     __day = r'\d{4}-\d{2}-\d{2}'
     __order = r'\d{6}'

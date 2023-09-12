@@ -1,7 +1,7 @@
 import modules.windows.source as source
 from modules.windows.settings import SettingsWindow
 from modules.windows.library import LibraryWindow
-from modules.other import MyDict
+from modules.common import MyDict
 
 
 class MainWindow(source.tk.Tk):

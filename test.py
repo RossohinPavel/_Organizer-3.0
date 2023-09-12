@@ -1,8 +1,11 @@
 class Test:
+    __slots__ = ('one', 'two')
+
     def __init__(self):
-        self.test = 1
+        self.one = 1
+        self.two = 2
 
-    @property
-    def prop_test(self):
-        return 'prop_test'
 
+test = Test()
+
+print(test.__slots__)
