@@ -9,7 +9,6 @@ class MainWindow(AppManagerR, source.tk.Tk):
     def __init__(self):
         super().__init__()
         self.set_main_graph_settings()
-        self.show_menus()
         self.show_mw_headers()
         self.show_processing_line()
         self.show_common_line()
@@ -17,7 +16,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     def set_main_graph_settings(self):
         """Основные настройки окна, положения и размера."""
         self.title('Органайзер 3_0 PRE ALPHA')
-        width, height = 530, 420
+        width, height = 530, 414
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
@@ -27,29 +26,13 @@ class MainWindow(AppManagerR, source.tk.Tk):
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
 
-    def show_menus(self):
-        """Отрисовка и инициализация менюшек"""
-        main_menu = source.tk.Menu()
-        main_menu.add_command(label="Настройки", command=lambda: SettingsWindow(self))
-        main_menu.add_command(label='Библиотека', command=lambda: LibraryWindow(self))
-        main_menu.add_command(label='Информация', command=lambda: print('None'))
-        self.config(menu=main_menu)
-
     def show_mw_headers(self):
         TxtVars()   # инициализация объекта для хранения текстовых переменных.
-        self.show_difficult_lbl()
         self.show_log_and_tracker_frame()
         self.show_queue_lbl()
 
     def show_separator(self):
         source.tk.Frame(master=self, bg='black', width=1, height=1).pack(fill='x')
-
-    def show_difficult_lbl(self):
-        """Отрисовка индекса сложности"""
-        self.show_separator()
-        var = source.tk.StringVar(master=self, value='Индекс сложности')
-        self.app_m.TxtVars.difficult = var
-        source.tk.Label(master=self, textvariable=var).pack(fill='x')
 
     def show_log_and_tracker_frame(self):
         """Отрисовка статуса процесса выполнения лога"""
@@ -105,13 +88,13 @@ class MainWindow(AppManagerR, source.tk.Tk):
         line.pack(fill='both', expand=True, padx=10)
         source.MyButton(master=line, text='Холсты', command=None, width=15).pack(side='left', pady=3)
         self.__dict__['add_btn'] = source.MyButton(master=line, text='Дополнительно',
-                                                   command=self.show_add_btn_list, width=15)
+                                                   command=self.show_add_btn_menu, width=15)
         self.__dict__['add_btn'].pack(side='right')
 
-    def show_add_btn_list(self):
+    def show_add_btn_menu(self):
         add_menu = source.tk.Menu(tearoff=0)
         add_menu.add_command(label="Обновить БД", command=self.app_m.OrdersTracker.run)
-        add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty())
+        add_menu.post(self.__dict__['add_btn'].winfo_rootx() + 115, self.__dict__['add_btn'].winfo_rooty())
 
     @staticmethod
     def show_processing_frame(frame):
@@ -128,14 +111,26 @@ class MainWindow(AppManagerR, source.tk.Tk):
         self.show_information_buttons(frame)
         self.show_information_frame(frame)
 
-    @staticmethod
-    def show_information_buttons(frame):
+    def show_information_buttons(self, frame):
         """Отрисовка кнопок получения различной информации о заказах"""
         l_frame = source.tk.Frame(master=frame, width=265, relief='raised', border=1)
         l_frame.pack(side='left', fill='both', expand=True, ipady=4)
-        source.MyButton(master=l_frame, text='СтикГен', width=18).pack(pady=4)
-        source.MyButton(master=l_frame, text='Планировщик', width=18).pack(pady=4)
-        source.MyButton(master=l_frame, text='Текстовые шаблоны', width=18).pack(pady=4)
+        source.MyButton(master=l_frame, text='СтикГен', width=18).pack(pady=5)
+        source.MyButton(master=l_frame, text='Планировщик', width=18).pack()
+        source.MyButton(master=l_frame, text='Текстовые шаблоны', width=18).pack(pady=5)
+        source.tk.Frame(master=l_frame, height=26, width=20).pack()
+        source.tk.Frame(master=l_frame, height=26, width=20).pack(pady=5)
+        source.tk.Frame(master=l_frame, height=26, width=20).pack()
+        self.__dict__['control_btn'] = source.MyButton(master=l_frame, text='Управление', width=18, command=self.show_control_btn_menu)
+        self.__dict__['control_btn'].pack(pady=5)
+
+    def show_control_btn_menu(self):
+        """Отрисовка менюшек управления приложением"""
+        control_menu = source.tk.Menu(tearoff=0)
+        control_menu.add_command(label="Настройки", command=lambda: SettingsWindow(self))
+        control_menu.add_command(label='Библиотека', command=lambda: LibraryWindow(self))
+        control_menu.add_command(label='Информация', command=lambda: print('None'))
+        control_menu.post(self.__dict__['control_btn'].winfo_rootx() + 136, self.__dict__['control_btn'].winfo_rooty() - 37)
 
     @staticmethod
     def show_information_frame(frame):

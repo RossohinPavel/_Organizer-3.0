@@ -6,6 +6,7 @@ from modules.trackers.tracker import Tracker
 
 class OrdersTracker(Tracker):
     """Основной объект слежения за файлами"""
+    __cleaning_flag = False
     __observing_period = []
     __orders = []
 
@@ -13,24 +14,34 @@ class OrdersTracker(Tracker):
         return self.app_m.Settings.autolog, self.app_m.TxtVars.orders_trk
 
     def main(self):
+        limit = self.app_m.Settings.log_check_depth
         path = self.app_m.Settings.z_disc
-        self.__update_period(path)
+        self.__update_period(limit, path)
+        if self.__cleaning_flag:
+            self.__clear_old_orders(limit)
         self.__update_orders(path)
         self.__update_log()
-        self.__update_difficult_ind()
 
-    def __update_period(self, path):
+    def __update_period(self, limit, path):
         """Функция для обновления отслеживаемого периода"""
-        limit = self.app_m.Settings.log_check_depth
-        self.__observing_period.clear()
-        new_period = reversed(os.listdir(path))
-        for day in new_period:
+        for day in reversed(os.listdir(path)):
             if limit == 0:
                 break
             if self.app_m.Constants.check_day(day):
                 if day not in self.__observing_period:
+                    self.__cleaning_flag = True
                     self.__observing_period.append(day)
                 limit -= 1
+                
+    def __clear_old_orders(self, limit):
+        """Функция для очистки отслеживаемого периода от старых дат с старых объектов заказов"""
+        self.__observing_period = self.__observing_period[:limit]
+        ind = 0
+        while ind < len(self.__orders):
+            if self.__orders[ind].creation_date not in self.__observing_period:
+                del self.__orders[ind]
+            ind += 1
+        self.__cleaning_flag = False
 
     def __update_orders(self, path):
         """Функция для обновления списка отслеживаемых заказов"""
@@ -43,24 +54,19 @@ class OrdersTracker(Tracker):
         """Получение информации из заказа и запись ее в лог"""
         pass
 
-    def __update_difficult_ind(self):
-        info = ''
-        for i, v in enumerate(reversed(Counter(x.creation_date for x in self.__orders).items())):
-            info += f'{v[0][5:]}: {v[1]}'
-            if i == 4:
-                break
-            info += ',  '
-        self.app_m.TxtVars.difficult.set(info)
-
 
 class Order:
-    __slots__ = 'path', 'creation_date', 'name'
+    __slots__ = 'path', 'creation_date', 'name', 'content', '_counter'
 
     def __init__(self, path, creation_date, name):
         self.path = path
         self.creation_date = creation_date
         self.name = name
-        print('объект создан')
+        self.content = tuple()
+        self._counter = 0
+
+    def get_content(self):
+        return tuple()
 
     def update_info(self):
         pass
