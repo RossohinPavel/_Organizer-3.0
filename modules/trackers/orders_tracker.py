@@ -1,5 +1,6 @@
 import os
 import time
+from collections import Counter
 from modules.trackers.tracker import Tracker
 
 
@@ -16,6 +17,7 @@ class OrdersTracker(Tracker):
         self.__update_period(path)
         self.__update_orders(path)
         self.__update_log()
+        self.__update_difficult_ind()
 
     def __update_period(self, path):
         """Функция для обновления отслеживаемого периода"""
@@ -35,17 +37,27 @@ class OrdersTracker(Tracker):
         for day in self.__observing_period:
             for order in os.listdir(f'{path}/{day}'):
                 if order not in self.__orders and self.app_m.Constants.check_order(order):
-                    self.__orders.insert(0, Order(day, order))
+                    self.__orders.insert(0, Order(path, day, order))
 
     def __update_log(self):
         """Получение информации из заказа и запись ее в лог"""
         pass
 
+    def __update_difficult_ind(self):
+        info = ''
+        for i, v in enumerate(reversed(Counter(x.creation_date for x in self.__orders).items())):
+            info += f'{v[0][5:]}: {v[1]}'
+            if i == 4:
+                break
+            info += ',  '
+        self.app_m.TxtVars.difficult.set(info)
+
 
 class Order:
-    __slots__ = 'creation_date', 'name'
+    __slots__ = 'path', 'creation_date', 'name'
 
-    def __init__(self, creation_date, name):
+    def __init__(self, path, creation_date, name):
+        self.path = path
         self.creation_date = creation_date
         self.name = name
         print('объект создан')

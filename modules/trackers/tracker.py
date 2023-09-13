@@ -16,7 +16,6 @@ class Tracker(AppManager):
     def __safe_run(func):
         """Обертка для безопасного запуска функции"""
         def wrapper(*args, **kwargs):
-            print('сработал cэйф ран')
             try:
                 func(*args, **kwargs)
             except Exception as e:
@@ -26,6 +25,7 @@ class Tracker(AppManager):
 
     @staticmethod
     def __update_txt_vars(txt_var, delay, func):
+        """Обертка для изменения значений текстовых переменных задач"""
         def wrapper(*args, **kwargs):
             txt_var.set('Ожидание выполнения')
             current_time = datetime.now() + timedelta(seconds=delay)
