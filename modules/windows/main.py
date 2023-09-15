@@ -94,7 +94,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     def show_add_btn_menu(self):
         add_menu = source.tk.Menu(tearoff=0)
         add_menu.add_command(label="Обновить БД", command=self.app_m.OrdersTracker.run)
-        add_menu.post(self.__dict__['add_btn'].winfo_rootx() + 115, self.__dict__['add_btn'].winfo_rooty())
+        add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty() + 25)
 
     @staticmethod
     def show_processing_frame(frame):
@@ -130,7 +130,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
         control_menu.add_command(label="Настройки", command=lambda: SettingsWindow(self))
         control_menu.add_command(label='Библиотека', command=lambda: LibraryWindow(self))
         control_menu.add_command(label='Информация', command=lambda: print('None'))
-        control_menu.post(self.__dict__['control_btn'].winfo_rootx() + 136, self.__dict__['control_btn'].winfo_rooty() - 37)
+        control_menu.post(self.__dict__['control_btn'].winfo_rootx(), self.__dict__['control_btn'].winfo_rooty() - 63)
 
     @staticmethod
     def show_information_frame(frame):
