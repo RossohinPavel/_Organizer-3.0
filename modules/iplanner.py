@@ -1,6 +1,7 @@
 from threading import Thread, Lock
 from time import time as t_time, sleep as t_sleep
 from modules.app_manager import AppManager
+from modules.windows.source import tkmb
 
 
 __all__ = ('IPlanner', )
@@ -18,7 +19,10 @@ class IPlanner(AppManager):
             num = cls.app_m.TxtVars.tasks_queue.get()
             cls.app_m.TxtVars.tasks_queue.set(num + 1)
             with cls.__lock:
-                func(*args, **kwargs)
+                try:
+                    func(*args, **kwargs)
+                except Exception as exc:
+                    tkmb.showerror('Ошибка', message=exc)
             num = cls.app_m.TxtVars.tasks_queue.get()
             cls.app_m.TxtVars.tasks_queue.set(num - 1)
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__

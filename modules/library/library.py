@@ -63,7 +63,6 @@ class Library(AppManagerW):
         """
         cursor.execute(f'DELETE FROM {category} WHERE full_name=\'{full_name}\'')
         self.get.cache_clear()
-        print(self.get.cache_info())
 
     @lru_cache
     @__safe_connect()

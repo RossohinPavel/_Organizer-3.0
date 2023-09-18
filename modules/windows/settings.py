@@ -16,10 +16,7 @@ class SettingsWindow(source.ChildWindow):
 
     def show_log_check_depth_widgets(self, row=0):
         """Отрисовка виджетов для настройки глубины проверки лога"""
-        r1 = 'Рекомендуемые значения для глубины проверки: 1 - 2 папки.\n'
-        r2 = 'При необходимости, захватит заказы с прошлого дня.\n'
-        r3 = 'Можно задать больше, но после первого сканирования\nрекомендуется вернуть значения по умолчанию.\n'
-        r4 = 'В особенности, это актуально для автоматического режима.'
+        msg = ('Рекомендуемый глубина ~ 100 заказов.', 'Ограничено свободным объемом ОЗУ.')
 
         def get_entry_value():
             value = entry_var.get()
@@ -29,7 +26,7 @@ class SettingsWindow(source.ChildWindow):
             entry.delete(0, source.tk.END)
 
         def update_label():
-            label.config(text=f'Глубина проверки лога: {self.app_m.Settings.log_check_depth} папок (дней)')
+            label.config(text=f'Глубина проверки лога: {self.app_m.Settings.log_check_depth} заказов (папок)')
 
         label = source.ttk.Label(master=self)
         label.grid(row=row, column=0, columnspan=2, sticky='W')
@@ -39,7 +36,7 @@ class SettingsWindow(source.ChildWindow):
         entry.grid(row=row+1, column=0, sticky='EW', padx=2)
         button = source.MyButton(master=self, text='Задать', command=get_entry_value)
         button.grid(row=row+1, column=1, sticky='EW', padx=1)
-        info_label = source.ttk.Label(master=self, text=r1 + r2 + r3 + r4)
+        info_label = source.ttk.Label(master=self, text='\n'.join(msg))
         info_label.grid(row=row+2, column=0, columnspan=2, sticky='W')
         self.show_separator(row=row+3)
 

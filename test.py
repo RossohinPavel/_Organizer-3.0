@@ -1,11 +1,21 @@
 class Test:
-    __slots__ = ('one', 'two')
-
     def __init__(self):
-        self.one = 1
-        self.two = 2
+        self.attr = '123456'
+
+    def __hash__(self):
+        return hash(self.attr)
+
+    def __eq__(self, other):
+        return self.attr == other
 
 
-test = Test()
+test1 = Test()
+test2 = Test()
 
-print(test.__slots__)
+print(id(test1), id(test2))
+
+my_set = {test1, test2}
+print(my_set)
+
+for obj in my_set:
+    print(id(obj))

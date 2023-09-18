@@ -6,22 +6,27 @@ class Tracker(AppManager):
     """Абстракнтый объект, предоставляющий основную логику слежения за файлами"""
     delay = 180
 
+    def get_tracker_settings(self):
+        """Возвращает настройки автоматического запуска и текстовую переменную"""
+        raise Exception('Функция get_tracker_settings не переопределена в дочерном классе')
+
     def __init__(self):
         """Регистрирует цикл проверок Трекера, если соответсвующий трекер активен"""
-        autorun, txt_var = self.get_settings()
+        autorun, txt_var = self.get_tracker_settings()
         if autorun:
-            self.app_m.IPlanner.create_loop(self.__update_txt_vars(txt_var, self.delay, self.__safe_run(self.main)), self.delay)
+            self.app_m.IPlanner.create_loop(self.__update_txt_vars(txt_var, self.delay, self.auto), self.delay)
 
-    @staticmethod
-    def __safe_run(func):
-        """Обертка для безопасного запуска функции"""
-        def wrapper(*args, **kwargs):
-            try:
-                func(*args, **kwargs)
-            except Exception as e:
-                print(e)
-        wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
-        return wrapper
+    def run(self):
+        """Функция предоставляющая возможность ручного создания основной задачи трекера"""
+        self.app_m.IPlanner.create_task(self.manual)
+
+    def manual(self):
+        """Абстрактная ф-я для сбора функций дочерних классов ручного управления трекером"""
+        raise Exception('Функция manual для ручного управления трекером не переопределена в дочернем классе')
+
+    def auto(self):
+        """Абстракная ф-я для сбора функций дочерних классов"""
+        raise Exception('Функция auto не переопределена в дочерном классе')
 
     @staticmethod
     def __update_txt_vars(txt_var, delay, func):
@@ -33,15 +38,3 @@ class Tracker(AppManager):
             txt_var.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
-
-    def get_settings(self):
-        """Возвращает настройки автоматического запуска и текстовую переменную"""
-        raise Exception('Функция get_settings не переопределена в дочерном классе')
-
-    def run(self):
-        """Функция предоставляющая возможность ручного создания основной задачи трекера"""
-        self.app_m.IPlanner.create_task(self.__safe_run(self.main))
-
-    def main(self):
-        """Абстракная ф-я для сбора функций дочерних классов"""
-        raise Exception('Функция main не переопределена в дочерном классе')
