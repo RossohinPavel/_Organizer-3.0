@@ -19,6 +19,8 @@ class ProcessingFrame(AppManagerW):
         self.header.set('__Имя модуля/номер заказа__')
         self.status.set('__Статус/имя тиража__')
         self.qty.set('__Количество__')
+        self.pb['maximum'] = 0
+        self.pb['value'] = 0
         place = 4
         for widget in self._widgets:
             widget.place(x=2, y=place)

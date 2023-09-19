@@ -19,9 +19,26 @@ class OrdersTracker(Tracker):
         self.auto()
 
     def auto(self):
+        self.app_m.ProcessingFrame.header.set('Трекер заказов')
+        self.app_m.ProcessingFrame.qty.set('0/4')
+        self.app_m.ProcessingFrame.pb['maximum'] = 4
+        self.app_m.ProcessingFrame.pb['value'] = 0
+        self.app_m.ProcessingFrame.status.set('Обновление списка заказов')
         self.__update_orders_dct()
+        self.app_m.ProcessingFrame.qty.set('1/4')
+        self.app_m.ProcessingFrame.pb['value'] += 1
+        self.app_m.ProcessingFrame.status.set('Обновление списка тиражей')
         self.__update_edition_list()
+        self.app_m.ProcessingFrame.qty.set('2/4')
+        self.app_m.ProcessingFrame.pb['value'] += 1
+        self.app_m.ProcessingFrame.status.set('Обновление объектов-тиражей')
         self.__update_proxies()
+        self.app_m.ProcessingFrame.qty.set('3/4')
+        self.app_m.ProcessingFrame.pb['value'] += 1
+        self.app_m.ProcessingFrame.status.set('Сохранение информации')
+        self.app_m.ProcessingFrame.qty.set('4/4')
+        self.app_m.ProcessingFrame.pb['value'] += 1
+        
 
     def __update_orders_dct(self):
         """Обновление списка отслеживаемых заказов"""
