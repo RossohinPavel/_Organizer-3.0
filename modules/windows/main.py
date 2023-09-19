@@ -1,6 +1,7 @@
 import modules.windows.source as source
 from modules.windows.settings import SettingsWindow
 from modules.windows.library import LibraryWindow
+from modules.windows.processing import ProcessingFrame
 from modules.app_manager import *
 
 
@@ -101,6 +102,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
         """Отрисовка фрейма отображения прогресса обработки файлов"""
         processing_frame = source.tk.Frame(master=frame, width=265, relief='raised', border=1)
         processing_frame.pack(side='right', fill='both')
+        ProcessingFrame(processing_frame)
 
     def show_common_line(self):
         """Отображение остальных фреймов для работы с заказами, клиентами и др"""
@@ -135,7 +137,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     @staticmethod
     def show_information_frame(frame):
         """Отрисовка фрейма отображения информации о заказах"""
-        source.tk.Frame(master=frame, width=268, height=218, bg='yellow').pack(side='right')
+        source.tk.Frame(master=frame, width=265, height=218, bg='yellow').pack(side='right')
 
 
 class TxtVars(AppManagerW):

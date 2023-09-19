@@ -18,7 +18,7 @@ class IPlanner(AppManager):
         def wrapper(*args, **kwargs):
             num = cls.app_m.TxtVars.tasks_queue.get()
             cls.app_m.TxtVars.tasks_queue.set(num + 1)
-            with cls.__lock:
+            with cls.__lock, cls.app_m.ProcessingFrame:
                 try:
                     func(*args, **kwargs)
                 except Exception as exc:

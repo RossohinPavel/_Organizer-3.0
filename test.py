@@ -1,21 +1,21 @@
 class Test:
-    def __init__(self):
-        self.attr = '123456'
+   
+    def __init__(self, atr='123'):
+        self.attr = atr
 
-    def __hash__(self):
-        return hash(self.attr)
+    def __enter__(self):
+        print(f'__enter__ in {self.__class__.__name__}', self.attr)
+        return self
 
-    def __eq__(self, other):
-        return self.attr == other
+    def __exit__(self, *args):
+        print(f'__exit__ on {self.__class__.__name__}', self.attr)
 
 
-test1 = Test()
-test2 = Test()
+class Test1(Test):
+    pass
 
-print(id(test1), id(test2))
+test = Test('123456')
 
-my_set = {test1, test2}
-print(my_set)
 
-for obj in my_set:
-    print(id(obj))
+with test, Test1() as t1:
+    pass
