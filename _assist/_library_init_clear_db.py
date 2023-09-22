@@ -15,8 +15,9 @@ def create_clear_db():
                 if descr:
                     row = ',\n' + row
                 descr += row
-            sql_req = f'CREATE TABLE {category}\n(id INTEGER PRIMARY KEY AUTOINCREMENT,\n{descr})'
-            cursor.execute(sql_req)
+            print(descr)
+            # sql_req = f'CREATE TABLE {category}\n(id INTEGER PRIMARY KEY AUTOINCREMENT,\n{descr})'
+            # cursor.execute(sql_req)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 import os
 import re
-
 from modules.trackers.tracker import Tracker
 from modules.order.tracker_proxies import *
 
@@ -36,9 +35,9 @@ class OrdersTracker(Tracker):
         self.app_m.ProcessingFrame.qty.set('3/4')
         self.app_m.ProcessingFrame.pb['value'] += 1
         self.app_m.ProcessingFrame.status.set('Сохранение информации')
+        self.__update_log()
         self.app_m.ProcessingFrame.qty.set('4/4')
         self.app_m.ProcessingFrame.pb['value'] += 1
-        
 
     def __update_orders_dct(self):
         """Обновление списка отслеживаемых заказов"""
@@ -78,3 +77,13 @@ class OrdersTracker(Tracker):
         for proxy_lst in self.__orders.values():
             for proxy in proxy_lst:
                 proxy.update_info()
+
+    def __update_log(self):
+        """Отправляем в лог заказы, в которых обновилась информация"""
+        lst = []
+        for ord_proxy, proxy_lst in self.__orders.items():
+            for proxy in proxy_lst:
+                if proxy.update_flag:
+                    lst.append(ord_proxy.order)
+                    break
+        self.app_m.Log.update_records(lst)

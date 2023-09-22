@@ -3,12 +3,12 @@ __all__ = ('Order', 'Edition', 'PhotoEdition', 'OrderInfo')
 
 class Order:
     """Датакласс для описания заказа"""
-    __slots__ = 'path', 'creation_date', 'name', 'photo', 'order_info', 'content'
+    __slots__ = 'name', 'creation_date', 'path', 'photo', 'order_info', 'content'
 
     def __init__(self, path, creation_date, name):
-        self.path = f'{path}/{creation_date}/{name}'
-        self.creation_date = creation_date
         self.name = name
+        self.creation_date = creation_date
+        self.path = f'{path}/{creation_date}/{name}'
         self.photo = None
         self.order_info = None
         self.content = tuple()
