@@ -117,9 +117,7 @@ class PhotoProxy(ProxyObserver):
 
 class OrderInfoProxy(ProxyObserver):
     def init_observer(self, order_obj, name):
-        obj = OrderInfo()
-        order_obj.order_info = obj
-        return obj
+        return order_obj
 
     def get_info(self):
         name, address, price = 'unknown', 'unknown', 0

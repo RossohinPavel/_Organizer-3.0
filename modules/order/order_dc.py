@@ -1,16 +1,18 @@
-__all__ = ('Order', 'Edition', 'PhotoEdition', 'OrderInfo')
+__all__ = ('Order', 'Edition', 'PhotoEdition')
 
 
 class Order:
     """Датакласс для описания заказа"""
-    __slots__ = 'name', 'creation_date', 'path', 'photo', 'order_info', 'content'
+    __slots__ = 'name', 'creation_date', 'path', 'photo', 'customer_name', 'customer_address', 'price', 'content'
 
     def __init__(self, path, creation_date, name):
         self.name = name
         self.creation_date = creation_date
         self.path = f'{path}/{creation_date}/{name}'
+        self.customer_name = 'unknown'
+        self.customer_address = 'unknown'
+        self.price = 0
         self.photo = None
-        self.order_info = None
         self.content = tuple()
 
 
@@ -29,13 +31,3 @@ class PhotoEdition:
 
     def __init__(self):
         self.matrix_repr = {}
-
-
-class OrderInfo:
-    """Датакласс для описания сопутствубщей информации о заказе"""
-    __slots__ = 'customer_name', 'customer_address', 'price'
-
-    def __init__(self):
-        self.customer_name = 'unknown'
-        self.customer_address = 'unknown'
-        self.price = 0
