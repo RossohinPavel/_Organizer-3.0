@@ -69,7 +69,7 @@ class OrdersTracker(Tracker):
                         proxies_lst.append(OrderInfoProxy(order_obj, path, name))
                     if name == 'PHOTO':
                         proxies_lst.append(PhotoProxy(order_obj, path, name))
-                    if name != 'PHOTO' and os.path.isdir(f'{path}/{name}'):
+                    if name not in ('PHOTO', '_TO_PRINT') and os.path.isdir(f'{path}/{name}'):
                         proxies_lst.append(EditionProxy(order_obj, path, name))
 
     def __update_proxies(self):
