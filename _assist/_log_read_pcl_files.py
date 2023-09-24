@@ -4,6 +4,8 @@ import time
 
 
 for pcl_file in os.listdir(f'../data/logs'):
+    if not pcl_file.endswith('pcl'):
+        continue
     with open(f'../data/logs/{pcl_file}', 'rb') as file:
         lst = pickle.load(file)
         for obj in lst:
