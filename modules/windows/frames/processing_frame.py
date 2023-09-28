@@ -1,4 +1,4 @@
-import modules.windows.source as source
+from .common import src as src
 from modules.app_manager import AppManagerW
 
 
@@ -6,13 +6,13 @@ class ProcessingFrame(AppManagerW):
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""
     def __init__(self, frame):
         self._frame = frame
-        self.header = source.tk.StringVar(master=frame)
-        self.status = source.tk.StringVar(master=frame)
-        self.qty = source.tk.StringVar(master=frame)
-        self.pb = source.ttk.Progressbar(master=frame, orient='horizontal', length=243)
-        self._widgets = [source.ttk.Label(master=self._frame, textvariable=self.header, width=40),
-                         source.ttk.Label(master=self._frame, textvariable=self.status, width=40),
-                         source.ttk.Label(master=self._frame, textvariable=self.qty, width=40), self.pb]
+        self.header = src.tk.StringVar(master=frame)
+        self.status = src.tk.StringVar(master=frame)
+        self.qty = src.tk.StringVar(master=frame)
+        self.pb = src.ttk.Progressbar(master=frame, orient='horizontal', length=243)
+        self._widgets = [src.ttk.Label(master=self._frame, textvariable=self.header, width=40),
+                         src.ttk.Label(master=self._frame, textvariable=self.status, width=40),
+                         src.ttk.Label(master=self._frame, textvariable=self.qty, width=40), self.pb]
 
     def __enter__(self):
         place = 4

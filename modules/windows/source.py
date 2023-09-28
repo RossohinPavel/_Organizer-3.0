@@ -2,7 +2,6 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox as tkmb
 from tkinter import filedialog as tkfd
-from tkinter import colorchooser as tkcc
 
 
 class ChildWindow(tk.Toplevel):
@@ -26,15 +25,6 @@ class ChildWindow(tk.Toplevel):
         place_x = ((self.master.winfo_width() - self.winfo_width()) // 2) + self.master.winfo_x()
         place_y = ((self.master.winfo_height() - self.winfo_height()) // 2) + self.master.winfo_y()
         self.geometry(f"+{place_x}+{place_y}")
-
-
-class LabeledFrame(ttk.Frame):
-    """Конструктор для фрейма с надписью"""
-    def __init__(self, *args, text='', **kwargs):
-        super().__init__(*args, padding=(3, 7, 3, 3), **kwargs)
-        self.container = ttk.Frame(master=self, width=50, height=50, borderwidth=1, padding=(2, 6, 2, 2), relief='solid')
-        self.container.pack(fill='both')
-        ttk.Label(master=self, text=text).place(x=20, y=-9)
 
 
 class MyButton(tk.Button):

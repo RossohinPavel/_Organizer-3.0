@@ -1,6 +1,6 @@
-import modules.windows.source as source
+from .common import *
 
 
-class MailSamplesFrame(source.LabeledFrame):
+class MailSamplesFrame(LabeledFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, text='Текстовые шаблоны', **kwargs)

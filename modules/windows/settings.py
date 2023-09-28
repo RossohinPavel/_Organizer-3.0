@@ -1,4 +1,5 @@
 import modules.windows.source as source
+from modules.windows.frames import LabeledFrame
 
 
 class SettingsWindow(source.ChildWindow):
@@ -24,7 +25,7 @@ class SettingsWindow(source.ChildWindow):
         def update_label():
             label.config(text=f'Текущее значение: {self.app_m.Settings.log_check_depth} заказов (папок)')
 
-        frame = source.LabeledFrame(master=self, text='Глубина проверки лога')
+        frame = LabeledFrame(master=self, text='Глубина проверки лога')
         label = source.ttk.Label(master=frame.container)
         update_label()
         entry_var = source.tk.StringVar(master=self)
@@ -44,7 +45,7 @@ class SettingsWindow(source.ChildWindow):
             source.tkmb.showinfo(parent=self, title="Изменение настроек",
                                  message="Для вступления настроек в силу нужно перезагрузить программу")
 
-        frame = source.LabeledFrame(master=self, text='Режимы работы программы')
+        frame = LabeledFrame(master=self, text='Режимы работы программы')
         frame.pack(fill='x')
         self.__dict__['autolog'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.autolog)
         chbtn1 = source.ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
@@ -57,7 +58,7 @@ class SettingsWindow(source.ChildWindow):
 
     def show_directory_widgets(self):
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
-        frame = source.LabeledFrame(master=self, text='Рабочие директории')
+        frame = LabeledFrame(master=self, text='Рабочие директории')
         frame.pack()
         self.show_directory_frame(frame.container, 'bottom', 'Диск операторов фотопечати \'Т\'', 't_disc', (1, 2))
         self.show_directory_frame(frame.container, 'left', 'Диск загрузки заказов \'Z\'', 'z_disc', (1, 1))
