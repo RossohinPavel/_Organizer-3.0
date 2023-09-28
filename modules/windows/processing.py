@@ -8,12 +8,11 @@ class ProcessingFrame(AppManagerW):
         self.header = source.tk.StringVar(master=frame)
         self.status = source.tk.StringVar(master=frame)
         self.qty = source.tk.StringVar(master=frame)
-        self.pb = source.ttk.Progressbar(master=frame, orient='horizontal', length=258)
-        self._widgets = [source.ttk.Label(master=self._frame, textvariable=self.header, width=42),
-                         source.ttk.Label(master=self._frame, textvariable=self.status, width=42),
-                         source.ttk.Label(master=self._frame, textvariable=self.qty, width=42),
+        self.pb = source.ttk.Progressbar(master=frame, orient='horizontal', length=243)
+        self._widgets = [source.ttk.Label(master=self._frame, textvariable=self.header, width=40),
+                         source.ttk.Label(master=self._frame, textvariable=self.status, width=40),
+                         source.ttk.Label(master=self._frame, textvariable=self.qty, width=40),
                          self.pb]
-
 
     def __enter__(self):
         self.header.set('__Имя модуля/номер заказа__')
@@ -25,9 +24,7 @@ class ProcessingFrame(AppManagerW):
         for widget in self._widgets:
             widget.place(x=2, y=place)
             place += 24
-            
 
     def __exit__(self, *args):
         for widget in self._widgets:
             widget.place_forget()
-        

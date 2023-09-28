@@ -1,21 +1,22 @@
-class Test:
-   
-    def __init__(self, atr='123'):
-        self.attr = atr
-
-    def __enter__(self):
-        print(f'__enter__ in {self.__class__.__name__}', self.attr)
-        return self
-
-    def __exit__(self, *args):
-        print(f'__exit__ on {self.__class__.__name__}', self.attr)
+import tkinter as tk
+import tkinter.ttk as ttk
+import re
 
 
-class Test1(Test):
-    pass
+class LabeledFrame(ttk.Frame):
+    def __init__(self, *args, text='', **kwargs):
+        super().__init__(*args, padding=(5, 8, 5, 5), **kwargs)
+        self.container = ttk.Frame(master=self, width=50, height=50, borderwidth=1, padding=(2, 4, 2, 2), relief='solid')
+        self.container.pack(fill='both')
+        ttk.Label(master=self, text=text).place(x=3, y=-10)
 
-test = Test('123456')
 
+root = tk.Tk()
+root.geometry('200x200')
 
-with test, Test1() as t1:
-    pass
+frame = LabeledFrame(master=root, text='test')
+frame.pack(fill='both')
+
+ttk.Label(master=frame.container, text='text_inside').pack(anchor='nw')
+
+root.mainloop()

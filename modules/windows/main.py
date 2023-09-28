@@ -17,7 +17,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     def set_main_graph_settings(self):
         """Основные настройки окна, положения и размера."""
         self.title('Органайзер 3_0 PRE ALPHA')
-        width, height = 530, 414
+        width, height = 500, 412
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
@@ -41,11 +41,11 @@ class MainWindow(AppManagerR, source.tk.Tk):
         frame = source.tk.Frame(master=self, height=20)
         frame.pack(fill='both')
         source.ttk.Label(master=frame, text='Трекер заказов:').place(x=0, y=0)
-        source.ttk.Label(master=frame, text='Трекер файлов:').place(x=265, y=0)
+        source.ttk.Label(master=frame, text='Трекер файлов:').place(x=250, y=0)
         orders_trk = source.tk.StringVar(master=self, value='Выключен')
         source.ttk.Label(master=frame, textvariable=orders_trk).place(x=90, y=0)
         files_trk = source.tk.StringVar(master=self, value='Выключен')
-        source.ttk.Label(master=frame, textvariable=files_trk).place(x=355, y=0)
+        source.ttk.Label(master=frame, textvariable=files_trk).place(x=340, y=0)
         self.app_m.TxtVars.orders_trk = orders_trk
         self.app_m.TxtVars.files_trk = files_trk
 
@@ -54,9 +54,9 @@ class MainWindow(AppManagerR, source.tk.Tk):
         self.show_separator()
         frame = source.tk.Frame(master=self, height=20)
         frame.pack(fill='both')
-        source.ttk.Label(master=frame, text='Задач в очереди:').place(x=265, y=0)
+        source.ttk.Label(master=frame, text='Задач в очереди:').place(x=250, y=0)
         tasks_queue = source.tk.IntVar(master=self, value=0)
-        source.ttk.Label(master=frame, textvariable=tasks_queue).place(x=361, y=0)
+        source.ttk.Label(master=frame, textvariable=tasks_queue).place(x=347, y=0)
         self.app_m.TxtVars.tasks_queue = tasks_queue
 
     def show_label(self, text, bg=None):
@@ -78,19 +78,21 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
     def show_processing_buttons(self, frame):
         """Отрисовка фрейма кнопок запуска обработчика файлов"""
-        left_frame = source.tk.Frame(master=frame, width=265, relief='raised', border=1)
-        left_frame.pack(side='left', fill='both', expand=True, ipady=4)
-        for ln, lc, rn, rc in (('Фотобумага', None, 'Полиграфия', None), ('Альбомы', None, 'Журналы', None)):
-            line = source.tk.Frame(master=left_frame)
-            line.pack(fill='both', expand=True, padx=10)
-            source.MyButton(master=line, text=ln, command=lc, width=15).pack(side='left', pady=3)
-            source.MyButton(master=line, text=rn, command=rc, width=15).pack(side='right')
-        line = source.tk.Frame(master=left_frame)
-        line.pack(fill='both', expand=True, padx=10)
-        source.MyButton(master=line, text='Холсты', command=None, width=15).pack(side='left', pady=3)
-        self.__dict__['add_btn'] = source.MyButton(master=line, text='Дополнительно',
-                                                   command=self.show_add_btn_menu, width=15)
-        self.__dict__['add_btn'].pack(side='right')
+        left_frame = source.tk.Frame(master=frame, relief='raised', border=1)
+        left_frame.pack(side='left', fill='both', expand=True)
+        line1 = source.tk.Frame(master=left_frame)
+        source.MyButton(master=line1, text='Фотобумага', command=None, width=15).pack(side='left')
+        source.MyButton(master=line1, text='Полиграфия', command=None, width=15).pack(side='right', padx=(5, 0))
+        line1.pack(anchor='nw', padx=(6, 0), pady=(6, 5))
+        line2 = source.tk.Frame(master=left_frame)
+        source.MyButton(master=line2, text='Альбомы', command=None, width=15).pack(side='left')
+        source.MyButton(master=line2, text='Журналы', command=None, width=15).pack(side='right', padx=(5, 0))
+        line2.pack(anchor='nw', padx=(6, 0))
+        line3 = source.tk.Frame(master=left_frame)
+        source.MyButton(master=line3, text='Холсты', command=None, width=15).pack(side='left')
+        setattr(self, 'add_btn', source.MyButton(master=line3, text='Дополнительно', command=self.show_add_btn_menu, width=15))
+        self.__dict__['add_btn'].pack(side='right', padx=(5, 0))
+        line3.pack(anchor='nw', padx=(6, 0), pady=(5, 7))
 
     def show_add_btn_menu(self):
         add_menu = source.tk.Menu(tearoff=0)
@@ -100,7 +102,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     @staticmethod
     def show_processing_frame(frame):
         """Отрисовка фрейма отображения прогресса обработки файлов"""
-        processing_frame = source.tk.Frame(master=frame, width=265, relief='raised', border=1)
+        processing_frame = source.tk.Frame(master=frame, width=250, relief='raised', border=1)
         processing_frame.pack(side='right', fill='both')
         ProcessingFrame(processing_frame)
 
@@ -115,7 +117,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
     def show_information_buttons(self, frame):
         """Отрисовка кнопок получения различной информации о заказах"""
-        l_frame = source.tk.Frame(master=frame, width=265, relief='raised', border=1)
+        l_frame = source.tk.Frame(master=frame, relief='raised', border=1)
         l_frame.pack(side='left', fill='both', expand=True, ipady=4)
         source.MyButton(master=l_frame, text='СтикГен', width=18).pack(pady=5)
         source.MyButton(master=l_frame, text='Планировщик', width=18).pack()
@@ -137,7 +139,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     @staticmethod
     def show_information_frame(frame):
         """Отрисовка фрейма отображения информации о заказах"""
-        source.tk.Frame(master=frame, width=265, height=218, bg='yellow').pack(side='right')
+        source.tk.Frame(master=frame, width=250, height=218, bg='yellow').pack(side='right')
 
 
 class TxtVars(AppManagerW):
