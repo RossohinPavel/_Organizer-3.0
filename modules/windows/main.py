@@ -1,8 +1,6 @@
-import modules.windows.source as source
-from modules.windows.settings import SettingsWindow
-from modules.windows.library import LibraryWindow
-from modules.windows.processing import ProcessingFrame
 from modules.app_manager import *
+import modules.windows.source as source
+from modules.windows.frames import *
 
 
 class MainWindow(AppManagerR, source.tk.Tk):
@@ -17,7 +15,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
     def set_main_graph_settings(self):
         """Основные настройки окна, положения и размера."""
         self.title('Органайзер 3_0 PRE ALPHA')
-        width, height = 500, 412
+        width, height = 500, 410
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
@@ -111,35 +109,44 @@ class MainWindow(AppManagerR, source.tk.Tk):
         self.show_label('Общее', bg='#adc6ed')
         self.show_separator()
         frame = source.tk.Frame(master=self)
-        frame.pack(fill='both')
+        frame.pack(anchor='nw', expand=1, fill='both')
         self.show_information_buttons(frame)
         self.show_information_frame(frame)
 
     def show_information_buttons(self, frame):
         """Отрисовка кнопок получения различной информации о заказах"""
         l_frame = source.tk.Frame(master=frame, relief='raised', border=1)
-        l_frame.pack(side='left', fill='both', expand=True, ipady=4)
-        source.MyButton(master=l_frame, text='СтикГен', width=18).pack(pady=5)
-        source.MyButton(master=l_frame, text='Планировщик', width=18).pack()
-        source.MyButton(master=l_frame, text='Текстовые шаблоны', width=18).pack(pady=5)
-        source.tk.Frame(master=l_frame, height=26, width=20).pack()
-        source.tk.Frame(master=l_frame, height=26, width=20).pack(pady=5)
-        source.tk.Frame(master=l_frame, height=26, width=20).pack()
-        self.__dict__['control_btn'] = source.MyButton(master=l_frame, text='Управление', width=18, command=self.show_control_btn_menu)
-        self.__dict__['control_btn'].pack(pady=5)
+        l_frame.pack(side='left', anchor='nw')
+        btn1 = source.MyButton(master=l_frame, text='СтикГен', command=self.update_info_frame(StickGenFrame), width=18)
+        btn1.pack(padx=56, pady=(5, 0))
+        btn2 = source.MyButton(master=l_frame, text='Планировщик', command=self.update_info_frame(PlanerFrame), width=18)
+        btn2.pack(pady=(5, 0))
+        btn3 = source.MyButton(master=l_frame, text='Текстовые шаблоны', command=self.update_info_frame(MailSamplesFrame), width=18)
+        btn3.pack(pady=(5, 0))
+        for _ in range(3):
+            source.tk.Frame(master=l_frame, height=26, width=20).pack(pady=(5, 0))
+        btn4 = source.MyButton(master=l_frame, text='Управление', width=18, command=self.update_info_frame(ControlFrame))
+        btn4.pack(pady=(5, 5))
 
-    def show_control_btn_menu(self):
-        """Отрисовка менюшек управления приложением"""
-        control_menu = source.tk.Menu(tearoff=0)
-        control_menu.add_command(label="Настройки", command=lambda: SettingsWindow(self))
-        control_menu.add_command(label='Библиотека', command=lambda: LibraryWindow(self))
-        control_menu.add_command(label='Информация', command=lambda: print('None'))
-        control_menu.post(self.__dict__['control_btn'].winfo_rootx(), self.__dict__['control_btn'].winfo_rooty() - 63)
-
-    @staticmethod
-    def show_information_frame(frame):
+    def show_information_frame(self, frame):
         """Отрисовка фрейма отображения информации о заказах"""
-        source.tk.Frame(master=frame, width=250, height=218, bg='yellow').pack(side='right')
+        frame = source.tk.Frame(master=frame, relief='raised', border=1)
+        frame.contained_obj = None
+        setattr(self, 'info_frame', frame)
+        frame.pack(side='right', expand=1, fill='both')
+
+    def update_info_frame(self, obj_link):
+        """Замыкание для реализации логики отрисовки информации на info_frame"""
+        def closure():
+            info_frame = getattr(self, 'info_frame')
+            for frame in info_frame.winfo_children():
+                frame.destroy()
+            if info_frame.contained_obj == obj_link:
+                info_frame.contained_obj = None
+            else:
+                info_frame.contained_obj = obj_link
+                obj_link(info_frame).pack(fill='both', expand=1)
+        return closure
 
 
 class TxtVars(AppManagerW):

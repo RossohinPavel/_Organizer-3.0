@@ -5,19 +5,6 @@ from tkinter import filedialog as tkfd
 from tkinter import colorchooser as tkcc
 
 
-class LabeledFrame(ttk.Frame):
-    def __init__(self, *args, text='', **kwargs):
-        super().__init__(*args, padding=(4, 7, 4, 3), **kwargs)
-        self.container = ttk.Frame(master=self, width=50, height=50, borderwidth=1, padding=(2, 6, 2, 2), relief='solid')
-        self.container.pack(fill='both')
-        ttk.Label(master=self, text=text).place(x=18, y=-9)
-
-
-class MyButton(tk.Button):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, relief=tk.FLAT, fg="#eee", bg="#454545", **kwargs)
-
-
 class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
     def __init__(self, parent_root):
@@ -39,3 +26,18 @@ class ChildWindow(tk.Toplevel):
         place_x = ((self.master.winfo_width() - self.winfo_width()) // 2) + self.master.winfo_x()
         place_y = ((self.master.winfo_height() - self.winfo_height()) // 2) + self.master.winfo_y()
         self.geometry(f"+{place_x}+{place_y}")
+
+
+class LabeledFrame(ttk.Frame):
+    """Конструктор для фрейма с надписью"""
+    def __init__(self, *args, text='', **kwargs):
+        super().__init__(*args, padding=(3, 7, 3, 3), **kwargs)
+        self.container = ttk.Frame(master=self, width=50, height=50, borderwidth=1, padding=(2, 6, 2, 2), relief='solid')
+        self.container.pack(fill='both')
+        ttk.Label(master=self, text=text).place(x=20, y=-9)
+
+
+class MyButton(tk.Button):
+    """Конструктор для кнопки с нужным стилем"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, relief=tk.FLAT, fg="#eee", bg="#454545", **kwargs)
