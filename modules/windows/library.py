@@ -54,7 +54,7 @@ class LibraryWindow(source.ChildWindow):
         """
         def wrapper():
             index = self.tree.selection()
-            if not index or module != 'add' and len(index[0]) < 2:
+            if not index or module != 'add' and not index[0][-1].isdigit():
                 source.tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
                 return
             item = self.tree.item(index[0])
@@ -184,14 +184,13 @@ class AssistWindow(source.ChildWindow):
 
     def show_buttons(self):
         """Функция для отрисовки кнопок"""
-        pass
         text = {'add': 'Добавить', 'copy': 'Копировать', 'change': 'Изменить'}[self.module]
-        frame = source.tk.Frame(self, width=487, height=30)
+        frame = source.tk.Frame(self, height=28)
         func_button = source.MyButton(frame, text=text, width=30, command=self.write_to_library)
-        func_button.place(x=130, y=2)
+        func_button.place(x=130, y=0)
         close_button = source.MyButton(frame, text='Закрыть', width=10, command=self.destroy)
-        close_button.place(x=407, y=2)
-        frame.pack()
+        close_button.place(x=415, y=0)
+        frame.pack(expand=1, fill='x')
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
