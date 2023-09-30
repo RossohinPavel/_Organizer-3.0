@@ -1,4 +1,5 @@
 import modules.windows.source as source
+from modules.windows.frames import LabeledFrame
 
 
 class LibraryWindow(source.ChildWindow):
@@ -35,13 +36,11 @@ class LibraryWindow(source.ChildWindow):
 
     def set_treeview_values(self):
         """Метод для установки значений в тривью"""
-        key_index = 1
-        for cat, lst in self.app_m.Library.get_product_headers().items():
-            tag, header = cat.split('=')
-            self.tree.insert('', 'end', iid=str(key_index), text=header, tags=tag)
-            for index, value in enumerate(lst):
-                self.tree.insert(str(key_index), 'end', iid=f'{key_index}{index}', text=value, tags=tag)
-            key_index += 1
+        for ind, obj in enumerate(self.app_m.lib.categories, 1):   # Устанавливаем категории
+            self.tree.insert('', 'end', iid=obj.__name__, text=obj.rus_name, tags=obj.__name__)
+        for ind, value in enumerate(self.app_m.Library.headers.items(), 1):     # Вставляем продукты в категории
+            name, category = value
+            self.tree.insert(str(category), 'end', iid=f'{category}{ind}', text=name, tags=category)
 
     def clear_treeview(self):
         """Очитска тривью от содержимого"""
@@ -77,25 +76,24 @@ class LibraryWindow(source.ChildWindow):
 
 class AssistWindow(source.ChildWindow):
     """Конструктор вспомогательных окон библиотеки"""
-    __FRAMES = {'full_name': ('entry', 'Введите полное имя продукта', 2, 0, {'width': 80}),
-                'segment': ('radio', 'Выберите сегмент продукции', 2, 41),
-                'short_name': ('combo', 'Выберите короткое имя', 2, 82),
-                'product_format': ('combo', 'Выберите формат продукта', 2, 123),
-                'book_option': ('radio', 'Выберите опции сборки книги', 250, 82),
-                'lamination': ('radio', 'Выберите ламинацию для продукта', 250, 41),
-                'cover_type': ('radio', 'Выберите тип обложки', 2, 169),
-                'carton_length': ('entry', 'Укажите ДЛИННУ и ВЫСОТУ картонки', 252, 169, {'width': 18}),
-                'carton_height': ('entry', None, 372, 169, {'width': 18}),
-                'cover_clapan': ('combo', 'Укажите значения КЛАПАНА и ШАРНИРА', 252, 210, {'width': 15}),
-                'cover_joint': ('combo', None, 372, 210, {'width': 15}),
-                'cover_print_mat': ('combo', 'Выберите печатный материал обложки', 2, 255),
-                'page_print_mat': ('combo', 'Выберите печатный материал разворотов', 250, 255),
-                'cover_canal': ('combo', "Выберите 'канал' обложки", 2, 300),
-                'page_canal': ('combo', "Выберите 'канал' разворотов", 250, 300),
-                'dc_top_indent': ('entry', 'Введите значение отступа СВЕРХУ в мм', 2, 300),
-                'dc_left_indent': ('entry', 'Введите значение отступа СЛЕВА в мм', 2, 341),
-                'dc_overlap': ('entry', 'НАХЛЕСТ для переплета в мм', 249, 300),
-                'dc_break': ('check', 'Раскодировка с разрывом', 250, 355)
+    __FRAMES = {'segment': ('options', 'radio', 'left', {'text': 'Выберите сегмент продукции'}),
+                'short_name': ('options', 'combo', 'left', {'text': 'Выберите короткое имя'}),
+                'product_format': ('options', 'combo', 'left', {'text': 'Выберите формат продукта'}),
+                'book_option': ('options', 'radio', 'right', {'text': 'Выберите опции сборки книги'}),
+                'lamination': ('options', 'radio', 'right', {'text': 'Выберите ламинацию для продукта'}),
+                'cover_type': ('cover_type', 'radio', 'left',  {}),
+                'carton_length': ('cover_val', 'entry', 'left', {'text': 'Укажите ДЛИННУ картонки'}),
+                'carton_height': ('cover_val',  'entry', 'left', {'text': 'Укажите ВЫСОТУ картонки'}),
+                'cover_clapan': ('cover_val', 'combo', 'right', {'text': 'Укажите значения КЛАПАНА'}),
+                'cover_joint': ('cover_val', 'combo', 'right', {'text': 'Укажите значения ШАРНИРА'}),
+                'cover_print_mat': ('print_mat', 'combo', 'left', {'text': 'Выберите печатный материал обложки'}),
+                'page_print_mat': ('print_mat', 'combo', 'right', {'text': 'Выберите печатный материал разворотов'}),
+                'cover_canal': ('individual', 'combo', 'left', {'text': "Выберите 'канал' обложки"}),
+                'page_canal': ('individual', 'combo', 'right', {'text': "Выберите 'канал' разворотов"}),
+                'dc_top_indent': ('individual', 'entry', 'left', {'text': 'Введите значение отступа СВЕРХУ в мм'}),
+                'dc_left_indent': ('individual', 'entry', 'left', {'text': 'Введите значение отступа СЛЕВА в мм'}),
+                'dc_overlap': ('individual', 'entry', 'right', {'text': 'НАХЛЕСТ для переплета в мм'}),
+                'dc_break': ('individual', 'check', 'right', {'text': 'Раскодировка с разрывом'})
                 }
 
     def __init__(self, parent_root, module, category, product):
@@ -116,71 +114,84 @@ class AssistWindow(source.ChildWindow):
 
     def show_main_widgets(self):
         """Отображает менюшки на self.product_menus_frame согласно выбранному продукту"""
-        frame = source.tk.Frame(self, height=385, width=490)
-        funcs = {'entry': self.__show_entry_frame, 'radio': self.__show_radio_frame,
-                 'combo': self.__show_combobox_frame, 'check': self.__show_check_frame}
-        for x, y in ((0, 167), (0, 254), (0, 299)):  # Рисуем разделители для отделения тематических блоков
-            separator = source.tk.Frame(frame, width=496, height=1, bg='black')
-            separator.place(x=x, y=y)
+        # Рисуем Фуллнейм независимо от основной логики отрисовки виджетов
+        self.__show_entry('full_name', self.show_m_frame('Введите полное имя продукта')().container, **{'width': 80})
+        mf = {'options': self.show_m_frame('Общие особенности продукта'),
+              'cover_type': self.show_m_frame('Тип сборки обложки'),
+              'cover_val': self.show_m_frame('Особенности сборки обложки'),
+              'print_mat': self.show_m_frame('Печатный материал'),
+              'individual': self.show_m_frame('Индивидуальные особенности продукта')}
+        funcs = {'entry': self.__show_entry, 'radio': self.__show_radio, 'combo': self.__show_combobox, 'check': self.__show_check}
+        sides = {'left': [], 'right': []}
         for frm in self.__FRAMES:
             if frm in self.product_obj.__dict__:
-                current_frame, *args = self.__FRAMES[frm]
-                kwargs = {'values': self.product_obj.__dict__[frm]}
-                if isinstance(args[-1], dict):
-                    kwargs.update(args[-1])
-                    args = args[:-1]
-                funcs[current_frame](frm, frame, *args, **kwargs)
-        frame.pack(expand=True, fill='both')
+                m_name, child, side, kwargs = self.__FRAMES[frm]
+                if not isinstance(mf[m_name], LabeledFrame):
+                    mf[m_name] = mf[m_name]()
+                    sides['left'] = [{'row': i, 'column': 0} for i in range(3)]
+                    sides['right'] = [{'row': i, 'column': 1} for i in range(3)]
+                kwargs.update({'values': self.product_obj.__dict__[frm], 'padx': 1.3, **sides[side].pop(0)})
+                funcs[child](frm, mf[m_name].container, **kwargs)
+
+    def show_m_frame(self, text):
+        """Замыкание для отрисовки мастер-фреймов"""
+        def wrapper():
+            frame = LabeledFrame(master=self, text=text)
+            frame.pack(expand=1, fill='x')
+            return frame
+        return wrapper
+
+    def __show_entry(self, key, container, **kwargs):
+        """Конструктор фрейма для отрисовки Entry виджета"""
+        frame = source.tk.Frame(master=container)
+        if 'text' in kwargs:
+            source.ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
+        self.product_vars[key] = var = source.tk.StringVar(master=container)
+        entry = source.ttk.Entry(master=frame, width=kwargs.get('width', 39), textvariable=var,
+                                 state='disabled' if key == 'full_name' and self.module == 'change' else 'normal')
+        entry.pack()
+        frame.grid(row=kwargs.get('row', 0), column=kwargs.get('column', 0), padx=kwargs.get('padx', 0))
+
+    def __show_radio(self, key, container, **kwargs):
+        """Конструктор для отрисовки Радио-баттон-фреймов"""
+        pos = [{'row': 1, 'column': i} for i in range(5)]
+        frame = source.tk.Frame(master=container)
+        if 'text' in kwargs:
+            source.ttk.Label(master=frame, text=kwargs['text']).grid(row=0, column=0, columnspan=3, sticky='nw')
+        self.product_vars[key] = var = source.tk.StringVar(master=container, value=kwargs['values'][0])
+        for name in kwargs['values']:
+            radio = source.ttk.Radiobutton(master=frame, text=name, value=name, variable=var)
+            radio.grid(**pos.pop(0), sticky='ew')
+        frame.grid(row=kwargs['row'], column=kwargs['column'], sticky='ew', padx=kwargs.get('padx', 0))
+
+    def __show_combobox(self, key, container, **kwargs):
+        """Конструктор фрейма для отрисовки Комбобокс виджета"""
+        frame = source.tk.Frame(master=container)
+        if 'text' in kwargs:
+            source.ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
+        self.product_vars[key] = source.ttk.Combobox(master=frame, width=kwargs.get('width', 36),
+                                                     state='readonly', values=kwargs['values'])
+        self.product_vars[key].pack(anchor='nw')
+        frame.grid(row=kwargs['row'], column=kwargs['column'], padx=kwargs.get('padx', 0))
+
+    def __show_check(self, key, container, **kwargs):
+        """Конструктор для отрисовки чек фреймов"""
+        frame = source.tk.Frame(master=container)
+        self.product_vars[key] = var = source.tk.IntVar(master=container)
+        chbtn = source.ttk.Checkbutton(master=frame, text=kwargs['text'], variable=var)
+        chbtn.pack()
+        frame.grid(row=kwargs['row'], column=kwargs['column'], padx=kwargs.get('padx', 0))
 
     def show_buttons(self):
         """Функция для отрисовки кнопок"""
+        pass
         text = {'add': 'Добавить', 'copy': 'Копировать', 'change': 'Изменить'}[self.module]
         frame = source.tk.Frame(self, width=487, height=30)
         func_button = source.MyButton(frame, text=text, width=30, command=self.write_to_library)
-        func_button.place(x=140, y=2)
+        func_button.place(x=130, y=2)
         close_button = source.MyButton(frame, text='Закрыть', width=10, command=self.destroy)
         close_button.place(x=407, y=2)
         frame.pack()
-
-    @staticmethod
-    def __show_label(container, text, x, y):
-        """Конструктор текстового лейбла"""
-        if text:
-            label = source.ttk.Label(master=container, text=text)
-            label.place(x=x, y=y)
-
-    def __show_entry_frame(self, key, container, text, x, y, **kwargs):
-        """Конструктор фрейма для отрисовки Entry виджета"""
-        self.__show_label(container, text, x, y)
-        self.product_vars[key] = var = source.tk.StringVar(master=container)
-        entry = source.ttk.Entry(master=container, width=kwargs.get('width', 39), textvariable=var,
-                                 state='disabled' if key == 'full_name' and self.module == 'change' else 'normal')
-        entry.place(x=x, y=y + 20)
-
-    def __show_radio_frame(self, key, container, text, x, y, **kwargs):
-        """Конструктор для отрисовки Радио-баттон-фреймов"""
-        self.__show_label(container, text, x, y)
-        self.product_vars[key] = var = source.tk.StringVar(master=container, value=kwargs['values'][0])
-        indent = {'segment': ((0, 20), (80, 20)), 'cover_type': ((0, 20), (0, 40), (0, 60), (80, 20), (80, 40)),
-                  'book_option': ((0, 20), (50, 20), (100, 20)), 'lamination': ((0, 20), (50, 20), (100, 20))}[key]
-        for i, name in enumerate(kwargs['values']):
-            i_x, i_y = indent[i]
-            x_pos, y_pos = x + i_x, y + i_y
-            radio = source.ttk.Radiobutton(master=container, text=name, value=name, variable=var)
-            radio.place(x=x_pos, y=y_pos)
-
-    def __show_combobox_frame(self, key, container, text, x, y, **kwargs):
-        """Конструктор фрейма для отрисовки Комбобокс виджета"""
-        self.__show_label(container, text, x, y)
-        self.product_vars[key] = source.ttk.Combobox(master=container, width=kwargs.get('width', 36),
-                                                     state='readonly', values=kwargs['values'])
-        self.product_vars[key].place(x=x, y=y + 20)
-
-    def __show_check_frame(self, key, container, text, x, y, **kwargs):
-        """Конструктор для отрисовки чек фреймов"""
-        self.product_vars[key] = var = source.tk.IntVar(master=container)
-        check_btn = source.ttk.Checkbutton(master=container, text=text, variable=var)
-        check_btn.place(x=x, y=y)
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""

@@ -11,23 +11,42 @@ class Log(AppManagerW):
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
     __s_con = SafeConnect('log.db')
 
+    def get(self, order_name):
+        """Функция для получения имени заказа и даты его создания"""
+        with self.__s_con:
+            return self.__check_order(order_name)
+
+    def get_order_obj(self, order_tpl):
+        """Возвращает объект заказа"""
+        with self.__s_con, open(f'data/logs/{order_tpl[1]}.pcl', 'rb') as file:
+            for order in pickle.load(file):
+                if order_tpl[0] == order.name:
+                    return order
+
+    def __check_order(self, order_name):
+        """Проверка на присутсвие заказа в библиотеке. Использовать строго с контекстным менеджером"""
+        self.__s_con.cursor.execute(f'SELECT order_name, creation_date FROM LOG WHERE order_name={order_name}')
+        return self.__s_con.cursor.fetchone()
+
     def update_records(self, lst: list):
+        """Сборная ф-я для обновления библиотеки"""
         lst.reverse()
         with self.__s_con:
             self.__update_log_db(lst)
             self.__update_pickle_obj(lst)
 
     def __update_log_db(self, lst):
+        """Обновление базы данных SQLite"""
         commit_flag = False
         for obj in lst:
-            self.__s_con.cursor.execute(f'SELECT order_name FROM LOG WHERE order_name={obj.name}')
-            if not self.__s_con.cursor.fetchone():
+            if self.__check_order(obj.name) is None:
                 self.__s_con.cursor.execute(f'INSERT INTO LOG (order_name, creation_date) VALUES (\'{obj.name}\', \'{obj.creation_date}\')')
                 commit_flag = True
         if commit_flag:
             self.__s_con.connect.commit()
 
     def __update_pickle_obj(self, lst):
+        """Обновление pickle файлов"""
         dct = {}
         for order in lst:
             dct.setdefault(order.creation_date, []).append(order)
@@ -43,6 +62,7 @@ class Log(AppManagerW):
 
     @staticmethod
     def __get_combined_lst(old_list: list, new_list: list) -> list:
+        """Вспомогательная ф-я для получения комбинированного списка, где новые значения заменяют старые"""
         for obj in new_list:
             ind = 0
             while ind > len(old_list):

@@ -11,7 +11,9 @@ class Storage:
         return cls.__instance
 
     def __getattr__(self, item):
-        return self.__dict__[item]
+        for key, value in self.__dict__.items():
+            if key.startswith(item) or key.endswith(item):
+                return value
 
     def __setattr__(self, attr_name, obj):
         if not isinstance(obj, AppManagerW | AppManagerR):
@@ -19,7 +21,7 @@ class Storage:
         self.__dict__[attr_name] = obj
 
     def __contains__(self, item):
-        return item in self.__dict__
+        return self.__getattr__(item) is not None
 
 
 class AppManagerR:
@@ -28,11 +30,13 @@ class AppManagerR:
 
 
 class AppManagerW:
-    """Абстрактный класс, при создании объекта записывает его в хранилище. По факту - реализует моносостояние."""
+    """Абстрактный класс, при создании объекта записывает его в хранилище. Реализует моносостояние."""
+    _alias = ''  # псевдоним, который может использовать объект. Должен быть переопределен в дочернем классе
+
     def __new__(cls, *args, **kwargs):
         storage = Storage()
         if cls.__name__ not in storage:
-            setattr(storage, cls.__name__, super().__new__(cls))
+            setattr(storage, f'{cls.__name__}={cls._alias}', super().__new__(cls))
         return getattr(storage, cls.__name__)
 
 

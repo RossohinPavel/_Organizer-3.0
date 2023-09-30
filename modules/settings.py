@@ -12,27 +12,21 @@ class Settings(AppManagerW):
     - z_disc - Ссылка на серверный диск, куда загружаются заказы
     - o_disc - Ссылка на серверный диск, откуда происходит печать заказов
     - t_disc - Ссылка на серверный диск цифрового отдела и операторов фотопечати
+    - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
     """
+    _alias = 'stg'
+
     def __init__(self):
         """Чтение настроек. Вызвывается только при инициализации объекта"""
         with open('data/settings.pcl', 'rb') as file:
-            self.__dict__.update(pickle.load(file))
-
-    def __getattr__(self, item):
-        if item in self.__dict__:
-            return self.__dict__[item]
-        raise AttributeError(f'Атрибута {item} нет в настройках')
+            for key, value in pickle.load(file).items():
+                setattr(self, key, value)
 
     def __setattr__(self, key, value):
-        if not isinstance(value, type(getattr(self, key))):
-            raise ValueError(f'Неправильный тип устанавливаемого значения {value} для атрибута {key}')
+        if key == 'autolog' and value:
+            print('Вызов каких-то методов для автолога')
+        if key == 'autofile' and value:
+            print('Вызов каких-то методов для автофала')
         self.__dict__[key] = value
-        self.__update_settings()
-
-    def __str__(self):
-        return f'{self.__class__.__name__}: {self.__dict__}'
-
-    def __update_settings(self):
-        """Обновление настроек. Вызывается только при обновлении сохраняемых в файл настроек."""
         with open('data/settings.pcl', 'wb') as file:
             pickle.dump(self.__dict__, file)

@@ -1,21 +1,18 @@
-from tkinter import *
+class Descriptor:
+    __slots__ = '_name', 'set_callback'
 
-root = Tk()
+    def __set_name__(self, owner, name):
+        self._name = name
 
-entry = Entry()
-entry.pack()
-
-
-def command():
-    print("Cursor positon:", entry.index("insert"))
-    if entry.selection_present():
-        selection_from = entry.index("sel.first")
-        selection_to = entry.index("sel.last")
-        print(f"Selection from {selection_from} to {selection_to}")
-        print("Selected text:", entry.get()[selection_from:selection_to])
+    def __init__(self, set_callback=()):
+        self.set_callback = set_callback
 
 
-button = Button(text="Press me", command=command)
-button.pack()
+class TestClass:
+    attr = Descriptor()
 
-root.mainloop()
+
+test = TestClass()
+test.attr = 1
+
+print(test.attr)

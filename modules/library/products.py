@@ -14,10 +14,6 @@ class Product:
         for prop in (*self.main_prop, *self.properties):
             self.__dict__[prop.__name__] = None if not default_values else prop(self.__class__.__name__)
 
-    @property
-    def category(self):
-        return self.__class__.__name__
-
     def __repr__(self):
         return f'{self.__class__.__name__} <full_name = {self.full_name}>'
 
