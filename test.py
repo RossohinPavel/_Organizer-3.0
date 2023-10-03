@@ -1,18 +1,11 @@
-class Descriptor:
-    __slots__ = '_name', 'set_callback'
-
-    def __set_name__(self, owner, name):
-        self._name = name
-
-    def __init__(self, set_callback=()):
-        self.set_callback = set_callback
+import threading as th
 
 
-class TestClass:
-    attr = Descriptor()
+dct = {}
 
+thread = th.Thread()
+thread.start()
 
-test = TestClass()
-test.attr = 1
-
-print(test.attr)
+for k, v in dct.items():
+    k.start(),
+    v.start()

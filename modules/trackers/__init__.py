@@ -1,2 +1,1 @@
-from modules.trackers.orders_tracker import OrdersTracker
-from modules.trackers.files_tracker import FilesTracker
+from modules.trackers.trackers import Trackers

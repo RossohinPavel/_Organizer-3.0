@@ -184,7 +184,7 @@ class AssistWindow(source.ChildWindow):
 
     def show_buttons(self):
         """Функция для отрисовки кнопок"""
-        text = {'add': 'Добавить', 'copy': 'Копировать', 'change': 'Изменить'}[self.module]
+        text = {'add': 'Добавить', 'copy': 'Добавить', 'change': 'Изменить'}[self.module]
         frame = source.tk.Frame(self, height=28)
         func_button = source.MyButton(frame, text=text, width=30, command=self.write_to_library)
         func_button.place(x=130, y=0)
@@ -200,8 +200,8 @@ class AssistWindow(source.ChildWindow):
     def get_values_from_widgets(self) -> bool:
         """Метод для получения информации из менюшек и установки их в product_obj
         Возвращает True если все значения были заполнены, False в противном случае"""
-        numbered_var = ('carton_length', 'carton_height', 'cover_clapan', 'cover_joint', 'dc_top_indent',
-                        'dc_left_indent', 'dc_overlap', 'dc_break')
+        numbered_var = ('carton_length', 'carton_height', 'dc_top_indent',
+                        'dc_left_indent', 'dc_overlap')
         for key, var in self.product_vars.items():
             value = var.get()
             if value == '':

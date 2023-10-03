@@ -3,6 +3,8 @@ from modules.app_manager import AppManagerW
 
 
 class ProcessingFrame(AppManagerW):
+    _alias = 'pfr'
+    
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""
     def __init__(self, frame):
         self._frame = frame

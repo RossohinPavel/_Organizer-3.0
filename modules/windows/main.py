@@ -150,6 +150,8 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
 
 class TxtVars(AppManagerW):
+    _alias = 'txtvars'
+
     def __getattr__(self, item):
         return self.__dict__[item]
 
