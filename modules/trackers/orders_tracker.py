@@ -1,15 +1,12 @@
 import os
 import re
-from modules.trackers.tracker import Tracker
+from modules.trackers._tracker import Tracker
 from modules.order.tracker_proxies import *
 
 
 class OrdersTracker(Tracker):
     """Основной объект слежения за файлами заказов"""
     __orders = {}
-
-    def get_tracker_settings(self):
-        return self.app_m.Settings.autolog, self.app_m.TxtVars.orders_trk
 
     def manual(self):
         for proxy_lst in self.__orders.values():

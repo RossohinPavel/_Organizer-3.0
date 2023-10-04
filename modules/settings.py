@@ -1,10 +1,10 @@
 import pickle
-from modules.app_manager import AppManagerW
+from modules.app_manager import AppManager
 
 __all__ = ('Settings', )
 
 
-class Settings(AppManagerW):
+class Settings(AppManager):
     """Предоставляет доступ к настройкам и сохраняет их текущие значения:
     - autolog - Инициализация записи лога файлов в автоматическом режиме
     - log_check_depth - Глубина проверки лога в днях (папках)
@@ -23,8 +23,8 @@ class Settings(AppManagerW):
                 setattr(self, key, value)
 
     def __setattr__(self, key, value):
-        if key == 'autolog' and value:
-            print('Вызов каких-то методов для автолога')
+        if key == 'autolog':
+            self.app_m.tr.ot.init_auto(value)
         if key == 'autofile' and value:
             print('Вызов каких-то методов для автофала')
         self.__dict__[key] = value

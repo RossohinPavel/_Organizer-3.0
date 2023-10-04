@@ -18,12 +18,12 @@ class SettingsWindow(source.ChildWindow):
         def get_entry_value():
             value = entry_var.get()
             if value.isdigit():
-                self.app_m.Settings.log_check_depth = int(value)
+                self.app_m.stg.log_check_depth = int(value)
                 update_label()
             entry.delete(0, source.tk.END)
 
         def update_label():
-            label.config(text=f'Текущее значение: {self.app_m.Settings.log_check_depth} заказов (папок)')
+            label.config(text=f'Текущее значение: {self.app_m.stg.log_check_depth} заказов (папок)')
 
         frame = LabeledFrame(master=self, text='Глубина проверки лога')
         label = source.ttk.Label(master=frame.container)
@@ -41,17 +41,15 @@ class SettingsWindow(source.ChildWindow):
     def show_mode_widgets(self):
         """Сборная ф-я для отрисовки виджетов управления режимов работы программы"""
         def select_cb(var_name):
-            setattr(self.app_m.Settings, var_name, self.__dict__[var_name].get())
-            source.tkmb.showinfo(parent=self, title="Изменение настроек",
-                                 message="Для вступления настроек в силу нужно перезагрузить программу")
+            setattr(self.app_m.stg, var_name, self.__dict__[var_name].get())
 
         frame = LabeledFrame(master=self, text='Режимы работы программы')
         frame.pack(fill='x')
-        self.__dict__['autolog'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.autolog)
+        self.__dict__['autolog'] = source.tk.BooleanVar(master=self, value=self.app_m.stg.autolog)
         chbtn1 = source.ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
                                         variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
         chbtn1.pack(anchor='nw')
-        self.__dict__['autofile'] = source.tk.BooleanVar(master=self, value=self.app_m.Settings.autofile)
+        self.__dict__['autofile'] = source.tk.BooleanVar(master=self, value=self.app_m.stg.autofile)
         chbtn2 = source.ttk.Checkbutton(master=frame.container, text='Автоматическое копирование на диск О',
                                         variable=self.__dict__['autofile'], command=lambda: select_cb('autofile'))
         chbtn2.pack(anchor='nw')
@@ -67,15 +65,13 @@ class SettingsWindow(source.ChildWindow):
     def show_directory_frame(self, container, side, text, stg_attr, btn_pdx):
         """Отрисовка виджетов управления рабочими папками"""
         def update_dir():
-            path = source.tkfd.askdirectory(parent=self, initialdir=getattr(self.app_m.Settings, stg_attr),
-                                            title=f'Выберите: {text}')
+            path = source.tkfd.askdirectory(parent=self, initialdir=getattr(self.app_m.stg, stg_attr), title=f'Выберите: {text}')
             if path:
-                setattr(self.app_m.Settings, stg_attr, path)
-                btn.config(text=getattr(self.app_m.Settings, stg_attr))
+                setattr(self.app_m.stg, stg_attr, path)
+                btn.config(text=getattr(self.app_m.stg, stg_attr))
 
         top_frame = source.ttk.Frame(master=container)
         top_frame.pack(side=side, anchor='nw')
-
         source.ttk.Label(master=top_frame, text=text).pack(anchor='nw')
-        btn = source.MyButton(master=top_frame, width=22, text=getattr(self.app_m.Settings, stg_attr), command=update_dir)
+        btn = source.MyButton(master=top_frame, width=22, text=getattr(self.app_m.stg, stg_attr), command=update_dir)
         btn.pack(anchor='nw', padx=btn_pdx, pady=(0, 1))

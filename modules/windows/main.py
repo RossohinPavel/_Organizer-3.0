@@ -25,6 +25,14 @@ class MainWindow(AppManagerR, source.tk.Tk):
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
 
+    def destroy(self) -> None:
+        ttl = 'Очередь задач не пуста'
+        msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
+        if self.app_m.txtvars.tasks_queue.get() > 0:
+            if not source.tkmb.askokcancel(parent=self, title=ttl, message=msg):
+                return
+        super().destroy()
+
     def show_mw_headers(self):
         TxtVars()   # инициализация объекта для хранения текстовых переменных.
         self.show_log_and_tracker_frame()

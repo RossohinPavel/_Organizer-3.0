@@ -9,7 +9,6 @@ __all__ = ('TaskManager', )
 class TaskManager(AppManager):
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
     _alias = 'tm'
-    __loops = []
     __lock = Lock()
 
     @classmethod
@@ -34,4 +33,4 @@ class TaskManager(AppManager):
         :param func: Cсылка на функцию
         :param args: Именованные аргументы к функции
         :param kwargs: Позиционные аргументы к функции"""
-        Thread(target=cls.__get_task(func), args=args, kwargs=kwargs).start()
+        Thread(target=cls.__get_task(func), args=args, kwargs=kwargs, daemon=True).start()

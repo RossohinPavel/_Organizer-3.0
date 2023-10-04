@@ -1,1 +1,1 @@
-from modules.trackers.trackers import Trackers
+from modules.trackers._manager import Trackers
