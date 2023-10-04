@@ -4,7 +4,7 @@ from modules.app_manager import AppManagerR
 
 
 class OrderProxy(AppManagerR):
-    __slots__ = 'order'
+    __slots__ = 'order_proxies'
 
     def __new__(cls, order_name):
         order = cls.app_m.Log.get(order_name)

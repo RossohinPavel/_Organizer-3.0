@@ -96,13 +96,13 @@ class MainWindow(AppManagerR, source.tk.Tk):
         line2.pack(anchor='nw', padx=(6, 0))
         line3 = source.tk.Frame(master=left_frame)
         source.MyButton(master=line3, text='Холсты', command=None, width=15).pack(side='left')
-        setattr(self, 'add_btn', source.MyButton(master=line3, text='Дополнительно', command=self.show_add_btn_menu, width=15))
+        self.__dict__['add_btn'] = source.MyButton(master=line3, text='Дополнительно', command=self.show_add_btn_menu, width=15)
         self.__dict__['add_btn'].pack(side='right', padx=(5, 0))
         line3.pack(anchor='nw', padx=(6, 0), pady=(5, 7))
 
     def show_add_btn_menu(self):
         add_menu = source.tk.Menu(tearoff=0)
-        add_menu.add_command(label="Обновить БД", command=self.app_m.OrdersTracker.run)
+        add_menu.add_command(label="Обновить БД", command=self.app_m.tr.ot.manual)
         add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty() + 25)
 
     @staticmethod

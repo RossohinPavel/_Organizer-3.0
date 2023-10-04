@@ -1,5 +1,5 @@
 from .common import *
-from modules.order.info_proxies import OrderProxy
+from modules.order_proxies.info import OrderProxy
 
 
 class StickGenFrame(LabeledFrame):

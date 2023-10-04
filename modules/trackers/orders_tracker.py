@@ -1,20 +1,15 @@
 import os
 import re
+from datetime import datetime, timedelta
 from modules.trackers._tracker import Tracker
-from modules.order.tracker_proxies import *
+from modules.order_proxies.tracker import *
 
 
 class OrdersTracker(Tracker):
     """Основной объект слежения за файлами заказов"""
     __orders = {}
 
-    def manual(self):
-        for proxy_lst in self.__orders.values():
-            for proxy in proxy_lst:
-                proxy.update_flag = True
-        self.auto()
-
-    def auto(self):
+    def run(self):
         self.app_m.ProcessingFrame.header.set('Трекер заказов')
         self.app_m.ProcessingFrame.qty.set('0/4')
         self.app_m.ProcessingFrame.pb['maximum'] = 4
@@ -29,17 +24,29 @@ class OrdersTracker(Tracker):
         self.app_m.ProcessingFrame.pb['value'] += 1
         self.app_m.ProcessingFrame.status.set('Обновление объектов-тиражей')
         self.__update_proxies()
-        self.app_m.ProcessingFrame.qty.set('3/4')
-        self.app_m.ProcessingFrame.pb['value'] += 1
-        self.app_m.ProcessingFrame.status.set('Сохранение информации')
-        self.__update_log()
-        self.app_m.ProcessingFrame.qty.set('4/4')
-        self.app_m.ProcessingFrame.pb['value'] += 1
+        # self.app_m.ProcessingFrame.qty.set('3/4')
+        # self.app_m.ProcessingFrame.pb['value'] += 1
+        # self.app_m.ProcessingFrame.status.set('Сохранение информации')
+        # self.__update_log()
+        # self.app_m.ProcessingFrame.qty.set('4/4')
+        # self.app_m.ProcessingFrame.pb['value'] += 1
+
+    def manual(self):
+        for proxy_lst in self.__orders.values():
+            for proxy in proxy_lst:
+                proxy.update_flag = True
+        self.run()
+
+    def auto(self):
+        self.app_m.txtvars.orders_trk.set('Ожидание выполнения')
+        current_time = datetime.now() + timedelta(seconds=self.delay)
+        self.run()
+        self.app_m.txtvars.orders_trk.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
 
     def __update_orders_dct(self):
         """Обновление списка отслеживаемых заказов"""
-        path = self.app_m.Settings.z_disc       # Получаем необходимые настройки
-        limit = self.app_m.Settings.log_check_depth
+        path = self.app_m.stg.z_disc       # Получаем необходимые настройки
+        limit = self.app_m.stg.log_check_depth
         for proxy_obj in self.__orders:         # Помечаем все заказы на удаление
             proxy_obj.delete_flag = True        # При удачном сравнении прокси объект вернет состояние False
         for day in reversed(os.listdir(path)):
@@ -49,14 +56,14 @@ class OrdersTracker(Tracker):
                 for order_name in reversed(os.listdir(f'{path}/{day}')):
                     if limit != 0 and re.fullmatch(r'\d{6}', order_name):
                         if order_name not in self.__orders:
-                            self.__orders[OrderProxy(path, day, order_name)] = []
+                            self.__orders[OrderProxy(order_name, day, path)] = []
                         limit -= 1
-        for obj in tuple(self.__orders):  # Очищаем словарь от заказов помеченных на удаление
-            if obj.delete_flag:                  # В большинстве случаев - ограничено глубиной проверки лога
-                del self.__orders[obj]           # Удалит из отслеживания удаленный вручную заказ
+        for order_proxy in tuple(self.__orders):  # Очищаем словарь от заказов помеченных на удаление
+            if order_proxy.delete_flag:                  # В большинстве случаев - ограничено глубиной проверки лога
+                del self.__orders[order_proxy]           # Удалит из отслеживания удаленный вручную заказ
 
     def __update_edition_list(self):
-        """Обновление списка отслеживаемых тиражей"""
+        """Обновление списка отслеживаемых прокси объектов тиражей и информации о заказе"""
         for order_proxy, proxies_lst in self.__orders.items():
             order_obj = order_proxy.order
             path = order_obj.path
