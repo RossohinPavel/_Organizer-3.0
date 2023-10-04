@@ -17,12 +17,14 @@ class ProcessingFrame(AppManagerW):
                          src.ttk.Label(master=self._frame, textvariable=self.qty, width=40), self.pb]
 
     def __enter__(self):
+        """При входе в менеджер, размещаем виджеты"""
         place = 4
         for widget in self._widgets:
             widget.place(x=2, y=place)
             place += 24
 
     def __exit__(self, *args):
+        """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""
         self.header.set('__Имя модуля/номер заказа__')
         self.status.set('__Статус/имя тиража__')
         self.qty.set('__Количество__')

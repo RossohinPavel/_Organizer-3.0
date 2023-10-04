@@ -13,6 +13,7 @@ class SafeConnect:
         self.cursor = None
 
     def __enter__(self):
+        """При входе в менеджер создаем подключение к бд и получаем ее курсор. Блокируем сторонний доступ"""
         if self.__db_name not in self.__lock_dct:
             self.__lock_dct[self.__db_name] = Lock()
         self.__lock_dct[self.__db_name].acquire()
@@ -21,6 +22,7 @@ class SafeConnect:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """При выходе из менеджера, закрываем подключение и снимаем блок с доступа."""
         self.__lock_dct[self.__db_name].release()
         self.cursor = None
         self.connect.close()

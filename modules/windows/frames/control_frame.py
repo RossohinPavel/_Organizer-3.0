@@ -4,6 +4,7 @@ from modules.windows.library import LibraryWindow
 
 
 class ControlFrame(LabeledFrame):
+    """Фрейм для отрисовки кнопок управления приложением"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, text='Управление приложением', **kwargs)
         self.container.pack(expand=1)

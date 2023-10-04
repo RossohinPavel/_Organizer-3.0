@@ -121,7 +121,8 @@ class AssistWindow(source.ChildWindow):
               'cover_val': self.show_m_frame('Особенности сборки обложки'),
               'print_mat': self.show_m_frame('Печатный материал'),
               'individual': self.show_m_frame('Индивидуальные особенности продукта')}
-        funcs = {'entry': self.__show_entry, 'radio': self.__show_radio, 'combo': self.__show_combobox, 'check': self.__show_check}
+        funcs = {'entry': self.__show_entry, 'radio': self.__show_radio,
+                 'combo': self.__show_combobox, 'check': self.__show_check}
         sides = {'left': [], 'right': []}
         for frm in self.__FRAMES:
             if frm in self.product_obj.__dict__:
@@ -212,14 +213,18 @@ class AssistWindow(source.ChildWindow):
         return True
 
     def write_to_library(self):
+        """Ф-я для обновления/записи информации библиотеку"""
         if not self.get_values_from_widgets():
             return
         if self.module != 'change' and not self.app_m.Library.check_unique(self.product_obj):
-            source.tkmb.showwarning(parent=self, title='Проверка на дубликат', message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
+            source.tkmb.showwarning(parent=self, title='Проверка на дубликат',
+                                    message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
             return
         if self.module == 'change':
             self.app_m.Library.change(self.product_obj)
-            source.tkmb.showinfo(parent=self, title='Изменение продукта', message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
+            source.tkmb.showinfo(parent=self, title='Изменение продукта',
+                                 message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
         else:
             self.app_m.Library.add(self.product_obj)
-            source.tkmb.showinfo(parent=self, title='Добавление  продукта', message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')
+            source.tkmb.showinfo(parent=self, title='Добавление  продукта',
+                                 message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')

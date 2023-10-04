@@ -12,7 +12,7 @@ class TaskManager(AppManager):
     __lock = Lock()
 
     @classmethod
-    def __get_task(cls, func) -> callable:
+    def __get_task(cls, func: callable) -> callable:
         """Декоратор, возвращающий ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args, **kwargs):
             num = cls.app_m.txtvars.tasks_queue.get()

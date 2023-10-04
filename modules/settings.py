@@ -23,12 +23,11 @@ class Settings(AppManager):
                 setattr(self, key, value)
 
     def __setattr__(self, key, value):
-        if key == 'autolog':
+        """Обновляем файл настроек при изменении атрибутов объекта"""
+        if key == 'autolog':    # Когда меняется атрибут autolog, инициализируем фоновую функцию трекера
             self.app_m.tr.ot.init_auto(value)
             if not value:
                 self.app_m.txtvars.orders_trk.set('Выключен')
-        if key == 'autofile' and value:
-            print('Вызов каких-то методов для автофала')
         self.__dict__[key] = value
         with open('data/settings.pcl', 'wb') as file:
             pickle.dump(self.__dict__, file)

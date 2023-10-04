@@ -7,6 +7,7 @@ __all__ = ('OrderProxy', 'EditionProxy', 'PhotoProxy', 'OrderInfoProxy')
 
 
 class OrderProxy:
+    """Прокси класс для обновления информации в датаклассе объекта заказа"""
     __slots__ = 'delete_flag', 'path', 'order'
 
     def __init__(self, path, creation_date, name):
@@ -76,6 +77,7 @@ class EditionProxy(ProxyObserver):
         return obj
 
     def get_info(self):
+        """Ф-я подсчета изображений в тиражах и определяет тип совмещения"""
         ex = []
         const = tuple()
         for catalog in os.listdir(self.path):
@@ -133,6 +135,7 @@ class PhotoProxy(ProxyObserver):
         return order_obj
 
     def get_info(self):
+        """Ф-я подсчета фотопечати в заказе."""
         path = f'{self.path}/_ALL/Фотопечать'
         if not os.path.exists(path):
             return tuple()
@@ -164,6 +167,7 @@ class OrderInfoProxy(ProxyObserver):
         return order_obj
 
     def get_info(self):
+        """Парсим completed.htm с целью нахождения нужной нам информации"""
         name, address, price = self.dc_obj.customer_name, self.dc_obj.customer_address, self.dc_obj.price
         with open(self.path, 'r', encoding='utf-8') as file:
             f = re.findall(r'(Уважаемый \(ая\), .+</p>|Адрес\W+выдачи.+\W+.+|доставки\), руб\. : <strong>\d+)', file.read())

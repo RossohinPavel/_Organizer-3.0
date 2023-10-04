@@ -22,10 +22,12 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
     @staticmethod
     def russian_hotkeys(event):
+        """Эвент для срабатывания Ctrl+C на русской раскладке"""
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
 
     def destroy(self) -> None:
+        """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
         ttl = 'Очередь задач не пуста'
         msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
         if self.app_m.txtvars.tasks_queue.get() > 0:
@@ -34,11 +36,13 @@ class MainWindow(AppManagerR, source.tk.Tk):
         super().destroy()
 
     def show_mw_headers(self):
+        """Сборная ф-я для отрисовки заголовков программы"""
         TxtVars()   # инициализация объекта для хранения текстовых переменных.
         self.show_log_and_tracker_frame()
         self.show_queue_lbl()
 
     def show_separator(self):
+        """Отрисовка фрейма - разделителя"""
         source.tk.Frame(master=self, bg='black', width=1, height=1).pack(fill='x')
 
     def show_log_and_tracker_frame(self):
@@ -101,6 +105,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
         line3.pack(anchor='nw', padx=(6, 0), pady=(5, 7))
 
     def show_add_btn_menu(self):
+        """Отрисовка меню под кнопкой Дополнительно"""
         add_menu = source.tk.Menu(tearoff=0)
         add_menu.add_command(label="Обновить БД", command=self.app_m.tr.ot.manual)
         add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty() + 25)
@@ -158,6 +163,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
 
 class TxtVars(AppManagerW):
+    """Класс для предостовления доступа к текстовым переменным через app_manager"""
     _alias = 'txtvars'
 
     def __getattr__(self, item):
