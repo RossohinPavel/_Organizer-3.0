@@ -9,7 +9,6 @@ class Order:
     """Датакласс для хранения информации о заказе"""
     name: str
     creation_date: str
-    path: str
     customer_name: str = 'Unknown'
     customer_address: str = 'Unknown'
     price: int = 0

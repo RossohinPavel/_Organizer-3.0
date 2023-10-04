@@ -25,6 +25,8 @@ class Settings(AppManager):
     def __setattr__(self, key, value):
         if key == 'autolog':
             self.app_m.tr.ot.init_auto(value)
+            if not value:
+                self.app_m.txtvars.orders_trk.set('Выключен')
         if key == 'autofile' and value:
             print('Вызов каких-то методов для автофала')
         self.__dict__[key] = value

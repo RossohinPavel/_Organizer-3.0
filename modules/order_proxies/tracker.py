@@ -7,11 +7,12 @@ __all__ = ('OrderProxy', 'EditionProxy', 'PhotoProxy', 'OrderInfoProxy')
 
 
 class OrderProxy:
-    __slots__ = 'order', 'delete_flag'
+    __slots__ = 'delete_flag', 'path', 'order'
 
-    def __init__(self, name, creation_date, path):
+    def __init__(self, path, creation_date, name):
         self.delete_flag = False
-        self.order = Order(name, creation_date, f'{path}/{creation_date}/{name}')
+        self.path = f'{path}/{creation_date}/{name}'
+        self.order = Order(name, creation_date)
 
     def __repr__(self):
         return f'Proxy <Order={self.order.name}>'
@@ -40,11 +41,11 @@ class ProxyObserver:
         raise Exception('Ф-я init_observer должна быть переопределена в дочернем классе с сохранением структуры')
 
     def update_info(self):
+        """Обновление информации в датаклассе."""
         if not self.update_flag:
             return
         res = self.get_info()
-        tttt = self.check_info(res)
-        if tttt:
+        if self.check_info(res):
             self.update_flag = False
         else:
             self.set_info(res)

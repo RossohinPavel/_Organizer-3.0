@@ -56,7 +56,7 @@ class OrdersTracker(Tracker):
                 for order_name in reversed(os.listdir(f'{path}/{day}')):
                     if limit != 0 and re.fullmatch(r'\d{6}', order_name):
                         if order_name not in self.__orders:
-                            self.__orders[OrderProxy(order_name, day, path)] = []
+                            self.__orders[OrderProxy(path, day, order_name)] = []
                         limit -= 1
         for order_proxy in tuple(self.__orders):  # Очищаем словарь от заказов помеченных на удаление
             if order_proxy.delete_flag:                  # В большинстве случаев - ограничено глубиной проверки лога
@@ -66,7 +66,7 @@ class OrdersTracker(Tracker):
         """Обновление списка отслеживаемых прокси объектов тиражей и информации о заказе"""
         for order_proxy, proxies_lst in self.__orders.items():
             order_obj = order_proxy.order
-            path = order_obj.path
+            path = order_proxy.path
             for name in os.listdir(path):
                 if name not in proxies_lst:
                     if name == 'completed.htm':
