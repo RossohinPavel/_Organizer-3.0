@@ -38,7 +38,7 @@ class LibraryWindow(source.ChildWindow):
         """Метод для установки значений в тривью"""
         for ind, obj in enumerate(self.app_m.lib.categories, 1):   # Устанавливаем категории
             self.tree.insert('', 'end', iid=obj.__name__, text=obj.rus_name, tags=obj.__name__)
-        for ind, value in enumerate(self.app_m.Library.headers.items(), 1):     # Вставляем продукты в категории
+        for ind, value in enumerate(sorted(self.app_m.Library.headers.items()), 1):     # Вставляем продукты в категории
             name, category = value
             self.tree.insert(str(category), 'end', iid=f'{category}{ind}', text=name, tags=category)
 
