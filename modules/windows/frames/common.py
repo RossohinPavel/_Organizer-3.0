@@ -20,21 +20,19 @@ class ONVFrame(src.ttk.Frame):
         self._entry.pack(anchor='n', pady=(0, 3))
         self._entry.focus_set()
         self.__insert_def_val()
+        self._entry.bind('<KeyPress>', self.__enter_event)
         self._entry.config(validatecommand=(self.register(self.__validate), "%P"))
+
+    def __enter_event(self, event):
+        if self._entry.get().startswith('#') and event.char.isdigit():
+            self._entry.delete(0, 'end')
 
     def __validate(self, value: str) -> bool:
         """Валидация введеных значений, вызов функции при полной валидации и очистка _entry"""
-        if value == '':
-            self.__insert_def_val()
-        if len(value) > 6:
-            value = value[0]
         res = re_match(r'\d{0,6}$', value) is not None
-        if res:
-            if len(value) == 1:
-                self.__insert_def_val(value, 1)
-            if len(value) == 6:
-                self._func(value)
-                self.__insert_def_val()
+        if res and len(value) == 6:
+            self._func(value)
+            self.__insert_def_val()
         return res
 
     def __insert_def_val(self, text='#Введите номер заказа', cursor=0):
