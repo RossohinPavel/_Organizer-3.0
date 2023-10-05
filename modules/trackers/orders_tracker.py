@@ -24,12 +24,12 @@ class OrdersTracker(Tracker):
         self.app_m.ProcessingFrame.pb['value'] += 1
         self.app_m.ProcessingFrame.status.set('Обновление объектов-тиражей')
         self.__update_proxies()
-        # self.app_m.ProcessingFrame.qty.set('3/4')
-        # self.app_m.ProcessingFrame.pb['value'] += 1
-        # self.app_m.ProcessingFrame.status.set('Сохранение информации')
-        # self.__update_log()
-        # self.app_m.ProcessingFrame.qty.set('4/4')
-        # self.app_m.ProcessingFrame.pb['value'] += 1
+        self.app_m.ProcessingFrame.qty.set('3/4')
+        self.app_m.ProcessingFrame.pb['value'] += 1
+        self.app_m.ProcessingFrame.status.set('Сохранение информации')
+        self.__update_log()
+        self.app_m.ProcessingFrame.qty.set('4/4')
+        self.app_m.ProcessingFrame.pb['value'] += 1
 
     def manual(self):
         for proxy_lst in self.__orders.values():
@@ -90,4 +90,5 @@ class OrdersTracker(Tracker):
                 if proxy.update_flag:
                     lst.append(ord_proxy.order)
                     break
-        self.app_m.Log.update_records(lst)
+        if lst:     # Вызываем обновление лога если в списке не пустой.
+            self.app_m.Log.update_records(lst)

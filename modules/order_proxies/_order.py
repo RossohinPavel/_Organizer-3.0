@@ -19,7 +19,7 @@ class Order:
 @dataclass
 class Edition:
     """Датакласс для хранения информации о тиражах"""
-    order: object
+    order_name: str
     name: str
     covers: int = 0
     pages: int = 0
@@ -30,6 +30,6 @@ class Edition:
 @dataclass
 class PhotoEdition:
     """Датакласс для хранения информации о фотопечати в заказе"""
-    order: object
+    order_name: str
     name: str
     count: int = 0

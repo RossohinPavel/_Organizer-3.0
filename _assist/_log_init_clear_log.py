@@ -7,7 +7,6 @@ def create_clear_log():
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 name TEXT,
                                 creation_date TEXT,
-                                path TEXT,
                                 customer_name TEXT,
                                 customer_address TEXT,
                                 price INT
@@ -19,8 +18,7 @@ def create_clear_log():
                                         covers INT,
                                         pages INT,
                                         ccount TEXT,
-                                        comp TEXT,
-                                        price INT
+                                        comp TEXT
                                         )""")
         log.cursor().execute("""CREATE TABLE Photos (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,

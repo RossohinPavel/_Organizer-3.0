@@ -72,7 +72,7 @@ class ProxyObserver:
 
 class EditionProxy(ProxyObserver):
     def init_observer(self, order_obj, name):
-        obj = Edition(order_obj, name)
+        obj = Edition(order_obj.name, name)
         order_obj.content += (obj, )
         return obj
 
@@ -150,7 +150,7 @@ class PhotoProxy(ProxyObserver):
                         obj = dc_obj
                         break
                 if obj is None:
-                    obj = PhotoEdition(self.dc_obj, name)
+                    obj = PhotoEdition(self.dc_obj.name, name)
                     lst.append(obj)
                 obj.count += len(os.listdir(f'{path}/{paper}/{form}')) * int(multiplier)
         return tuple(lst)
