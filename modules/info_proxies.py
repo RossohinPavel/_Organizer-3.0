@@ -22,8 +22,11 @@ class StickerGenProxy(OrderProxy):
             line = ed.name
             prod = self.product_comp[line]
             if prod:
-                if prod.short_name.startswith('+'):
-                    sub[prod.short_name] += ed.covers
+                short_name = prod.short_name
+                if short_name.startswith('+'):
+                    if short_name not in sub:
+                        sub[short_name] = 0
+                    sub[short_name] += ed.covers
                     continue
                 line = ' '.join(tuple(self.__create_line(ed, prod)))
             main.append(line)
@@ -38,6 +41,8 @@ class StickerGenProxy(OrderProxy):
         option = getattr(prod_obj, 'book_option', None)
         if option:
             yield option
-        yield prod_obj.lamination
+        lamination = getattr(prod_obj, 'lamination', None)
+        if lamination:
+            yield lamination
         if edition.comp:
             yield f'-- {edition.comp}'
