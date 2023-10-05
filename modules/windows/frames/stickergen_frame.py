@@ -1,5 +1,5 @@
 from .common import *
-from modules.info_proxies import OrderProxy
+from modules.info_proxies import StickerGenProxy
 
 
 class StickGenFrame(LabeledFrame):
@@ -15,8 +15,9 @@ class StickGenFrame(LabeledFrame):
         src.MyButton(master=self.container, text='Скопировать инфо').pack(anchor='s', expand=1)
 
     def main(self, order_name):
-        proxy = OrderProxy(order_name)
+        proxy = StickerGenProxy(order_name)
         if proxy is None:
             self.header_var.set(f'Не могу найти заказ {order_name}')
             return
         self.header_var.set(f'{proxy.order.name} - {proxy.order.customer_name}')
+        self.info_var.set(proxy.create_sticker())

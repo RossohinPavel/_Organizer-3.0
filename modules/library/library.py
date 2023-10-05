@@ -15,10 +15,12 @@ class Library(AppManagerW):
     @classmethod
     def get_product_headers(cls) -> dict:
         """Возвращает словрь имен продуктов в виде {имя продукта: категория}"""
+        dct = {}
         with cls.__s_con:
             for category in (x.__name__ for x in cls.categories):
                 cls.__s_con.cursor.execute(f"SELECT full_name FROM {category}")
-                return {name[0]: category for name in cls.__s_con.cursor.fetchall()}
+                dct.update((name[0], category) for name in cls.__s_con.cursor.fetchall())
+        return dct
 
     @classmethod
     def get_blank(cls, category: str) -> object:
@@ -84,4 +86,5 @@ class Library(AppManagerW):
     def get_product_obj_from_name(self, name: str) -> object | None:
         """Возвращает объект продукта с которым связан тираж, если этот продукт есть в библиотеке"""
         for product_name in self.headers:
-            print(product_name)
+            if name.endswith(product_name):
+                return self.get(product_name)
