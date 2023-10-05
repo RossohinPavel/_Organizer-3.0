@@ -12,7 +12,7 @@ class StickGenFrame(LabeledFrame):
         src.ttk.Label(master=self.container, textvariable=self.header_var).pack(anchor='nw', fill='x')
         self.info_var = src.tk.StringVar(master=self)
         src.ttk.Label(master=self.container, textvariable=self.info_var).pack(anchor='nw', fill='both')
-        src.MyButton(master=self.container, text='Скопировать инфо').pack(anchor='s', expand=1)
+        src.MyButton(master=self.container, text='Скопировать инфо', command=self.to_clipboard).pack(anchor='s', expand=1)
 
     def main(self, order_name):
         proxy = StickerGenProxy(order_name)
@@ -21,3 +21,8 @@ class StickGenFrame(LabeledFrame):
             return
         self.header_var.set(f'{proxy.order.name} - {proxy.order.customer_name}')
         self.info_var.set(proxy.create_sticker())
+        self.to_clipboard()
+
+    def to_clipboard(self):
+        self.clipboard_clear()
+        self.clipboard_append(self.info_var.get().encode('windows-1251').decode('windows-1251'))
