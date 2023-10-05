@@ -1,5 +1,5 @@
 from .common import *
-from modules.order_proxies.info import OrderProxy
+from modules.info_proxies import OrderProxy
 
 
 class StickGenFrame(LabeledFrame):
@@ -20,5 +20,3 @@ class StickGenFrame(LabeledFrame):
             self.header_var.set(f'Не могу найти заказ {order_name}')
             return
         self.header_var.set(f'{proxy.order.name} - {proxy.order.customer_name}')
-        order_dct = proxy.get_order_content_info()
-        print(order_dct)

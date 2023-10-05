@@ -22,7 +22,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
 
     @staticmethod
     def russian_hotkeys(event):
-        """Эвент для срабатывания Ctrl+C на русской раскладке"""
+        """Эвент для срабатывания Ctrl+V на русской раскладке"""
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
 
