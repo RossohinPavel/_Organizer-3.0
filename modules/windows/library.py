@@ -196,6 +196,8 @@ class AssistWindow(source.ChildWindow):
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
         for key, value in self.app_m.Library.get(self.product).__dict__.items():
+            if key == 'full_name' and self.module == 'copy':
+                continue
             self.product_vars[key].set(value)
 
     def get_values_from_widgets(self) -> bool:
