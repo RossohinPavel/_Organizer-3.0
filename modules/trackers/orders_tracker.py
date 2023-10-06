@@ -10,25 +10,20 @@ class OrdersTracker(Tracker):
     __orders = {}
 
     def run(self):
-        self.app_m.ProcessingFrame.header.set('Трекер заказов')
-        self.app_m.ProcessingFrame.qty.set('0/4')
-        self.app_m.ProcessingFrame.pb['maximum'] = 4
-        self.app_m.ProcessingFrame.pb['value'] = 0
-        self.app_m.ProcessingFrame.status.set('Обновление списка заказов')
+        self.app_m.pf.header.set('Трекер заказов')
+        self.app_m.pf.pb['maximum'] = 4
+        self.app_m.pf.pb['value'] = 0
+        self.app_m.pf.status.set('1/4: Обновление списка заказов')
         self.__update_orders_dct()
-        self.app_m.ProcessingFrame.qty.set('1/4')
-        self.app_m.ProcessingFrame.pb['value'] += 1
-        self.app_m.ProcessingFrame.status.set('Обновление списка тиражей')
+        self.app_m.pf.pb['value'] += 1
+        self.app_m.pf.status.set('2/4: Обновление списка тиражей')
         self.__update_edition_list()
-        self.app_m.ProcessingFrame.qty.set('2/4')
-        self.app_m.ProcessingFrame.pb['value'] += 1
-        self.app_m.ProcessingFrame.status.set('Обновление объектов-тиражей')
+        self.app_m.pf.pb['value'] += 1
+        self.app_m.pf.status.set('3/4: Обновление объектов-тиражей')
         self.__update_proxies()
-        self.app_m.ProcessingFrame.qty.set('3/4')
         self.app_m.ProcessingFrame.pb['value'] += 1
-        self.app_m.ProcessingFrame.status.set('Сохранение информации')
+        self.app_m.ProcessingFrame.status.set('4/4: Сохранение информации')
         self.__update_log()
-        self.app_m.ProcessingFrame.qty.set('4/4')
         self.app_m.ProcessingFrame.pb['value'] += 1
 
     def manual(self):

@@ -15,15 +15,13 @@ class TaskManager(AppManager):
     def __get_task(cls, func: callable) -> callable:
         """Декоратор, возвращающий ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args, **kwargs):
-            num = cls.app_m.txtvars.tasks_queue.get()
-            cls.app_m.txtvars.tasks_queue.set(num + 1)
-            with cls.__lock, cls.app_m.pfr:
+            with cls.app_m.pf, cls.__lock:
+                cls.app_m.pf.queue.set(cls.app_m.pf.queue.get() + 1)
                 try:
                     func(*args, **kwargs)
                 except Exception as exc:
                     tkmb.showerror('Ошибка', message=exc)
-            num = cls.app_m.txtvars.tasks_queue.get()
-            cls.app_m.txtvars.tasks_queue.set(num - 1)
+                cls.app_m.pf.queue.set(cls.app_m.pf.queue.get() - 1)
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 
