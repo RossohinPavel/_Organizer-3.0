@@ -100,6 +100,11 @@ class AssistWindow(source.ChildWindow):
                 'dc_break': ('individual', 'check', 'right', {'text': 'Раскодировка с разрывом'})
                 }
 
+    def do_before(self, *args, **kwargs):
+        dct = {'Album': (498, 528), 'Canvas': (498, 278), 'Journal': (498, 278), 'Layflat': (498, 425),
+               'Photobook': (498, 488), 'Photofolder': (498, 381),  'Subproduct': (498, 238)}
+        self.width, self.height = dct[self.category]
+
     def __init__(self, *args, **kwargs):
         self.module = kwargs.pop('module')
         self.category = kwargs.pop('category')
@@ -135,7 +140,7 @@ class AssistWindow(source.ChildWindow):
                     mf[m_name] = mf[m_name]()
                     sides['left'] = [{'row': i, 'column': 0} for i in range(3)]
                     sides['right'] = [{'row': i, 'column': 1} for i in range(3)]
-                kwargs.update({'values': self.product_obj.__dict__[frm], 'padx': 1.3, **sides[side].pop(0)})
+                kwargs.update({'values': self.product_obj.__dict__[frm], 'padx': 1.48, **sides[side].pop(0)})
                 funcs[child](frm, mf[m_name].container, **kwargs)
 
     def show_m_frame(self, text):
@@ -176,7 +181,7 @@ class AssistWindow(source.ChildWindow):
             source.ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
         self.product_vars[key] = source.ttk.Combobox(master=frame, width=kwargs.get('width', 36),
                                                      state='readonly', values=kwargs['values'])
-        self.product_vars[key].pack(anchor='nw')
+        self.product_vars[key].pack(anchor='nw', padx=0.5)
         frame.grid(row=kwargs['row'], column=kwargs['column'], padx=kwargs.get('padx', 0))
 
     def __show_check(self, key, container, **kwargs):
