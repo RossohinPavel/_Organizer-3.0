@@ -4,7 +4,11 @@ from modules.windows.frames import LabeledFrame
 
 class LibraryWindow(source.ChildWindow):
     """Окно управления библиотекой"""
-    def main(self):
+    def do_before(self, *args, **kwargs):
+        self.width = 397
+        self.height = 351
+
+    def do_after(self, *args, **kwargs):
         self.title('Библиотека')
         self.show_main_widget()
         self.set_treeview_values()
@@ -58,11 +62,11 @@ class LibraryWindow(source.ChildWindow):
                 source.tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
                 return
             item = self.tree.item(index[0])
-            args = item['tags'][0], item['text']
+            category, product = item['tags'][0], item['text']
             if module != 'delete':
-                self.wait_window(AssistWindow(self, module, *args))
+                self.wait_window(AssistWindow(self, module=module, category=category, product=product))
             else:
-                self.__delete_from_lib(*args)
+                self.__delete_from_lib(category, product)
             self.clear_treeview()
             self.set_treeview_values()
         return wrapper
@@ -96,15 +100,15 @@ class AssistWindow(source.ChildWindow):
                 'dc_break': ('individual', 'check', 'right', {'text': 'Раскодировка с разрывом'})
                 }
 
-    def __init__(self, parent_root, module, category, product):
-        self.module = module
-        self.category = category
-        self.product = product
+    def __init__(self, *args, **kwargs):
+        self.module = kwargs.pop('module')
+        self.category = kwargs.pop('category')
+        self.product = kwargs.pop('product')
         self.product_vars = {}  # Словарь для хранения переменных виджетов
         self.product_obj = None
-        super().__init__(parent_root)
+        super().__init__(*args, **kwargs)
 
-    def main(self):
+    def do_after(self, *args, **kwargs):
         self.title({'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module])
         self.product_obj = self.app_m.Library.get_blank(self.category)
         self.show_main_widgets()

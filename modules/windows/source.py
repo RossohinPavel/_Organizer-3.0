@@ -6,26 +6,32 @@ from tkinter import filedialog as tkfd
 
 class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
+    width = 1
+    height = 1
+
     def __init__(self, *args, **kwargs):
+        self.do_before(*args, **kwargs)
         super().__init__(*args, **kwargs)
+        self.set_geometry()
         self.app_m = self.master.app_m
-        self.main()
-        self.to_parent_center()
+        self.do_after(*args, **kwargs)
         self.focus_set()
         self.grab_set()
 
-    def main(self):
-        """Абстрактная ф-я для сборки отрисовки виджетов наследуемых окон"""
+    def do_before(self, *args, **kwargs):
+        """Абстрактная ф-я для сборки других ф-й, которые делают что-то до вызова виджета"""
         pass
 
-    def to_parent_center(self):
-        """Центрирование относительно родительского окна"""
+    def set_geometry(self):
+        """Установка размеров окна и центрирование его относительно центрального"""
+        place_x = ((self.master.winfo_width() - self.width) // 2) + self.master.winfo_x()
+        place_y = ((self.master.winfo_height() - self.height) // 2) + self.master.winfo_y()
+        self.geometry(f"{self.width}x{self.height}+{place_x}+{place_y}")
         self.resizable(False, False)
-        self.master.update_idletasks()
-        width, height = self.winfo_width(), self.winfo_height()
-        place_x = ((self.master.winfo_width() - width) // 2) + self.master.winfo_x()
-        place_y = ((self.master.winfo_height() - height) // 2) + self.master.winfo_y()
-        self.geometry(f"{width}x{height}+{place_x}+{place_y}")
+
+    def do_after(self, *args, **kwargs):
+        """Абстрактная ф-я для сборки других ф-й, которые делают что-то после вызова виджета"""
+        pass
 
 
 class MyButton(tk.Button):

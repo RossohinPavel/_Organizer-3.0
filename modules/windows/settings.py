@@ -4,7 +4,11 @@ from modules.windows.frames import LabeledFrame
 
 class SettingsWindow(source.ChildWindow):
     """Окно основных настроек приложения"""
-    def main(self):
+    def do_before(self, *args, **kwargs):
+        self.width = 345
+        self.height = 294
+
+    def do_after(self, *args, **kwargs):
         self.title('Настройки')
         self.show_log_check_depth_widgets()
         self.show_mode_widgets()
