@@ -49,10 +49,6 @@ class SettingsWindow(source.ChildWindow):
         chbtn1 = source.ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
                                         variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
         chbtn1.pack(anchor='nw')
-        self.__dict__['autofile'] = source.tk.BooleanVar(master=self, value=self.app_m.stg.autofile)
-        chbtn2 = source.ttk.Checkbutton(master=frame.container, text='Автоматическое копирование на диск О',
-                                        variable=self.__dict__['autofile'], command=lambda: select_cb('autofile'))
-        chbtn2.pack(anchor='nw')
 
     def show_directory_widgets(self):
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""

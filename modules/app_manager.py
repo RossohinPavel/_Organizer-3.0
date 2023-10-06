@@ -30,14 +30,18 @@ class AppManagerR:
 
 
 class AppManagerW:
-    """Абстрактный класс, при создании объекта записывает его в хранилище. Реализует моносостояние."""
-    _alias = ''  # псевдоним, который может использовать объект. Должен быть переопределен в дочернем классе
+    """Абстрактный класс, при создании объекта записывает его в хранилище. Реализует моносостояние.
+    Можно использовать как контейнер, чтобы сгруппировать некие присвоенные атрибуты"""
+    _alias = ''  # псевдоним, который может использовать объект.
 
     def __new__(cls, *args, **kwargs):
         storage = Storage()
-        if cls.__name__ not in storage:
-            setattr(storage, f'{cls.__name__}={cls._alias}', super().__new__(cls))
-        return getattr(storage, cls.__name__)
+        name = kwargs.get('group_name', cls.__name__)
+        if name not in storage:
+            if name == 'AppManagerW':
+                raise TypeError('Не передан аргумент group_name')
+            setattr(storage, f'{name}={kwargs.get("alias", cls._alias)}', super().__new__(cls))
+        return getattr(storage, name)
 
 
 class AppManager(AppManagerR, AppManagerW):

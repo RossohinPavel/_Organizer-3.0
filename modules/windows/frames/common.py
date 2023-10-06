@@ -5,10 +5,14 @@ from re import match as re_match
 class LabeledFrame(src.ttk.Frame):
     """Конструктор для фрейма с надписью"""
     def __init__(self, *args, text='', **kwargs):
-        super().__init__(*args, padding=(3, 7, 3, 3), **kwargs)
-        self.container = src.ttk.Frame(master=self, width=50, height=50, borderwidth=1, padding=(2, 9, 2, 2), relief='solid')
-        self.container.pack(fill='both')
-        src.ttk.Label(master=self, text=text).place(x=20, y=-9)
+        super().__init__(*args, padding=(3, 7 if text else 3, 3, 3), **kwargs)
+        self.container = src.ttk.Frame(master=self, borderwidth=1, padding=2, relief='solid')
+        self.container.pack(fill='both', expand=1)
+        if text:
+            label = src.ttk.Label(master=self, text=text)
+            label.place(x=20, y=-9)
+            self.update_idletasks()
+            self.container.config(width=label.winfo_width() + 25, height=label.winfo_height() - 8, padding=(2, 9, 2, 2))
 
 
 class ONVFrame(src.ttk.Frame):
