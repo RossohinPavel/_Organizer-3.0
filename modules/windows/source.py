@@ -6,11 +6,10 @@ from tkinter import filedialog as tkfd
 
 class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
-    def __init__(self, parent_root):
-        self.app_m = parent_root.app_m  # Сохраняем ссылку на модули программы
-        super().__init__(master=parent_root)
-        self.main()             # Абстрактная ф-я, которая собирает все виджеты дочернего окна
-        self.resizable(False, False)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.app_m = self.master.app_m
+        self.main()
         self.to_parent_center()
         self.focus_set()
         self.grab_set()
@@ -21,10 +20,12 @@ class ChildWindow(tk.Toplevel):
 
     def to_parent_center(self):
         """Центрирование относительно родительского окна"""
-        self.update_idletasks()
-        place_x = ((self.master.winfo_width() - self.winfo_width()) // 2) + self.master.winfo_x()
-        place_y = ((self.master.winfo_height() - self.winfo_height()) // 2) + self.master.winfo_y()
-        self.geometry(f"+{place_x}+{place_y}")
+        self.resizable(False, False)
+        self.master.update_idletasks()
+        width, height = self.winfo_width(), self.winfo_height()
+        place_x = ((self.master.winfo_width() - width) // 2) + self.master.winfo_x()
+        place_y = ((self.master.winfo_height() - height) // 2) + self.master.winfo_y()
+        self.geometry(f"{width}x{height}+{place_x}+{place_y}")
 
 
 class MyButton(tk.Button):

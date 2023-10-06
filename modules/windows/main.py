@@ -20,6 +20,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
         self.geometry(f'+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
+        self.update_idletasks()
 
     @staticmethod
     def russian_hotkeys(event):
