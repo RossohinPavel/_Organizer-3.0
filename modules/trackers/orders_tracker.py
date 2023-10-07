@@ -33,10 +33,10 @@ class OrdersTracker(Tracker):
         self.run()
 
     def auto(self):
-        self.app_m.txtvars.orders_trk.set('Ожидание выполнения')
+        self.app_m.txt_vars.orders_trk.set('Ожидание выполнения')
         current_time = datetime.now() + timedelta(seconds=self.delay)
         self.run()
-        self.app_m.txtvars.orders_trk.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
+        self.app_m.txt_vars.orders_trk.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
 
     def __update_orders_dct(self):
         """Обновление списка отслеживаемых заказов"""

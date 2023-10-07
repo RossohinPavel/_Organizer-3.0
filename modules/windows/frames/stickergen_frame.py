@@ -25,4 +25,4 @@ class StickGenFrame(LabeledFrame):
 
     def to_clipboard(self):
         self.clipboard_clear()
-        self.clipboard_append(self.info_var.get().encode('windows-1251').decode('windows-1251'))
+        self.clipboard_append(self.info_var.get().encode('ansi').decode('ansi'))

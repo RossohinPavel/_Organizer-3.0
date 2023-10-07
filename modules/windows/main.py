@@ -17,7 +17,7 @@ class MainWindow(AppManagerR, source.tk.Tk):
         """Основные настройки окна, положения и размера."""
         self.title('Органайзер 3_0 PRE ALPHA')
         width, height = 444, 414
-        self.geometry(f'+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
+        self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
         self.update_idletasks()
