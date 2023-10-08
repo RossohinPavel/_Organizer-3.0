@@ -23,7 +23,7 @@ class Edition:
     name: str
     covers: int = 0
     pages: int = 0
-    ccount: str = '0/0'
+    ccount: str = None
     comp: str = None
 
 

@@ -99,7 +99,8 @@ class EditionProxy(ProxyObserver):
     @staticmethod
     def get_ccount(ex_list) -> str:
         """Метод для формирования комплексного счетчика"""
-        return ' '.join(f'{v}/{k}' for k, v in sorted(Counter(ex_list).items(), key=lambda x: (x[1], x[0])))
+        res = ' '.join(f'{v}/{k}' for k, v in sorted(Counter(ex_list).items(), key=lambda x: (x[1], x[0])))
+        return res if res else None
 
     @staticmethod
     def get_combination(cover_count, page_count, const_list):
