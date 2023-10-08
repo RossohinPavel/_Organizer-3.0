@@ -18,6 +18,7 @@ class StickGenFrame(LabeledFrame):
         proxy = StickerGenProxy(order_name)
         if proxy is None:
             self.header_var.set(f'Не могу найти заказ {order_name}')
+            self.info_var.set('')
             return
         self.header_var.set(f'{proxy.order.name} - {proxy.order.customer_name}')
         self.info_var.set(proxy.create_sticker())

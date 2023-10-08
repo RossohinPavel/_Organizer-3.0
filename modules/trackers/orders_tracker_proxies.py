@@ -82,25 +82,31 @@ class EditionProxy(ProxyObserver):
         const = tuple()
         for catalog in os.listdir(self.path):
             catalog_path = f'{self.path}/{catalog}'
-            if re.fullmatch(r'\d{3}', catalog):
-                ex.append(sum(1 for x in os.listdir(catalog_path) if re.fullmatch(r'\d{3}__\d{3}\.jpg', x)))
-                continue
-            if re.fullmatch(r'\d{3}-\d+_pcs', catalog):
-                multiplier = int(re.split('[-_]', catalog)[1])
-                pic_length = sum(1 for x in os.listdir(catalog_path) if re.fullmatch(r'\d{3}__\d{3}-\d+_pcs\.jpg', x))
-                ex.extend(pic_length for _ in range(multiplier))
+            if re.fullmatch(r'\d{3}(-\d+_pcs)?', catalog):
+                cover_exist = False
+                page_count = 0
+                for img in os.listdir(catalog_path):
+                    if re.fullmatch(r'\d{3}__\d{3}(-\d+_pcs)?\.jpg', img):
+                        page_count += 1
+                        continue
+                    if re.fullmatch(r'cover_\d{3}(-\d+_pcs)?\.jpg', img):
+                        cover_exist = True
+                if cover_exist:
+                    multiplier = int(re.split('[-_]', catalog)[1]) if 'pcs' in catalog else 1
+                    ex.extend(page_count for _ in range(multiplier))
             if catalog == 'Constant':
                 const = iter(x for x in os.listdir(catalog_path) if re.fullmatch(r'(cover|\d{3})_\d+_pcs\.jpg', x))
                 continue
         cover_count = len(ex)
         page_count = sum(ex)
-        return cover_count, page_count, self.get_ccount(ex), self.get_combination(cover_count, page_count, const)
+        return cover_count, page_count, self.get_ccount(page_count, ex), self.get_combination(cover_count, page_count, const)
 
     @staticmethod
-    def get_ccount(ex_list) -> str:
+    def get_ccount(page_count, ex_list) -> str | None:
         """Метод для формирования комплексного счетчика"""
-        res = ' '.join(f'{v}/{k}' for k, v in sorted(Counter(ex_list).items(), key=lambda x: (x[1], x[0])))
-        return res if res else None
+        if not page_count:
+            return
+        return ' '.join(f'{v}/{k}' for k, v in sorted(Counter(ex_list).items(), key=lambda x: (x[1], x[0])))
 
     @staticmethod
     def get_combination(cover_count, page_count, const_list):
