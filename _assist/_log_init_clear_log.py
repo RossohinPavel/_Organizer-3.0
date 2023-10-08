@@ -9,7 +9,7 @@ def create_clear_log():
                                 creation_date TEXT,
                                 customer_name TEXT,
                                 customer_address TEXT,
-                                price INT
+                                price REAL
                                 )""")
         log.cursor().execute("""CREATE TABLE Editions (
                                         id INTEGER PRIMARY KEY AUTOINCREMENT,

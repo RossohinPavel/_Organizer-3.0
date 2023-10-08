@@ -25,7 +25,7 @@ class Log(AppManagerW):
             self.__s_con.cursor.execute(f'SELECT EXISTS (SELECT name FROM Orders WHERE name={order_dc.name} LIMIT 1)')
             if self.__s_con.cursor.fetchone()[0]:
                 req = ', '.join(f'{keys[x]} = \'{values[x]}\'' for x in range(2, 5))
-                self.__s_con.cursor.execute(f'UPDATE Orders set {req} WHERE name={values[0]}')
+                self.__s_con.cursor.execute(f'UPDATE Orders SET {req} WHERE name={values[0]}')
             else:
                 self.__s_con.cursor.execute(f'INSERT INTO Orders {keys} VALUES {values}')
             self.__update_editions_tables(*order_dc.content, *order_dc.photo)
@@ -38,7 +38,7 @@ class Log(AppManagerW):
             self.__s_con.cursor.execute(f'SELECT EXISTS(SELECT name FROM {table} WHERE order_name={values[0]} AND name=\'{values[1]}\' LIMIT 1)')
             if self.__s_con.cursor.fetchone()[0]:
                 req = ', '.join(f'{keys[x]} = \'{values[x]}\'' for x in range(2, len(keys)))
-                self.__s_con.cursor.execute(f'UPDATE {table} set {req} WHERE order_name={values[0]} AND name=\'{values[1]}\'')
+                self.__s_con.cursor.execute(f'UPDATE {table} SET {req} WHERE order_name={values[0]} AND name=\'{values[1]}\'')
             else:
                 self.__s_con.cursor.execute(f'INSERT INTO {table} {keys} VALUES {values}')
 

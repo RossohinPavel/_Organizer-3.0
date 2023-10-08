@@ -13,7 +13,7 @@ class ProcessingFrame(AppManagerW, LabeledFrame):
         src.ttk.Frame(master=self.container, width=300).pack()
         self.header = src.tk.StringVar(master=self)
         self.status = src.tk.StringVar(master=self)
-        self.pb = src.ttk.Progressbar(master=self.container, orient='horizontal', length=300)
+        self.pb = src.ttk.Progressbar(master=self.container, orient='horizontal', length=298)
         self._widgets = [src.ttk.Label(master=self.container, textvariable=self.header, width=49),
                          src.ttk.Label(master=self.container, textvariable=self.status, width=49),
                          self.pb]
@@ -22,7 +22,7 @@ class ProcessingFrame(AppManagerW, LabeledFrame):
         """При входе в менеджер, размещаем виджеты"""
         place = 4
         for widget in self._widgets:
-            widget.place(x=2, y=place)
+            widget.place(x=1, y=place)
             place += 24
 
     def __exit__(self, *args):
