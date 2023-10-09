@@ -5,6 +5,10 @@ import os
 
 MEM = {}
 
+if not os.path.exists('db.mem'):
+    with open('db.mem', 'wb') as file:
+        pickle.dump(MEM, file)
+
 with open('db.mem', 'rb') as file:
     MEM.update(pickle.load(file))
 
