@@ -1,6 +1,7 @@
 from modules.app_manager import *
 import modules.windows.source as source
 from modules.windows.frames import *
+from modules.windows.roddom import RoddomWindow
 
 
 class MainWindow(AppManagerR, source.tk.Tk):
@@ -89,11 +90,10 @@ class MainWindow(AppManagerR, source.tk.Tk):
         add_menu.add_command(label='Разместить по каналам')
         add_menu.add_command(label='Холсты')
         add_menu.add_separator()
-        add_menu.add_command(label='Роддом')
+        add_menu.add_command(label='Роддом', command=lambda: RoddomWindow(master=self))
         add_menu.add_separator()
         add_menu.add_command(label='Бакап')
         add_menu.add_command(label='Замена')
-        add_menu.add_command(label="Print Geometry", command=lambda: print(self.geometry()))
         add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty() + 25)
 
     @staticmethod
