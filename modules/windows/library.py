@@ -1,5 +1,6 @@
 import modules.windows.source as source
 from modules.windows.frames import LabeledFrame
+from idlelib.tooltip import Hovertip
 
 
 class LibraryWindow(source.ChildWindow):
@@ -12,6 +13,19 @@ class LibraryWindow(source.ChildWindow):
         self.title('Библиотека')
         self.show_main_widget()
         self.set_treeview_values()
+        self.tree.bind('<Button-3>', self.rclick_event)
+
+    def rclick_event(self, event):
+        row = self.tree.identify_row(event.y)
+        self.tree.selection_set(row)
+        if row[-1].isdigit():
+            product = self.app_m.lib.get(self.tree.item(row)['text'])
+            text = f'{product.full_name}'
+            line_len = len(text)
+            for k, v in product.__dict__.items():
+                if k != 'full_name':
+                    text += f'\n{k}: {v}'
+            source.TipWindow(master=self, mouse_event=event, text=text)
 
     def show_main_widget(self):
         """Отрисовка виджетов основного меню библиотеки"""
@@ -42,7 +56,7 @@ class LibraryWindow(source.ChildWindow):
         """Метод для установки значений в тривью"""
         for ind, obj in enumerate(self.app_m.lib.categories, 1):   # Устанавливаем категории
             self.tree.insert('', 'end', iid=obj.__name__, text=obj.rus_name, tags=obj.__name__)
-        for ind, value in enumerate(sorted(self.app_m.Library.headers.items()), 1):     # Вставляем продукты в категории
+        for ind, value in enumerate(sorted(self.app_m.lib.headers.items()), 1):     # Вставляем продукты в категории
             name, category = value
             self.tree.insert(str(category), 'end', iid=f'{category}{ind}', text=name, tags=category)
 

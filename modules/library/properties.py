@@ -79,7 +79,7 @@ def print_mat(pos):
     pg_poly = ('Sappi SRA3', 'Sappi 320x620', 'UPM SRA4 170', 'UPM SRA4 150', 'UPM SRA4 250', 'UPM SRA3 170',
                'UPM SRA3 250', 'Flex Bind 330x330', 'Flex Bind 320x450')
     dct = {'cover': {'Photobook': cvr_photo + cvr_poly, 'Layflat': cvr_poly, 'Album': cvr_poly, 'Journal': pg_poly,
-                     'Photofolder': cvr_poly[2:], 'Canvas': ('CottonCanvas',), 'Subproduct': pg_poly},
+                     'Photofolder': cvr_poly[2:], 'Canvas': ('CottonCanvas',), 'Subproduct': pg_poly + ('MagnetycVinyl', )},
            'page': {'Photobook': pg_photo, 'Layflat': pg_poly[:-2], 'Album': pg_poly, 'Journal': pg_poly[:-2]}
            }
     return dct[pos]

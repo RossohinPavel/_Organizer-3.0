@@ -32,7 +32,8 @@ class StickerGenProxy(OrderProxy):
             main.append(line)
         return '\n'.join((*main, *(f'{k} {f"{v}шт" if v else ""}' for k, v in sub.items())))
 
-    def __create_line(self, edition, prod_obj):
+    @staticmethod
+    def __create_line(edition, prod_obj):
         short_name = prod_obj.short_name
         yield short_name
         if short_name not in ("Дуо", "Дуо гор", "Трио"):
@@ -46,3 +47,5 @@ class StickerGenProxy(OrderProxy):
             yield lamination
         if edition.comp:
             yield f'-- {edition.comp}'
+        if getattr(prod_obj, 'cover_type', None) == 'Кожаный корешок':
+            yield '\nкож кор'
