@@ -9,8 +9,6 @@ def create_clear_log():
                                 name TEXT,
                                 sample TEXT
                                 )""")
-        val = [(f'tag{x%2}', f'name{x}', f'some_text\nsome_text {"with ?%var?%" if x%2==0 else "without var"} and\nsome_text') for x in range(20)]
-        db.executemany('INSERT INTO Samples (tag, name, sample) VALUES (?, ?, ?)', val)
 
 
 if __name__ == '__main__':

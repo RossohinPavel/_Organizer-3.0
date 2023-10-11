@@ -48,6 +48,7 @@ class TipWindow(tk.Toplevel):
         self.overrideredirect(True)
         self.bind('<ButtonPress>', lambda x: self.destroy())
         self.bind('<Escape>', lambda x: self.destroy())
+        self.bind('<FocusOut>', lambda x: self.destroy())
         self.focus_set()
         self.set_position()
         self.show_text()

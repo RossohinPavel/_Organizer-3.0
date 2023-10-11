@@ -13,10 +13,11 @@ class LibraryWindow(ChildWindow):
     def main(self, *args, **kwargs):
         self.title('Библиотека')
         self.show_main_widget()
-        self.set_treeview_values()
+        self.update_treeview_values()
         self.tree.bind('<Button-3>', self.rclick_event)
 
     def rclick_event(self, event):
+        """Вызов подсказки по нажатию правой кнопки"""
         row = self.tree.identify_row(event.y)
         self.tree.selection_set(row)
         if row[-1].isdigit():
@@ -45,18 +46,15 @@ class LibraryWindow(ChildWindow):
         tk.Frame(self, height=200).grid(row=5, column=2)
         MyButton(self, text='Закрыть', command=self.destroy).grid(row=6, column=2, sticky='EW', rowspan=2, padx=2, pady=2)
 
-    def set_treeview_values(self):
+    def update_treeview_values(self):
         """Метод для установки значений в тривью"""
+        for i in self.tree.get_children(''):
+            self.tree.delete(i)
         for ind, obj in enumerate(self.app_m.lib.categories, 1):   # Устанавливаем категории
             self.tree.insert('', 'end', iid=obj.__name__, text=obj.rus_name, tags=obj.__name__)
         for ind, value in enumerate(sorted(self.app_m.lib.headers.items()), 1):     # Вставляем продукты в категории
             name, category = value
             self.tree.insert(str(category), 'end', iid=f'{category}{ind}', text=name, tags=category)
-
-    def clear_treeview(self):
-        """Очитска тривью от содержимого"""
-        for i in self.tree.get_children(''):
-            self.tree.delete(i)
 
     def init_lib(self, module: str):
         """Замыкание для наделения кнопок соответствующими функциями
@@ -74,8 +72,7 @@ class LibraryWindow(ChildWindow):
                 self.wait_window(AssistWindow(self, module=module, category=category, product=product))
             else:
                 self.__delete_from_lib(category, product)
-            self.clear_treeview()
-            self.set_treeview_values()
+            self.update_treeview_values()
         return wrapper
 
     def __delete_from_lib(self, category: str, full_name: str):
@@ -196,9 +193,8 @@ class AssistWindow(ChildWindow):
 
     def show_buttons(self):
         """Функция для отрисовки кнопок"""
-        text = {'add': 'Добавить', 'copy': 'Добавить', 'change': 'Изменить'}[self.module]
         frame = tk.Frame(self, height=28)
-        MyButton(frame, text=text, width=30, command=self.write_to_library).place(x=130, y=0)
+        MyButton(frame, text='Сохранить', width=30, command=self.write_to_library).place(x=130, y=0)
         MyButton(frame, text='Закрыть', width=10, command=self.destroy).place(x=415, y=0)
         frame.pack(expand=1, fill='x')
 
