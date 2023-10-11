@@ -6,11 +6,11 @@ __all__ = ['LibraryWindow']
 
 class LibraryWindow(ChildWindow):
     """Окно управления библиотекой"""
-    def do_before(self, *args, **kwargs):
-        self.width = 397
-        self.height = 351
+    def __init__(self, *args, **kwargs):
+        self.width, self.height = 397, 351
+        super().__init__(*args, **kwargs)
 
-    def do_after(self, *args, **kwargs):
+    def main(self, *args, **kwargs):
         self.title('Библиотека')
         self.show_main_widget()
         self.set_treeview_values()
@@ -106,20 +106,18 @@ class AssistWindow(ChildWindow):
                 'dc_break': ('individual', 'check', 'right', {'text': 'Раскодировка с разрывом'})
                 }
 
-    def do_before(self, *args, **kwargs):
-        dct = {'Album': (498, 528), 'Canvas': (498, 278), 'Journal': (498, 278), 'Layflat': (498, 425),
-               'Photobook': (498, 488), 'Photofolder': (498, 381),  'Subproduct': (498, 238)}
-        self.width, self.height = dct[self.category]
-
     def __init__(self, *args, **kwargs):
+        dct = {'Album': (498, 528), 'Canvas': (498, 278), 'Journal': (498, 278), 'Layflat': (498, 425),
+               'Photobook': (498, 488), 'Photofolder': (498, 381), 'Subproduct': (498, 238)}
         self.module = kwargs.pop('module')
         self.category = kwargs.pop('category')
         self.product = kwargs.pop('product')
+        self.width, self.height = dct[self.category]
         self.product_vars = {}  # Словарь для хранения переменных виджетов
         self.product_obj = None
         super().__init__(*args, **kwargs)
 
-    def do_after(self, *args, **kwargs):
+    def main(self, *args, **kwargs):
         self.title({'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module])
         self.product_obj = self.app_m.Library.get_blank(self.category)
         self.show_main_widgets()

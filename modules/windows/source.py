@@ -10,17 +10,17 @@ class ChildWindow(tk.Toplevel):
     height = 20
 
     def __init__(self, *args, **kwargs):
-        self.do_before(*args, **kwargs)
         super().__init__(*args, **kwargs)
         self.bind('<Escape>', lambda x: self.destroy())
         self.set_geometry()
-        self.app_m = self.master.app_m
-        self.do_after(*args, **kwargs)
+        self.app_m = getattr(self.master, 'app_m', None)
+        self.main(*args, **kwargs)
         self.focus_set()
         self.grab_set()
 
-    def do_before(self, *args, **kwargs):
-        """Абстрактная ф-я для сборки других ф-й, которые делают что-то до вызова виджета"""
+    def main(self, *args, **kwargs):
+        """Абстрактная ф-я для сборки других ф-й. Запускается в момент инициализации объекта.
+        В основном, служит для сборки ф-й отрисовки дочерних виджетов."""
         pass
 
     def set_geometry(self):
@@ -29,10 +29,6 @@ class ChildWindow(tk.Toplevel):
         place_y = ((self.master.winfo_height() - self.height) // 2) + self.master.winfo_y()
         self.geometry(f"{self.width}x{self.height}+{place_x}+{place_y}")
         self.resizable(False, False)
-
-    def do_after(self, *args, **kwargs):
-        """Абстрактная ф-я для сборки других ф-й, которые делают что-то после вызова виджета"""
-        pass
 
 
 class MyButton(tk.Button):

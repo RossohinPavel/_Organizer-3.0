@@ -3,17 +3,18 @@ from ..file_handlers.roddom import Roddom
 
 
 class RoddomWindow(ChildWindow):
-    def do_before(self, *args, **kwargs):
-        self.width = 253
-        self.height = 216
+    """Окно управления заказами роддома"""
+    def __init__(self, *args, **kwargs):
+        self.width, self.height = 253, 216
         self.order_obj = None
+        super().__init__(*args, **kwargs)
 
-    def do_after(self, *args, **kwargs):
+    def main(self, *args, **kwargs):
         self.title('Роддом')
-        self.show_directory_widget()
         self.info_var = tk.StringVar(master=self)
-        self.show_info_widget()
         self.txt_sum = tk.BooleanVar(master=self, value=True)
+        self.show_directory_widget()
+        self.show_info_widget()
         self.show_buttons()
 
     def show_directory_widget(self):
