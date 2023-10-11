@@ -1,4 +1,5 @@
-from .common import *
+from ..source import *
+from .order_name_validate_frame import ONVFrame
 from modules.info_proxies import StickerGenProxy
 
 
@@ -7,12 +8,12 @@ class StickGenFrame(LabeledFrame):
         super().__init__(*args, text='Генератор наклеек', **kwargs)
         self.container.pack(expand=1)
         ONVFrame(master=self.container, func=self.main, width=50, height=50).pack(pady=(3, 0), fill='both')
-        src.ttk.Frame(master=self.container, borderwidth=1, relief='solid').pack(fill='x')
-        self.header_var = src.tk.StringVar(master=self)
-        src.ttk.Label(master=self.container, textvariable=self.header_var).pack(anchor='nw', fill='x')
-        self.info_var = src.tk.StringVar(master=self)
-        src.ttk.Label(master=self.container, textvariable=self.info_var).pack(anchor='nw', fill='both')
-        src.MyButton(master=self.container, text='Скопировать инфо', command=self.to_clipboard).pack(anchor='s', expand=1)
+        ttk.Frame(master=self.container, borderwidth=1, relief='solid').pack(fill='x')
+        self.header_var = tk.StringVar(master=self)
+        ttk.Label(master=self.container, textvariable=self.header_var).pack(anchor='nw', fill='x')
+        self.info_var = tk.StringVar(master=self)
+        ttk.Label(master=self.container, textvariable=self.info_var).pack(anchor='nw', fill='both')
+        MyButton(master=self.container, text='Скопировать инфо', command=self.to_clipboard).pack(anchor='s', expand=1)
 
     def main(self, order_name):
         proxy = StickerGenProxy(order_name)

@@ -1,4 +1,4 @@
-from .common import *
+from ..source import *
 from modules.app_manager import AppManagerW
 
 
@@ -8,14 +8,14 @@ class ProcessingFrame(AppManagerW, LabeledFrame):
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.queue = src.tk.IntVar(master=self, value=0)
-        src.ttk.Label(master=self, textvariable=self.queue).place(x=130, y=-9)
-        src.ttk.Frame(master=self.container, width=300).pack()
-        self.header = src.tk.StringVar(master=self)
-        self.status = src.tk.StringVar(master=self)
-        self.pb = src.ttk.Progressbar(master=self.container, orient='horizontal', length=298)
-        self._widgets = [src.ttk.Label(master=self.container, textvariable=self.header, width=49),
-                         src.ttk.Label(master=self.container, textvariable=self.status, width=49),
+        self.queue = tk.IntVar(master=self, value=0)
+        ttk.Label(master=self, textvariable=self.queue).place(x=130, y=-9)
+        ttk.Frame(master=self.container, width=300).pack()
+        self.header = tk.StringVar(master=self)
+        self.status = tk.StringVar(master=self)
+        self.pb = ttk.Progressbar(master=self.container, orient='horizontal', length=298)
+        self._widgets = [ttk.Label(master=self.container, textvariable=self.header, width=49),
+                         ttk.Label(master=self.container, textvariable=self.status, width=49),
                          self.pb]
 
     def __enter__(self):

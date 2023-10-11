@@ -1,4 +1,4 @@
-from modules.app_manager import AppManagerR
+from .app_manager import AppManagerR
 
 
 class OrderProxy(AppManagerR):

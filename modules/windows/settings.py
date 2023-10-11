@@ -1,8 +1,10 @@
-import modules.windows.source as source
-from modules.windows.frames import LabeledFrame
+from .source import *
 
 
-class SettingsWindow(source.ChildWindow):
+__all__ = ['SettingsWindow']
+
+
+class SettingsWindow(ChildWindow):
     """Окно основных настроек приложения"""
     def do_before(self, *args, **kwargs):
         self.width = 345
@@ -13,7 +15,7 @@ class SettingsWindow(source.ChildWindow):
         self.show_log_check_depth_widgets()
         self.show_mode_widgets()
         self.show_directory_widgets()
-        source.MyButton(master=self, text='Закрыть', command=self.destroy, width=23).pack(anchor='se', pady=(2, 4), padx=4)
+        MyButton(master=self, text='Закрыть', command=self.destroy, width=23).pack(anchor='se', pady=(2, 4), padx=4)
 
     def show_log_check_depth_widgets(self):
         """Отрисовка виджетов для настройки глубины проверки лога"""
@@ -24,18 +26,18 @@ class SettingsWindow(source.ChildWindow):
             if value.isdigit():
                 self.app_m.stg.log_check_depth = int(value)
                 update_label()
-            entry.delete(0, source.tk.END)
+            entry.delete(0, tk.END)
 
         def update_label():
             label.config(text=f'Текущее значение: {self.app_m.stg.log_check_depth} заказов (папок)')
 
         frame = LabeledFrame(master=self, text='Глубина проверки лога')
-        label = source.ttk.Label(master=frame.container)
+        label = ttk.Label(master=frame.container)
         update_label()
-        entry_var = source.tk.StringVar(master=self)
-        entry = source.ttk.Entry(master=frame.container, textvariable=entry_var, width=26)
-        btn = source.MyButton(master=frame.container, text='Задать', command=get_entry_value)
-        info = source.ttk.Label(master=frame.container, text='\n'.join(msg))
+        entry_var = tk.StringVar(master=self)
+        entry = ttk.Entry(master=frame.container, textvariable=entry_var, width=26)
+        btn = MyButton(master=frame.container, text='Задать', command=get_entry_value)
+        info = ttk.Label(master=frame.container, text='\n'.join(msg))
         label.pack(side='top', anchor='nw')
         info.pack(side='bottom', anchor='nw')
         entry.pack(side='left', padx=(2, 4), pady=3)
@@ -49,8 +51,8 @@ class SettingsWindow(source.ChildWindow):
 
         frame = LabeledFrame(master=self, text='Режимы работы программы')
         frame.pack(fill='x')
-        self.__dict__['autolog'] = source.tk.BooleanVar(master=self, value=self.app_m.stg.autolog)
-        chbtn1 = source.ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
+        self.__dict__['autolog'] = tk.BooleanVar(master=self, value=self.app_m.stg.autolog)
+        chbtn1 = ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
                                         variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
         chbtn1.pack(anchor='nw')
 
@@ -65,13 +67,13 @@ class SettingsWindow(source.ChildWindow):
     def show_directory_frame(self, container, side, text, stg_attr, btn_pdx):
         """Отрисовка виджетов управления рабочими папками"""
         def update_dir():
-            path = source.tkfd.askdirectory(parent=self, initialdir=getattr(self.app_m.stg, stg_attr), title=f'Выберите: {text}')
+            path = tkfd.askdirectory(parent=self, initialdir=getattr(self.app_m.stg, stg_attr), title=f'Выберите: {text}')
             if path:
                 setattr(self.app_m.stg, stg_attr, path)
                 btn.config(text=getattr(self.app_m.stg, stg_attr))
 
-        top_frame = source.ttk.Frame(master=container)
+        top_frame = ttk.Frame(master=container)
         top_frame.pack(side=side, anchor='nw')
-        source.ttk.Label(master=top_frame, text=text).pack(anchor='nw')
-        btn = source.MyButton(master=top_frame, width=22, text=getattr(self.app_m.stg, stg_attr), command=update_dir)
+        ttk.Label(master=top_frame, text=text).pack(anchor='nw')
+        btn = MyButton(master=top_frame, width=22, text=getattr(self.app_m.stg, stg_attr), command=update_dir)
         btn.pack(anchor='nw', padx=btn_pdx, pady=(0, 1))

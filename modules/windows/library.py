@@ -1,9 +1,10 @@
-import modules.windows.source as source
-from modules.windows.frames import LabeledFrame
-from idlelib.tooltip import Hovertip
+from .source import *
 
 
-class LibraryWindow(source.ChildWindow):
+__all__ = ['LibraryWindow']
+
+
+class LibraryWindow(ChildWindow):
     """Окно управления библиотекой"""
     def do_before(self, *args, **kwargs):
         self.width = 397
@@ -21,36 +22,28 @@ class LibraryWindow(source.ChildWindow):
         if row[-1].isdigit():
             product = self.app_m.lib.get(self.tree.item(row)['text'])
             text = f'{product.full_name}'
-            line_len = len(text)
             for k, v in product.__dict__.items():
                 if k != 'full_name':
                     text += f'\n{k}: {v}'
-            source.TipWindow(master=self, mouse_event=event, text=text)
+            TipWindow(master=self, mouse_event=event, text=text)
 
     def show_main_widget(self):
         """Отрисовка виджетов основного меню библиотеки"""
-        x_leveler = source.tk.Frame(self, width=300)  # Выравнивание тривью по текущему значению
-        x_leveler.grid(row=0, column=0)
-        self.tree = source.ttk.Treeview(self, show='tree', height=15)
+        tk.Frame(self, width=300).grid(row=0, column=0)  # Выравнивание тривью по текущему значению
+        self.tree = ttk.Treeview(self, show='tree', height=15)
         self.tree.grid(row=1, column=0, padx=2, pady=2, sticky='NSEW', rowspan=5)
-        x_scroll = source.ttk.Scrollbar(self, orient='horizontal', command=self.tree.xview)
+        x_scroll = ttk.Scrollbar(self, orient='horizontal', command=self.tree.xview)
         self.tree.config(xscroll=x_scroll.set)
         x_scroll.grid(row=6, column=0, sticky='EW')
-        y_scroll = source.ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
+        y_scroll = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
         self.tree.config(yscroll=y_scroll.set)
         y_scroll.grid(row=1, column=1, sticky='NS', rowspan=5)
-        add_btn = source.MyButton(self, text='Добавить', command=self.init_lib('add'))
-        add_btn.grid(row=1, column=2, sticky='EW', padx=2, pady=2)
-        copy_btn = source.MyButton(self, text='Копировать', command=self.init_lib('copy'))
-        copy_btn.grid(row=2, column=2, sticky='EW', padx=2, pady=2)
-        change_btn = source.MyButton(self, text='Изменить', command=self.init_lib('change'))
-        change_btn.grid(row=3, column=2, sticky='EW', padx=2, pady=2)
-        del_btn = source.MyButton(self, text='Удалить', command=self.init_lib('delete'))
-        del_btn.grid(row=4, column=2, sticky='EW', padx=2, pady=2)
-        y_leveler = source.tk.Frame(self, height=200)
-        y_leveler.grid(row=5, column=2)
-        close_btn = source.MyButton(self, text='Закрыть', command=self.destroy)
-        close_btn.grid(row=6, column=2, sticky='EW', rowspan=2, padx=2, pady=2)
+        MyButton(self, text='Добавить', command=self.init_lib('add')).grid(row=1, column=2, sticky='EW', padx=2, pady=2)
+        MyButton(self, text='Копировать', command=self.init_lib('copy')).grid(row=2, column=2, sticky='EW', padx=2, pady=2)
+        MyButton(self, text='Изменить', command=self.init_lib('change')).grid(row=3, column=2, sticky='EW', padx=2, pady=2)
+        MyButton(self, text='Удалить', command=self.init_lib('delete')).grid(row=4, column=2, sticky='EW', padx=2, pady=2)
+        tk.Frame(self, height=200).grid(row=5, column=2)
+        MyButton(self, text='Закрыть', command=self.destroy).grid(row=6, column=2, sticky='EW', rowspan=2, padx=2, pady=2)
 
     def set_treeview_values(self):
         """Метод для установки значений в тривью"""
@@ -73,7 +66,7 @@ class LibraryWindow(source.ChildWindow):
         def wrapper():
             index = self.tree.selection()
             if not index or module != 'add' and not index[0][-1].isdigit():
-                source.tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
+                tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
                 return
             item = self.tree.item(index[0])
             category, product = item['tags'][0], item['text']
@@ -88,11 +81,10 @@ class LibraryWindow(source.ChildWindow):
     def __delete_from_lib(self, category: str, full_name: str):
         """Удаление продукта по выбору в тривью из библиотеки"""
         self.app_m.Library.delete(category, full_name)
-        source.tkmb.showinfo(parent=self, title="Удаление продукта",
-                             message=f'{full_name}\nУспешно удален из библиотеки')
+        tkmb.showinfo(parent=self, title="Удаление продукта", message=f'{full_name}\nУспешно удален из библиотеки')
 
 
-class AssistWindow(source.ChildWindow):
+class AssistWindow(ChildWindow):
     """Конструктор вспомогательных окон библиотеки"""
     __FRAMES = {'segment': ('options', 'radio', 'left', {'text': 'Выберите сегмент продукции'}),
                 'short_name': ('options', 'combo', 'left', {'text': 'Выберите короткое имя'}),
@@ -167,53 +159,49 @@ class AssistWindow(source.ChildWindow):
 
     def __show_entry(self, key, container, **kwargs):
         """Конструктор фрейма для отрисовки Entry виджета"""
-        frame = source.tk.Frame(master=container)
+        frame = tk.Frame(master=container)
         if 'text' in kwargs:
-            source.ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
-        self.product_vars[key] = var = source.tk.StringVar(master=container)
-        entry = source.ttk.Entry(master=frame, width=kwargs.get('width', 39), textvariable=var,
-                                 state='disabled' if key == 'full_name' and self.module == 'change' else 'normal')
+            ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
+        self.product_vars[key] = var = tk.StringVar(master=container)
+        entry = ttk.Entry(master=frame, width=kwargs.get('width', 39), textvariable=var,
+                          state='disabled' if key == 'full_name' and self.module == 'change' else 'normal')
         entry.pack()
         frame.grid(row=kwargs.get('row', 0), column=kwargs.get('column', 0), padx=kwargs.get('padx', 0))
 
     def __show_radio(self, key, container, **kwargs):
         """Конструктор для отрисовки Радио-баттон-фреймов"""
         pos = [{'row': 1, 'column': i} for i in range(5)]
-        frame = source.tk.Frame(master=container)
+        frame = tk.Frame(master=container)
         if 'text' in kwargs:
-            source.ttk.Label(master=frame, text=kwargs['text']).grid(row=0, column=0, columnspan=3, sticky='nw')
-        self.product_vars[key] = var = source.tk.StringVar(master=container, value=kwargs['values'][0])
+            ttk.Label(master=frame, text=kwargs['text']).grid(row=0, column=0, columnspan=3, sticky='nw')
+        self.product_vars[key] = var = tk.StringVar(master=container, value=kwargs['values'][0])
         for name in kwargs['values']:
-            radio = source.ttk.Radiobutton(master=frame, text=name, value=name, variable=var)
-            radio.grid(**pos.pop(0), sticky='ew')
+            ttk.Radiobutton(master=frame, text=name, value=name, variable=var).grid(**pos.pop(0), sticky='ew')
         frame.grid(row=kwargs['row'], column=kwargs['column'], sticky='ew', padx=kwargs.get('padx', 0))
 
     def __show_combobox(self, key, container, **kwargs):
         """Конструктор фрейма для отрисовки Комбобокс виджета"""
-        frame = source.tk.Frame(master=container)
+        frame = tk.Frame(master=container)
         if 'text' in kwargs:
-            source.ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
-        self.product_vars[key] = source.ttk.Combobox(master=frame, width=kwargs.get('width', 36),
-                                                     state='readonly', values=kwargs['values'])
+            ttk.Label(master=frame, text=kwargs['text']).pack(anchor='nw')
+        self.product_vars[key] = ttk.Combobox(master=frame, width=kwargs.get('width', 36),
+                                              state='readonly', values=kwargs['values'])
         self.product_vars[key].pack(anchor='nw', padx=0.5)
         frame.grid(row=kwargs['row'], column=kwargs['column'], padx=kwargs.get('padx', 0))
 
     def __show_check(self, key, container, **kwargs):
         """Конструктор для отрисовки чек фреймов"""
-        frame = source.tk.Frame(master=container)
-        self.product_vars[key] = var = source.tk.IntVar(master=container)
-        chbtn = source.ttk.Checkbutton(master=frame, text=kwargs['text'], variable=var)
-        chbtn.pack()
+        frame = tk.Frame(master=container)
+        self.product_vars[key] = var = tk.IntVar(master=container)
+        ttk.Checkbutton(master=frame, text=kwargs['text'], variable=var).pack()
         frame.grid(row=kwargs['row'], column=kwargs['column'], padx=kwargs.get('padx', 0))
 
     def show_buttons(self):
         """Функция для отрисовки кнопок"""
         text = {'add': 'Добавить', 'copy': 'Добавить', 'change': 'Изменить'}[self.module]
-        frame = source.tk.Frame(self, height=28)
-        func_button = source.MyButton(frame, text=text, width=30, command=self.write_to_library)
-        func_button.place(x=130, y=0)
-        close_button = source.MyButton(frame, text='Закрыть', width=10, command=self.destroy)
-        close_button.place(x=415, y=0)
+        frame = tk.Frame(self, height=28)
+        MyButton(frame, text=text, width=30, command=self.write_to_library).place(x=130, y=0)
+        MyButton(frame, text='Закрыть', width=10, command=self.destroy).place(x=415, y=0)
         frame.pack(expand=1, fill='x')
 
     def insert_values_from_lib(self):
@@ -242,14 +230,14 @@ class AssistWindow(source.ChildWindow):
         if not self.get_values_from_widgets():
             return
         if self.module != 'change' and not self.app_m.Library.check_unique(self.product_obj):
-            source.tkmb.showwarning(parent=self, title='Проверка на дубликат',
-                                    message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
+            tkmb.showwarning(parent=self, title='Проверка на дубликат',
+                             message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
             return
         if self.module == 'change':
             self.app_m.Library.change(self.product_obj)
-            source.tkmb.showinfo(parent=self, title='Изменение продукта',
-                                 message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
+            tkmb.showinfo(parent=self, title='Изменение продукта',
+                          message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
         else:
             self.app_m.Library.add(self.product_obj)
-            source.tkmb.showinfo(parent=self, title='Добавление  продукта',
-                                 message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')
+            tkmb.showinfo(parent=self, title='Добавление  продукта',
+                          message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')

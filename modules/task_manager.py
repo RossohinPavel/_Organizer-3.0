@@ -1,6 +1,6 @@
 from threading import Thread, Lock
-from modules.app_manager import AppManager
-from modules.windows.source import tkmb
+from .app_manager import AppManager
+from .windows.source import tkmb
 
 
 __all__ = ('TaskManager', )

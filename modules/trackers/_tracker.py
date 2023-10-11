@@ -1,6 +1,6 @@
 from threading import Thread
 from time import sleep
-from modules.app_manager import AppManagerR
+from ..app_manager import AppManagerR
 
 
 class TrackerThread(Thread):

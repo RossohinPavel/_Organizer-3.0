@@ -1,5 +1,5 @@
 import pickle
-from modules.app_manager import AppManager
+from .app_manager import AppManager
 
 __all__ = ('Settings', )
 

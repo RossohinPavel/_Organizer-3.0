@@ -1,6 +1,6 @@
-from modules.db_contextmanager import SafeConnect
-from modules.app_manager import AppManagerW
-from modules.logs_dataclasses import *
+from .db_contextmanager import SafeConnect
+from .app_manager import AppManagerW
+from .logs_dataclasses import *
 
 
 __aLL__ = ('Logger', )

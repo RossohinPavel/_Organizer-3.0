@@ -1,5 +1,5 @@
-from modules.app_manager import AppManagerW
-from modules.trackers.orders_tracker import OrdersTracker
+from ..app_manager import AppManagerW
+from .orders_tracker import OrdersTracker
 
 
 class Trackers(AppManagerW):

@@ -6,8 +6,8 @@ from tkinter import filedialog as tkfd
 
 class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
-    width = 1
-    height = 1
+    width = 20
+    height = 20
 
     def __init__(self, *args, **kwargs):
         self.do_before(*args, **kwargs)
@@ -83,3 +83,16 @@ class TipWindow(tk.Toplevel):
         if not self.text:
             return
         tk.Label(master=self, text=self.text, bg='#FFFFE0', relief='raised', justify='left').pack(padx=1, pady=1)
+
+
+class LabeledFrame(ttk.Frame):
+    """Конструктор для фрейма с надписью"""
+    def __init__(self, *args, text='', **kwargs):
+        super().__init__(*args, padding=(3, 7 if text else 3, 3, 3), **kwargs)
+        self.container = ttk.Frame(master=self, borderwidth=1, padding=2, relief='solid')
+        self.container.pack(fill='both', expand=1)
+        if text:
+            label = ttk.Label(master=self, text=text)
+            label.place(x=20, y=-9)
+            self.update_idletasks()
+            self.container.config(width=label.winfo_width() + 25, height=label.winfo_height() - 8, padding=(2, 9, 2, 2))
