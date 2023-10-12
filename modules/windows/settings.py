@@ -6,9 +6,8 @@ __all__ = ['SettingsWindow']
 
 class SettingsWindow(ChildWindow):
     """Окно основных настроек приложения"""
-    def __init__(self, *args, **kwargs):
-        self.width, self.height = 345, 294
-        super().__init__(*args, **kwargs)
+    width = 345
+    height = 294
 
     def main(self, *args, **kwargs):
         self.title('Настройки')

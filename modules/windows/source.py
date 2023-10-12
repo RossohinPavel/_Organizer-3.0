@@ -8,9 +8,16 @@ class ChildWindow(tk.Toplevel):
     """Конструктор для дочерних окон"""
     width = 20
     height = 20
+    win_title = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.win_title is None:
+            cls.win_title = cls.__name__
+        return super().__new__(cls)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.title(self.win_title)
         self.bind('<Escape>', lambda x: self.destroy())
         self.set_geometry()
         self.app_m = getattr(self.master, 'app_m', None)
@@ -46,12 +53,13 @@ class TipWindow(tk.Toplevel):
         self.event = self.get_event(kwargs)
         super().__init__(*args, **kwargs)
         self.overrideredirect(True)
+        self.config(relief='solid', borderwidth=1)
         self.bind('<ButtonPress>', lambda x: self.destroy())
         self.bind('<Escape>', lambda x: self.destroy())
         self.bind('<FocusOut>', lambda x: self.destroy())
         self.focus_set()
-        self.set_position()
         self.show_text()
+        self.set_position()
 
     @staticmethod
     def get_text(kwargs: dict):
@@ -70,16 +78,24 @@ class TipWindow(tk.Toplevel):
         return event
 
     def set_position(self):
-        """Устанавливаем положение окна по координатам клика мыши"""
+        """Устанавливаем положение окна по координатам клика мыши. Сдвигаем по необходимости от края экрана"""
         if not self.event:
             return
-        self.geometry(f'+{self.event.x_root}+{self.event.y_root}')
+        x_pos, y_pos = self.event.x_root, self.event.y_root
+        self.update_idletasks()
+        x_shift = self.winfo_screenwidth() - x_pos - self.winfo_width()
+        y_shift = self.winfo_screenheight() - y_pos - self.winfo_height()
+        if x_shift < 0:
+            x_pos = x_pos + x_shift
+        if y_shift < 0:
+            y_pos = y_pos - y_shift
+        self.geometry(f'+{x_pos}+{y_pos}')
 
     def show_text(self):
         """Отображение текста на виджете"""
         if not self.text:
             return
-        tk.Label(master=self, text=self.text, bg='#FFFFE0', relief='raised', justify='left').pack(padx=1, pady=1)
+        tk.Label(master=self, text=self.text, bg='#FFFFE0', justify='left').pack(padx=1, pady=1)
 
 
 class LabeledFrame(ttk.Frame):

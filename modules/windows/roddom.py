@@ -4,12 +4,11 @@ from ..file_handlers.roddom import Roddom
 
 class RoddomWindow(ChildWindow):
     """Окно управления заказами роддома"""
-    def __init__(self, *args, **kwargs):
-        self.width, self.height = 253, 216
-        self.order_obj = None
-        super().__init__(*args, **kwargs)
+    width = 253
+    height = 216
 
     def main(self, *args, **kwargs):
+        self.order_obj = None
         self.title('Роддом')
         self.info_var = tk.StringVar(master=self)
         self.txt_sum = tk.BooleanVar(master=self, value=True)

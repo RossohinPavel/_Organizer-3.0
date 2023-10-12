@@ -2,7 +2,7 @@ import os
 import re
 from datetime import datetime, timedelta
 from ._tracker import Tracker
-from .orders_tracker_proxies import *
+from modules.orders_submission.orders_tracker_proxies import *
 
 
 class OrdersTracker(Tracker):

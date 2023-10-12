@@ -83,13 +83,14 @@ class MailSamplesFrame(LabeledFrame):
 class SampleEditWindow(ChildWindow):
     """Окно редактирования/добавление текстового шаблона"""
     _samples = MailSamples()
+    width = 440
+    height = 385
 
     def __init__(self, *args, **kwargs):
         self.mode = kwargs.pop('mode')
         self.s_id, *sample_tpl = kwargs.pop('sample_tpl')
         self.update_func = kwargs.pop('update_func')
         self.widget_lst = []
-        self.width, self.height = 440, 385
         super().__init__(*args, **kwargs)
         self.widget_lst[0].focus_set()
         self.insert_def_values(sample_tpl)
@@ -157,11 +158,12 @@ class SampleEditWindow(ChildWindow):
 
 class InitSampleWindow(ChildWindow):
     """Вспомогательное окно для заполнения переменных в текстовом шаблоне"""
+    width = 194
 
     def __init__(self, *args, **kwargs):
         self.text = kwargs.pop('text').split('?%')
         self.sample_title = kwargs.pop('sample_title')
-        self.width, self.height = 194, 20 + 30 + len(self.text[1::2]) * 44
+        self.height = 20 + 30 + len(self.text[1::2]) * 44
         self.widget_lst = []
         super().__init__(*args, **kwargs)
         self.overrideredirect(True)

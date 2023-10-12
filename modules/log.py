@@ -1,9 +1,9 @@
-from .db_contextmanager import SafeConnect
+from ._safe_connect import SafeConnect
 from .app_manager import AppManagerW
-from .logs_dataclasses import *
+from modules.orders_submission.base_dataclasses import *
 
 
-__aLL__ = ('Logger', )
+__aLL__ = ('Log', )
 
 
 class Log(AppManagerW):

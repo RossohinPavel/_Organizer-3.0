@@ -1,6 +1,6 @@
 from ..source import *
 from .order_name_validate_frame import ONVFrame
-from modules.info_proxies import StickerGenProxy
+from modules.orders_submission.proxy_info import StickerGenProxy
 
 
 class StickGenFrame(LabeledFrame):

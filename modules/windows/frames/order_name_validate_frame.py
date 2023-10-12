@@ -22,7 +22,8 @@ class ONVFrame(ttk.Frame):
         """Валидация введеных значений, вызов функции при полной валидации и очистка _entry"""
         res = re_match(r'\d{0,6}$', value) is not None
         if res and len(value) == 6:
-            self._func(value)
+            if self._func:
+                self._func(value)
             self.__insert_def_val()
         return res
 

@@ -1,10 +1,11 @@
-from modules.app_manager import *
-import modules.windows.source as source
-from modules.windows.frames import *
-from modules.windows.roddom import RoddomWindow
+from ..app_manager import *
+from .source import *
+from .frames import *
+from .handlers import *
+from .roddom import RoddomWindow
 
 
-class MainWindow(AppManagerR, source.tk.Tk):
+class MainWindow(AppManagerR, tk.Tk):
     """Основное окно приложения"""
     def __init__(self):
         super().__init__()
@@ -13,6 +14,8 @@ class MainWindow(AppManagerR, source.tk.Tk):
         self.show_log_tracker_frame()
         self.show_processing_line()
         self.show_common_line()
+        self.iconbitmap(default='./data/app.ico')
+        self.BTN_ICO = tk.PhotoImage(file='./data/btn.png')
 
     def set_main_graph_settings(self):
         """Основные настройки окна, положения и размера."""
@@ -34,56 +37,56 @@ class MainWindow(AppManagerR, source.tk.Tk):
         ttl = 'Очередь задач не пуста'
         msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
         if self.app_m.pf.queue.get() > 0:
-            if not source.tkmb.askokcancel(parent=self, title=ttl, message=msg):
+            if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
                 return
         super().destroy()
 
     def show_log_tracker_frame(self):
         """Отрисовка статуса процесса выполнения лога"""
-        source.ttk.Frame(master=self, relief='solid').pack(fill='x')
-        container = source.ttk.Frame(master=self)
+        ttk.Frame(master=self, relief='solid').pack(fill='x')
+        container = ttk.Frame(master=self)
         container.pack(fill='x')
-        source.ttk.Frame(master=container, relief='solid').pack(side='left', fill='y')
-        source.ttk.Label(master=container, text='Трекер заказов:').pack(anchor='nw', side='left')
-        orders_trk = source.tk.StringVar(master=container, value='Выключен')
-        source.ttk.Label(master=container, textvariable=orders_trk).pack(side='left')
-        source.ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
+        ttk.Frame(master=container, relief='solid').pack(side='left', fill='y')
+        ttk.Label(master=container, text='Трекер заказов:').pack(anchor='nw', side='left')
+        orders_trk = tk.StringVar(master=container, value='Выключен')
+        ttk.Label(master=container, textvariable=orders_trk).pack(side='left')
+        ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
         self.txt_vars.orders_trk = orders_trk
 
     def show_processing_line(self):
         """Отображение фреймов для обработки файлов"""
-        source.ttk.Frame(master=self, relief='solid').pack(fill='x')
-        container = source.ttk.Frame(master=self)
+        ttk.Frame(master=self, relief='solid').pack(fill='x')
+        container = ttk.Frame(master=self)
         container.pack(fill='x')
-        source.ttk.Frame(master=container, relief='solid').pack(side='left', fill='y')
-        frame_style = source.ttk.Style(self)
+        ttk.Frame(master=container, relief='solid').pack(side='left', fill='y')
+        frame_style = ttk.Style(self)
         frame_style.configure('pl.TFrame', background='dark salmon')
-        container_for_label = source.ttk.Frame(master=container, style='pl.TFrame')
+        container_for_label = ttk.Frame(master=container, style='pl.TFrame')
         container_for_label.pack(side='left', fill='x', expand=1)
-        source.ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
-        source.ttk.Label(master=container_for_label, text='Обработка Файлов', background='dark salmon').pack()
-        source.ttk.Frame(master=self, relief='solid').pack(fill='x')
-        container_for_widgets = source.ttk.Frame(master=self)
+        ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
+        ttk.Label(master=container_for_label, text='Обработка Файлов', background='dark salmon').pack()
+        ttk.Frame(master=self, relief='solid').pack(fill='x')
+        container_for_widgets = ttk.Frame(master=self)
         container_for_widgets.pack(fill='x')
         self.show_processing_buttons(container_for_widgets)
         self.show_processing_frame(container_for_widgets)
 
     def show_processing_buttons(self, frame):
         """Отрисовка фрейма кнопок запуска обработчика файлов"""
-        source.ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
-        container = source.ttk.Frame(master=frame)
+        ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
+        container = ttk.Frame(master=frame)
         container.pack(side='left', fill='x')
-        btn1 = source.MyButton(master=container, text='Сетка на обложки', command=None, width=15)
+        btn1 = MyButton(master=container, text='Сетка на обложки', command=lambda: CoverMarker(self), width=15)
         btn1.pack(padx=7, pady=(5, 0))
-        btn2 = source.MyButton(master=container, text='Раскодировка', command=None, width=15)
+        btn2 = MyButton(master=container, text='Раскодировка', command=None, width=15)
         btn2.pack(padx=7, pady=(5, 0))
-        btn3 = source.MyButton(master=container, text='Дополнительно', command=self.show_add_btn_menu, width=15)
+        btn3 = MyButton(master=container, text='Дополнительно', command=self.show_add_btn_menu, width=15)
         btn3.pack(padx=7, pady=5)
         self.__dict__['add_btn'] = btn3
 
     def show_add_btn_menu(self):
         """Отрисовка меню под кнопкой Дополнительно"""
-        add_menu = source.tk.Menu(tearoff=0)
+        add_menu = tk.Menu(tearoff=0)
         add_menu.add_command(label="Обновить БД", command=self.app_m.tr.ot.manual)
         add_menu.add_separator()
         add_menu.add_command(label='Направляющие')
@@ -99,54 +102,54 @@ class MainWindow(AppManagerR, source.tk.Tk):
     @staticmethod
     def show_processing_frame(frame):
         """Отрисовка фрейма отображения прогресса обработки файлов"""
-        source.ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
+        ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
         proc_frm = ProcessingFrame(master=frame, text='Заданий в очереди:')
         proc_frm.pack(side='left', fill='both', expand=1)
-        source.ttk.Frame(master=frame, relief='solid').pack(side='right', fill='y')
+        ttk.Frame(master=frame, relief='solid').pack(side='right', fill='y')
 
     def show_common_line(self):
         """Отображение остальных фреймов для работы с заказами, клиентами и др"""
-        source.ttk.Frame(master=self, relief='solid').pack(fill='x')
-        container = source.ttk.Frame(master=self)
+        ttk.Frame(master=self, relief='solid').pack(fill='x')
+        container = ttk.Frame(master=self)
         container.pack(fill='x')
-        source.ttk.Frame(master=container, relief='solid').pack(side='left', fill='y')
-        frame_style = source.ttk.Style(self)
+        ttk.Frame(master=container, relief='solid').pack(side='left', fill='y')
+        frame_style = ttk.Style(self)
         frame_style.configure('cl.TFrame', background='#adc6ed')
-        container_for_label = source.ttk.Frame(master=container, style='cl.TFrame')
+        container_for_label = ttk.Frame(master=container, style='cl.TFrame')
         container_for_label.pack(side='left', fill='x', expand=1)
-        source.ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
-        source.ttk.Label(master=container_for_label, text='Общее', background='#adc6ed').pack()
-        source.ttk.Frame(master=self, relief='solid').pack(fill='x')
-        container_for_widgets = source.ttk.Frame(master=self)
+        ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
+        ttk.Label(master=container_for_label, text='Общее', background='#adc6ed').pack()
+        ttk.Frame(master=self, relief='solid').pack(fill='x')
+        container_for_widgets = ttk.Frame(master=self)
         container_for_widgets.pack(fill='x')
-        source.ttk.Frame(master=self, relief='solid').pack(fill='x')
+        ttk.Frame(master=self, relief='solid').pack(fill='x')
         self.show_information_buttons(container_for_widgets)
         self.show_information_frame(container_for_widgets)
 
     def show_information_buttons(self, frame):
         """Отрисовка кнопок получения различной информации о заказах"""
-        source.ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
-        container = source.tk.Frame(master=frame)
+        ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
+        container = tk.Frame(master=frame)
         container.pack(side='left', fill='y')
-        btn1 = source.MyButton(master=container, text='СтикГен', command=self.update_info_frame(StickGenFrame), width=15)
+        btn1 = MyButton(master=container, text='СтикГен', command=self.update_info_frame(StickGenFrame), width=15)
         btn1.pack(padx=7, pady=(5, 0))
-        btn2 = source.MyButton(master=container, text='Планировщик', command=self.update_info_frame(PlanerFrame), width=15)
+        btn2 = MyButton(master=container, text='Планировщик', command=self.update_info_frame(PlanerFrame), width=15)
         btn2.pack(padx=7, pady=(5, 0))
-        btn3 = source.MyButton(master=container, text='Шаблоны писем', command=self.update_info_frame(MailSamplesFrame), width=15)
+        btn3 = MyButton(master=container, text='Шаблоны писем', command=self.update_info_frame(MailSamplesFrame), width=15)
         btn3.pack(padx=7, pady=(5, 0))
         for _ in range(4):
-            source.tk.Frame(master=container, height=26, width=20).pack(padx=7, pady=(5, 0))
-        btn4 = source.MyButton(master=container, text='Управление', width=15, command=self.update_info_frame(ControlFrame))
+            tk.Frame(master=container, height=26, width=20).pack(padx=7, pady=(5, 0))
+        btn4 = MyButton(master=container, text='Управление', width=15, command=self.update_info_frame(ControlFrame))
         btn4.pack(pady=(5, 5))
-        source.ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
+        ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
 
     def show_information_frame(self, frame):
         """Отрисовка фрейма отображения информации о заказах"""
-        frame = source.tk.Frame(master=frame)
+        frame = tk.Frame(master=frame)
         frame.contained_obj = None
         setattr(self, 'info_frame', frame)
         frame.pack(side='left', expand=1, fill='both')
-        source.ttk.Frame(master=frame, relief='solid').pack(side='right', fill='y')
+        ttk.Frame(master=frame, relief='solid').pack(side='right', fill='y')
 
     def update_info_frame(self, obj_link):
         """Замыкание для реализации логики отрисовки информации на info_frame"""
@@ -160,3 +163,4 @@ class MainWindow(AppManagerR, source.tk.Tk):
                 info_frame.contained_obj = obj_link
                 obj_link(info_frame).pack(fill='both', expand=1)
         return closure
+

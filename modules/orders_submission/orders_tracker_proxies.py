@@ -1,7 +1,7 @@
 import re
 import os
 from collections import Counter
-from ..logs_dataclasses import *
+from .base_dataclasses import *
 
 __all__ = ('OrderProxy', 'EditionProxy', 'PhotoProxy', 'OrderInfoProxy')
 

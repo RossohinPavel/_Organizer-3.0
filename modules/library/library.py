@@ -1,7 +1,7 @@
 from functools import lru_cache
 import modules.library.products as products
 from modules.app_manager import AppManagerW
-from modules.db_contextmanager import SafeConnect
+from modules._safe_connect import SafeConnect
 
 __all__ = ('Library', )
 

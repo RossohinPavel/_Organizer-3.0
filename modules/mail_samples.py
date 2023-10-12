@@ -1,4 +1,4 @@
-from .db_contextmanager import SafeConnect
+from ._safe_connect import SafeConnect
 
 
 class MailSamples:
