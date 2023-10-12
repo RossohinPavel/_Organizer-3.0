@@ -76,7 +76,7 @@ class MainWindow(AppManagerR, tk.Tk):
         ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
         container = ttk.Frame(master=frame)
         container.pack(side='left', fill='x')
-        btn1 = MyButton(master=container, text='Сетка на обложки', command=lambda: CoverMarker(self), width=15)
+        btn1 = MyButton(master=container, text='Разметка обложек', command=lambda: CoverMarker(self), width=15)
         btn1.pack(padx=7, pady=(5, 0))
         btn2 = MyButton(master=container, text='Раскодировка', command=None, width=15)
         btn2.pack(padx=7, pady=(5, 0))
