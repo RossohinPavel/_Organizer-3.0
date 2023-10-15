@@ -151,6 +151,9 @@ class PhotoProxy(ProxyObserver):
             for form in os.listdir(f'{path}/{paper}'):
                 paper_format, multiplier = form[5:].split('--')
                 name = f'{self.paper_type.get(paper, "Fuji ???")} {paper_format}'
+                res = len(os.listdir(f'{path}/{paper}/{form}')) * int(multiplier)
+                if res == 0:
+                    continue
                 obj = None
                 for dc_obj in lst:
                     if dc_obj.name == name:
@@ -159,7 +162,7 @@ class PhotoProxy(ProxyObserver):
                 if obj is None:
                     obj = Photo(self.dc_obj.name, name)
                     lst.append(obj)
-                obj.count += len(os.listdir(f'{path}/{paper}/{form}')) * int(multiplier)
+                obj.count += res
         return tuple(lst)
 
     def check_info(self, res):
