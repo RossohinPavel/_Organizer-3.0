@@ -1,15 +1,20 @@
 import os
 from re import fullmatch as re_fullmatch
 from ..app_manager import AppManager
+from PIL import Image, ImageDraw, ImageFont
 
 
 @AppManager
 class CoverHandler:
-
     def __init__(self):
         self.cache = {}
         self.__name__ = self.__class__.__name__
         self.__doc__ = self.__class__.__doc__
+
+    @staticmethod
+    def mm_to_pixel(value: int) -> int:
+        """Возвращает значение в пикселях при разрешении в 300 dpi"""
+        return int(value * 11.808)
 
     @staticmethod
     def get_covers_from_comparison(path: str, comp: str | None) -> tuple:
@@ -22,6 +27,27 @@ class CoverHandler:
 
 class CoverMarkerHandler(CoverHandler):
     def __call__(self, obj, **kwargs):
+        self.storage.pf.header.set(f'Обработка обложек в заказе {obj.order}')
         for edt, prd in obj.target.items():
             src_path = f'{self.storage.stg.z_disc}/{obj.creation_date}/{obj.order}/{edt.name}'
-            print(self.get_covers_from_comparison(src_path, edt.comp))
+            for cover_name in self.get_covers_from_comparison(src_path, edt.comp):
+                self.storage.pf.status.set(f'{cover_name}')
+                with Image.open(f'{src_path}/{cover_name}') as cover_img:
+                    cover_img.load()
+                cwidth, cheight = cover_img.width, cover_img.height
+                draw_name = f'{cwidth}x{cheight}={prd.full_name}'
+                draw_obj = self.cache.get(draw_name, None)
+                if draw_obj is None:
+                    p_clapan = self.mm_to_pixel(prd.cover_clapan)
+                    p_joint = self.mm_to_pixel(prd.cover_joint)
+                    p_clength = self.mm_to_pixel(prd.carton_length)
+                    draw_obj = cover_img
+                    draw = ImageDraw.Draw(draw_obj)
+                    draw.rectangle((0, 0, cwidth, cheight), fill='#FFFFFF')     # Заливка белым
+                    draw.rectangle((p_clapan, p_clapan, p_clapan + p_clength, cheight - p_clapan), outline='#000000')
+                    draw.rectangle((cwidth - p_clapan, p_clapan, cwidth - p_clapan - p_clength, cheight - p_clapan), outline='#000000')
+                    main_line = p_clapan + p_clength + p_joint
+                    draw.rectangle((main_line, p_clapan, cwidth - main_line, cheight - p_clapan), outline='#000000')
+                    draw.rectangle((main_line - 50, p_clapan + 150, cwidth - main_line + 50, cheight - p_clapan - 150), fill='#FFFFFF')
+                    self.cache[draw_name] = cover_img
+                draw_obj.save(f'{src_path}/{cover_name[:-4]}_1.jpg', quality='keep', dpi=(300, 300))
