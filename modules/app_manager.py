@@ -1,4 +1,13 @@
-__all__ = ('AppManagerR', 'AppManagerW', 'AppManager')
+__all__ = ('AppManager', )
+
+
+class Group:
+    """Класс-контейнер."""
+    def __init__(self, group_name: str):
+        self._group_name = group_name
+
+    def __repr__(self):
+        return f'<{self._group_name}>: {", ".join(f"{repr(k)}: {repr(v)}" for k, v in self.__dict__.items() if k != "_group_name")}'
 
 
 class Storage:
@@ -15,36 +24,49 @@ class Storage:
             if key.startswith(item) or key.endswith(item):
                 return value
 
-    def __setattr__(self, attr_name, obj):
-        if not isinstance(obj, AppManagerW | AppManagerR):
-            raise AttributeError(f'{obj} не является объектом-наследником классов AppManager')
-        self.__dict__[attr_name] = obj
-
     def __contains__(self, item):
         return self.__getattr__(item) is not None
 
-
-class AppManagerR:
-    """Абстрактный класс, предостовляющий наследникам доступ к хранилищу модулей приложения по переменной app_m"""
-    app_m = Storage()
+    def __repr__(self):
+        return f'Storage: <{repr(self.__dict__)}>'
 
 
-class AppManagerW:
-    """Абстрактный класс, при создании объекта записывает его в хранилище. Реализует моносостояние.
-    Можно использовать как контейнер, чтобы сгруппировать некие присвоенные атрибуты"""
-    _alias = ''  # псевдоним, который может использовать объект.
+class AppManager:
+    """Класс-декоратор для сборки основных модулей программы в storage и предостовления к ним доступа. Если аргумент
+    write=True, то объект этого класса будет записан в storage. Для подобных объектов реализовано моносостояние."""
+    __slots__ = '__write'
+    storage = Storage()
 
-    def __new__(cls, *args, **kwargs):
-        storage = Storage()
-        name = kwargs.get('group_name', cls.__name__)
-        if name not in storage:
-            if name == 'AppManagerW':
-                raise TypeError('Не передан аргумент group_name')
-            setattr(storage, f'{name}={kwargs.get("alias", cls._alias)}', super().__new__(cls))
-        return getattr(storage, name)
+    def __new__(cls, write: object | bool) -> object:
+        """Фильтруем аргументы. Если передан класс, то возвращаем объект класса AppManager с аргументом write=False."""
+        if isinstance(write, type):
+            return cls(False)(write)
+        return super().__new__(cls)
 
+    def __init__(self, write: object | bool):
+        self.__write = write
 
-class AppManager(AppManagerR, AppManagerW):
-    """Абстрактный класс, предостовляющий наследникам как доступ к хранилищу модулей приложения, так и записывающий
-    модуль в это хранилище"""
-    pass
+    def __call__(self, type_obj: type = None) -> type:
+        """Наполняем передаваемый класс атрибутом класса storage и, если write=True, подменяем функцию __new__"""
+        type_obj.storage = self.storage
+        if self.__write:
+            setattr(type_obj, '__new__', self.__new_decorator(getattr(type_obj, '__new__')))
+        return type_obj
+
+    @classmethod
+    def __new_decorator(cls, new_func: callable) -> callable:
+        """Декоратор функции __new__. Реализует моносостояние и записывает объект класса в storage"""
+        def wrapper(instance, *args, **kwargs):
+            if instance.__name__ not in cls.storage:
+                name = f'{instance.__name__}={getattr(instance, "_alias", "")}'
+                setattr(cls.storage, name, new_func(instance))
+            return getattr(cls.storage, instance.__name__)
+        wrapper.__name__, wrapper.__doc__ = new_func.__name__, new_func.__doc__
+        return wrapper
+
+    @classmethod
+    def create_group(cls, group_name: str, alias: str = '') -> Group:
+        """Создает в Storage группу (Group) и возвращает ее"""
+        group = Group(group_name)
+        setattr(cls.storage, f'{group_name}={alias}', group)
+        return group

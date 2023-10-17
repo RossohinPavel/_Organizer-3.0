@@ -22,12 +22,12 @@ class RoddomWindow(ChildWindow):
             """Функция смены папки роддома"""
             path = tkfd.askdirectory()
             if path:
-                self.app_m.stg.roddom_dir = path
+                self.storage.stg.roddom_dir = path
                 upd_btn.config(text=path)
 
         frame = LabeledFrame(master=self, text='Папка, где хранятся заказы Роддом\'а')
         frame.pack(fill='x')
-        upd_btn = MyButton(master=frame.container, text=self.app_m.stg.roddom_dir, command=update_dir)
+        upd_btn = MyButton(master=frame.container, text=self.storage.stg.roddom_dir, command=update_dir)
         upd_btn.pack(expand=1, fill='x')
 
     def show_info_widget(self):
@@ -46,7 +46,7 @@ class RoddomWindow(ChildWindow):
 
     def calc_order(self):
         """Инициализация подсчета информации в заказе"""
-        path = tkfd.askdirectory(parent=self, initialdir=self.app_m.stg.roddom_dir)
+        path = tkfd.askdirectory(parent=self, initialdir=self.storage.stg.roddom_dir)
         if not path:
             return
         self.order_obj = Roddom(path, self.txt_sum.get())
@@ -58,12 +58,12 @@ class RoddomWindow(ChildWindow):
         if self.order_obj is None:
             tkmb.showwarning(parent=self, title='Отправка в печать', message='Заказ не выбран')
             return
-        path = tkfd.askdirectory(parent=self, initialdir=self.app_m.stg.t_disc)
+        path = tkfd.askdirectory(parent=self, initialdir=self.storage.stg.t_disc)
         if not path:
             return
         self.clipboard_clear()
         self.clipboard_append(f'{path}/{self.order_obj.order}\n\n{self.order_obj.order} -- Роддом')
-        self.app_m.tm.create_task(self.order_obj.to_print, args=(path, ))
+        self.storage.tm.create_task(self.order_obj.to_print, args=(path, ))
         tkmb.showinfo(parent=self, title='Отправка в печать', message=f'Заказ {self.order_obj.order} отправлен в печать')
 
     def info_to_clipboard(self):

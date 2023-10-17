@@ -5,25 +5,25 @@ from threading import Lock
 class SafeConnect:
     """Менеджер контекста для безопасного подключения к базам данных sqlite3"""
     __slots__ = '__db_name', 'connect', 'cursor'
-    __lock_dct = {}
 
-    def __init__(self, db_name: str):
-        self.__db_name = db_name
-        self.connect = None
-        self.cursor = None
+    def __new__(cls, db_name: str):
+        if not getattr(cls, f'__{db_name}l', None):
+            setattr(cls, f'__{db_name}l', Lock())
+        obj = super().__new__(cls)
+        obj.__db_name = db_name
+        obj.connect = obj.cursor = None
+        return obj
 
     def __enter__(self):
         """При входе в менеджер создаем подключение к бд и получаем ее курсор. Блокируем сторонний доступ"""
-        if self.__db_name not in self.__lock_dct:
-            self.__lock_dct[self.__db_name] = Lock()
-        self.__lock_dct[self.__db_name].acquire()
+        getattr(self, f'__{self.__db_name}l').acquire()
         self.connect = sqlite3.connect(f'data/{self.__db_name}')
         self.cursor = self.connect.cursor()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """При выходе из менеджера, закрываем подключение и снимаем блок с доступа."""
-        self.__lock_dct[self.__db_name].release()
+        getattr(self, f'__{self.__db_name}l').release()
         self.cursor = None
         self.connect.close()
         return False

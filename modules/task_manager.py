@@ -6,7 +6,8 @@ from .windows.source import tkmb
 __all__ = ('TaskManager', )
 
 
-class TaskManager(AppManager):
+@AppManager(write=True)
+class TaskManager:
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
     _alias = 'tm'
     __lock = Lock()
@@ -15,13 +16,13 @@ class TaskManager(AppManager):
     def __get_task(cls, func: callable) -> callable:
         """Декоратор, возвращающий ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args, **kwargs):
-            with cls.app_m.pf, cls.__lock:
-                cls.app_m.pf.queue.set(cls.app_m.pf.queue.get() + 1)
+            with cls.storage.pf, cls.__lock:
+                cls.storage.pf.queue.set(cls.storage.pf.queue.get() + 1)
                 try:
                     func(*args, **kwargs)
                 except Exception as exc:
                     tkmb.showerror('Ошибка', message=exc)
-                cls.app_m.pf.queue.set(cls.app_m.pf.queue.get() - 1)
+                cls.storage.pf.queue.set(cls.storage.pf.queue.get() - 1)
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 

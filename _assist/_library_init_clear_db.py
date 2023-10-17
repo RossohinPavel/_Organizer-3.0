@@ -20,5 +20,5 @@ def create_clear_db():
             # cursor.execute(sql_req)
 
 
-if __name__ == '__main__':
-    create_clear_db()
+# if __name__ == '__main__':
+#     create_clear_db()

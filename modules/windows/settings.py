@@ -23,12 +23,12 @@ class SettingsWindow(ChildWindow):
         def get_entry_value():
             value = entry_var.get()
             if value.isdigit():
-                self.app_m.stg.log_check_depth = int(value)
+                self.storage.stg.log_check_depth = int(value)
                 update_label()
             entry.delete(0, tk.END)
 
         def update_label():
-            label.config(text=f'Текущее значение: {self.app_m.stg.log_check_depth} заказов (папок)')
+            label.config(text=f'Текущее значение: {self.storage.stg.log_check_depth} заказов (папок)')
 
         frame = LabeledFrame(master=self, text='Глубина проверки лога')
         label = ttk.Label(master=frame.container)
@@ -46,11 +46,11 @@ class SettingsWindow(ChildWindow):
     def show_mode_widgets(self):
         """Сборная ф-я для отрисовки виджетов управления режимов работы программы"""
         def select_cb(var_name):
-            setattr(self.app_m.stg, var_name, self.__dict__[var_name].get())
+            setattr(self.storage.stg, var_name, self.__dict__[var_name].get())
 
         frame = LabeledFrame(master=self, text='Режимы работы программы')
         frame.pack(fill='x')
-        self.__dict__['autolog'] = tk.BooleanVar(master=self, value=self.app_m.stg.autolog)
+        self.__dict__['autolog'] = tk.BooleanVar(master=self, value=self.storage.stg.autolog)
         chbtn1 = ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
                                         variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
         chbtn1.pack(anchor='nw')
@@ -66,13 +66,13 @@ class SettingsWindow(ChildWindow):
     def show_directory_frame(self, container, side, text, stg_attr, btn_pdx):
         """Отрисовка виджетов управления рабочими папками"""
         def update_dir():
-            path = tkfd.askdirectory(parent=self, initialdir=getattr(self.app_m.stg, stg_attr), title=f'Выберите: {text}')
+            path = tkfd.askdirectory(parent=self, initialdir=getattr(self.storage.stg, stg_attr), title=f'Выберите: {text}')
             if path:
-                setattr(self.app_m.stg, stg_attr, path)
-                btn.config(text=getattr(self.app_m.stg, stg_attr))
+                setattr(self.storage.stg, stg_attr, path)
+                btn.config(text=getattr(self.storage.stg, stg_attr))
 
         top_frame = ttk.Frame(master=container)
         top_frame.pack(side=side, anchor='nw')
         ttk.Label(master=top_frame, text=text).pack(anchor='nw')
-        btn = MyButton(master=top_frame, width=22, text=getattr(self.app_m.stg, stg_attr), command=update_dir)
+        btn = MyButton(master=top_frame, width=22, text=getattr(self.storage.stg, stg_attr), command=update_dir)
         btn.pack(anchor='nw', padx=btn_pdx, pady=(0, 1))

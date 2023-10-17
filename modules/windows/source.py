@@ -20,7 +20,7 @@ class ChildWindow(tk.Toplevel):
         self.title(self.win_title)
         self.bind('<Escape>', lambda x: self.destroy())
         self.set_geometry()
-        self.app_m = getattr(self.master, 'app_m', None)
+        self.storage = getattr(self.master, 'storage', None)
         self.main(*args, **kwargs)
         self.focus_set()
         self.grab_set()

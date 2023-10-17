@@ -1,6 +1,6 @@
 from threading import Thread
 from time import sleep
-from ..app_manager import AppManagerR
+from ..app_manager import AppManager
 
 
 class TrackerThread(Thread):
@@ -16,7 +16,8 @@ class TrackerThread(Thread):
             sleep(self.tracker.delay)
 
 
-class Tracker(AppManagerR):
+@AppManager
+class Tracker:
     """Абстрактный класс реализующий общую логику работы трекера"""
     delay = 180
 
@@ -40,7 +41,7 @@ class Tracker(AppManagerR):
     def __run_decorator(self, func):
         """Декоратор для запуска трекера в менеджере задач"""
         def wrapper(*args, **kwargs):
-            self.app_m.tm.create_task(func, args, kwargs)
+            self.storage.tm.create_task(func, args, kwargs)
 
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper

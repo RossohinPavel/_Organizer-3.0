@@ -1,8 +1,9 @@
 from ..source import *
-from modules.app_manager import AppManagerW
+from modules.app_manager import AppManager
 
 
-class ProcessingFrame(AppManagerW, LabeledFrame):
+@AppManager(write=True)
+class ProcessingFrame(LabeledFrame):
     _alias = 'pf'
     
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""

@@ -10,21 +10,21 @@ class OrdersTracker(Tracker):
     __orders = {}
 
     def run(self):
-        self.app_m.pf.header.set('Трекер заказов')
-        self.app_m.pf.pb['maximum'] = 4
-        self.app_m.pf.pb['value'] = 0
-        self.app_m.pf.status.set('1/4: Обновление списка заказов')
+        self.storage.pf.header.set('Трекер заказов')
+        self.storage.pf.pb['maximum'] = 4
+        self.storage.pf.pb['value'] = 0
+        self.storage.pf.status.set('1/4: Обновление списка заказов')
         self.__update_orders_dct()
-        self.app_m.pf.pb['value'] += 1
-        self.app_m.pf.status.set('2/4: Обновление списка тиражей')
+        self.storage.pf.pb['value'] += 1
+        self.storage.pf.status.set('2/4: Обновление списка тиражей')
         self.__update_edition_list()
-        self.app_m.pf.pb['value'] += 1
-        self.app_m.pf.status.set('3/4: Обновление объектов-тиражей')
+        self.storage.pf.pb['value'] += 1
+        self.storage.pf.status.set('3/4: Обновление объектов-тиражей')
         self.__update_proxies()
-        self.app_m.ProcessingFrame.pb['value'] += 1
-        self.app_m.ProcessingFrame.status.set('4/4: Сохранение информации')
+        self.storage.pf.pb['value'] += 1
+        self.storage.pf.status.set('4/4: Сохранение информации')
         self.__update_log()
-        self.app_m.ProcessingFrame.pb['value'] += 1
+        self.storage.pf.pb['value'] += 1
 
     def manual(self):
         for proxy_lst in self.__orders.values():
@@ -33,15 +33,15 @@ class OrdersTracker(Tracker):
         self.run()
 
     def auto(self):
-        self.app_m.txt_vars.orders_trk.set('Ожидание выполнения')
+        self.storage.txt_vars.orders_trk.set('Ожидание выполнения')
         current_time = datetime.now() + timedelta(seconds=self.delay)
         self.run()
-        self.app_m.txt_vars.orders_trk.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
+        self.storage.txt_vars.orders_trk.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
 
     def __update_orders_dct(self):
         """Обновление списка отслеживаемых заказов"""
-        path = self.app_m.stg.z_disc       # Получаем необходимые настройки
-        limit = self.app_m.stg.log_check_depth
+        path = self.storage.stg.z_disc       # Получаем необходимые настройки
+        limit = self.storage.stg.log_check_depth
         for proxy_obj in self.__orders:         # Помечаем все заказы на удаление
             proxy_obj.delete_flag = True        # При удачном сравнении прокси объект вернет состояние False
         for day in reversed(os.listdir(path)):
@@ -86,4 +86,4 @@ class OrdersTracker(Tracker):
                     lst.append(ord_proxy.order)
                     break
         if lst:     # Вызываем обновление лога если в списке не пустой.
-            self.app_m.Log.update_records(lst)
+            self.storage.Log.update_records(lst)

@@ -20,7 +20,7 @@ class LibraryWindow(ChildWindow):
         row = self.tree.identify_row(event.y)
         self.tree.selection_set(row)
         if row[-1].isdigit():
-            product = self.app_m.lib.get(self.tree.item(row)['text'])
+            product = self.storage.lib.get(self.tree.item(row)['text'])
             text = f'{product.full_name}'
             for k, v in product.__dict__.items():
                 if k != 'full_name':
@@ -49,9 +49,9 @@ class LibraryWindow(ChildWindow):
         """Метод для установки значений в тривью"""
         for i in self.tree.get_children(''):
             self.tree.delete(i)
-        for ind, obj in enumerate(self.app_m.lib.categories, 1):   # Устанавливаем категории
+        for ind, obj in enumerate(self.storage.lib.categories, 1):   # Устанавливаем категории
             self.tree.insert('', 'end', iid=obj.__name__, text=obj.rus_name, tags=obj.__name__)
-        for ind, value in enumerate(sorted(self.app_m.lib.headers.items()), 1):     # Вставляем продукты в категории
+        for ind, value in enumerate(sorted(self.storage.lib.headers.items()), 1):     # Вставляем продукты в категории
             name, category = value
             self.tree.insert(str(category), 'end', iid=f'{category}{ind}', text=name, tags=category)
 
@@ -76,7 +76,7 @@ class LibraryWindow(ChildWindow):
 
     def __delete_from_lib(self, category: str, full_name: str):
         """Удаление продукта по выбору в тривью из библиотеки"""
-        self.app_m.Library.delete(category, full_name)
+        self.storage.Library.delete(category, full_name)
         tkmb.showinfo(parent=self, title="Удаление продукта", message=f'{full_name}\nУспешно удален из библиотеки')
 
 
@@ -115,7 +115,7 @@ class AssistWindow(ChildWindow):
 
     def main(self, *args, **kwargs):
         self.title({'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module])
-        self.product_obj = self.app_m.Library.get_blank(self.category)
+        self.product_obj = self.storage.Library.get_blank(self.category)
         self.show_main_widgets()
         if self.module != 'add':
             self.insert_values_from_lib()
@@ -199,7 +199,7 @@ class AssistWindow(ChildWindow):
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
-        for key, value in self.app_m.Library.get(self.product).__dict__.items():
+        for key, value in self.storage.Library.get(self.product).__dict__.items():
             if key == 'full_name' and self.module == 'copy':
                 continue
             self.product_vars[key].set(value)
@@ -222,15 +222,15 @@ class AssistWindow(ChildWindow):
         """Ф-я для обновления/записи информации библиотеку"""
         if not self.get_values_from_widgets():
             return
-        if self.module != 'change' and not self.app_m.Library.check_unique(self.product_obj):
+        if self.module != 'change' and not self.storage.Library.check_unique(self.product_obj):
             tkmb.showwarning(parent=self, title='Проверка на дубликат',
                              message=f'Добавляемый продукт:\n{self.product_obj.full_name}\nуже есть в библиотеке')
             return
         if self.module == 'change':
-            self.app_m.Library.change(self.product_obj)
+            self.storage.Library.change(self.product_obj)
             tkmb.showinfo(parent=self, title='Изменение продукта',
                           message=f'Данне успешно обновлены для:\n{self.product_obj.full_name}')
         else:
-            self.app_m.Library.add(self.product_obj)
+            self.storage.Library.add(self.product_obj)
             tkmb.showinfo(parent=self, title='Добавление  продукта',
                           message=f'Продукт:\n{self.product_obj.full_name}\nуспешно добавлен в библиотеку')

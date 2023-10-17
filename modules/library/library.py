@@ -1,12 +1,13 @@
 from functools import lru_cache
 import modules.library.products as products
-from modules.app_manager import AppManagerW
+from modules.app_manager import AppManager
 from modules._safe_connect import SafeConnect
 
 __all__ = ('Library', )
 
 
-class Library(AppManagerW):
+@AppManager(write=True)
+class Library:
     """Класс для работы с библиотекой продуктов"""
     _alias = 'lib'
     __s_con = SafeConnect('library.db')

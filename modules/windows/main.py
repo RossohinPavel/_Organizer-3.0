@@ -5,17 +5,25 @@ from .handlers import *
 from .roddom import RoddomWindow
 
 
-class MainWindow(AppManagerR, tk.Tk):
+@AppManager(write=True)
+class MainWindow(tk.Tk):
     """Основное окно приложения"""
+    _alias = 'mw'
+
     def __init__(self):
         super().__init__()
         self.set_main_graph_settings()
-        self.txt_vars = AppManagerW(group_name='txt_vars')   # Инициализация объекта для хранения текстовых переменных.
+        self.txt_vars = AppManager.create_group('txt_vars')   # Инициализация объекта для хранения текстовых переменных.
         self.show_log_tracker_frame()
         self.show_processing_line()
         self.show_common_line()
-        self.iconbitmap(default='./data/app.ico')
-        self.BTN_ICO = tk.PhotoImage(file='./data/btn.png')
+
+    def set_app_img(self, img_tuple: tuple[str, bytes]):
+        """Устанавливаем изображения, который будут использоваться в программе. Первое значение будет установлено как
+        иконка приложения - все последующие станут атрибутами MainWindow"""
+        self.iconphoto(True, tk.PhotoImage(data=img_tuple[0][1]))
+        for attr_name, byte in img_tuple[1:]:
+            setattr(self, attr_name, tk.PhotoImage(data=byte))
 
     def set_main_graph_settings(self):
         """Основные настройки окна, положения и размера."""
@@ -36,7 +44,7 @@ class MainWindow(AppManagerR, tk.Tk):
         """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
         ttl = 'Очередь задач не пуста'
         msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
-        if self.app_m.pf.queue.get() > 0:
+        if self.storage.pf.queue.get() > 0:
             if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
                 return
         super().destroy()
@@ -87,7 +95,7 @@ class MainWindow(AppManagerR, tk.Tk):
     def show_add_btn_menu(self):
         """Отрисовка меню под кнопкой Дополнительно"""
         add_menu = tk.Menu(tearoff=0)
-        add_menu.add_command(label="Обновить БД", command=self.app_m.tr.ot.manual)
+        add_menu.add_command(label="Обновить БД", command=self.storage.tr.ot.manual)
         add_menu.add_separator()
         add_menu.add_command(label='Направляющие')
         add_menu.add_command(label='Разместить по каналам')

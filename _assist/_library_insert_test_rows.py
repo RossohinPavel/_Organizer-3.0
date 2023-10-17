@@ -24,5 +24,5 @@ def insert_test_rows():
             lib.commit()
 
 
-if __name__ == '__main__' and os.path.exists('../data/library.db'):
-    insert_test_rows()
+# if __name__ == '__main__' and os.path.exists('../data/library.db'):
+#     insert_test_rows()

@@ -1,12 +1,13 @@
 from ._safe_connect import SafeConnect
-from .app_manager import AppManagerW
+from .app_manager import AppManager
 from modules.orders_submission.base_dataclasses import *
 
 
 __aLL__ = ('Log', )
 
 
-class Log(AppManagerW):
+@AppManager(write=True)
+class Log:
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
     _alias = 'log'
     __s_con = SafeConnect('log.db')

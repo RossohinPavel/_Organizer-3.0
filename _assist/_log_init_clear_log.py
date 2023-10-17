@@ -28,5 +28,5 @@ def create_clear_log():
                                         )""")
 
 
-if __name__ == '__main__':
-    create_clear_log()
+# if __name__ == '__main__':
+#     create_clear_log()

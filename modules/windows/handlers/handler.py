@@ -30,7 +30,7 @@ class HandlerWindow(ChildWindow):
 
     def show_info_label(self, frame):
         """Отрисовка лейбла с подсказкой о том, что делает обработчик"""
-        info = ttk.Label(master=frame, image=self.master.BTN_ICO)
+        info = ttk.Label(master=frame, image=self.master.question_ico)
         info.place(x=249, y=1)
         info.bind('<Button-1>', lambda event: TipWindow(self, mouse_event=event, text=self.handler_description))
 
