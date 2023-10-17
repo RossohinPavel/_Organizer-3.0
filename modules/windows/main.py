@@ -5,10 +5,11 @@ from .handlers import *
 from .roddom import RoddomWindow
 
 
-@AppManager(write=True)
+@AppManager
 class MainWindow(tk.Tk):
     """Основное окно приложения"""
     _alias = 'mw'
+    __new__ = AppManager.write_to_storage
 
     def __init__(self):
         super().__init__()

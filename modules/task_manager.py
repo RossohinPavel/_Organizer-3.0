@@ -6,9 +6,10 @@ from .windows.source import tkmb
 __all__ = ('TaskManager', )
 
 
-@AppManager(write=True)
+@AppManager
 class TaskManager:
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
+    __new__ = AppManager.write_to_storage
     _alias = 'tm'
     __lock = Lock()
 

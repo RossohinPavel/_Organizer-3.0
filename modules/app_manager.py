@@ -32,37 +32,23 @@ class Storage:
 
 
 class AppManager:
-    """Класс-декоратор для сборки основных модулей программы в storage и предостовления к ним доступа. Если аргумент
-    write=True, то объект этого класса будет записан в storage. Для подобных объектов реализовано моносостояние."""
-    __slots__ = '__write'
+    """Класс-декоратор. """
+    __slots__ = tuple()
     storage = Storage()
 
-    def __new__(cls, write: object | bool) -> object:
-        """Фильтруем аргументы. Если передан класс, то возвращаем объект класса AppManager с аргументом write=False."""
-        if isinstance(write, type):
-            return cls(False)(write)
-        return super().__new__(cls)
-
-    def __init__(self, write: object | bool):
-        self.__write = write
-
-    def __call__(self, type_obj: type = None) -> type:
-        """Наполняем передаваемый класс атрибутом класса storage и, если write=True, подменяем функцию __new__"""
-        type_obj.storage = self.storage
-        if self.__write:
-            setattr(type_obj, '__new__', self.__new_decorator(getattr(type_obj, '__new__')))
+    def __new__(cls, type_obj: type) -> type:
+        """Наделяем класс хранилищем storage"""
+        type_obj.storage = cls.storage
         return type_obj
 
     @classmethod
-    def __new_decorator(cls, new_func: callable) -> callable:
-        """Декоратор функции __new__. Реализует моносостояние и записывает объект класса в storage"""
-        def wrapper(instance, *args, **kwargs):
-            if instance.__name__ not in cls.storage:
-                name = f'{instance.__name__}={getattr(instance, "_alias", "")}'
-                setattr(cls.storage, name, new_func(instance))
-            return getattr(cls.storage, instance.__name__)
-        wrapper.__name__, wrapper.__doc__ = new_func.__name__, new_func.__doc__
-        return wrapper
+    def write_to_storage(cls, instance, *args, **kwargs) -> callable:
+        """Замена ф-ии __new__ в декорируемом классе. записывает Объект в Storage и возвращает его.
+        Реализует моносостояние"""
+        if instance.__name__ not in cls.storage:
+            name = f'{instance.__name__}={getattr(instance, "_alias", "")}'
+            setattr(cls.storage, name, super().__new__(instance))
+        return getattr(cls.storage, instance.__name__)
 
     @classmethod
     def create_group(cls, group_name: str, alias: str = '') -> Group:

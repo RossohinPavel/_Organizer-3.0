@@ -2,9 +2,10 @@ from ..source import *
 from modules.app_manager import AppManager
 
 
-@AppManager(write=True)
+@AppManager
 class ProcessingFrame(LabeledFrame):
     _alias = 'pf'
+    __new__ = AppManager.write_to_storage
     
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""
     def __init__(self, *args, **kwargs):

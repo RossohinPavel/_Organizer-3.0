@@ -107,14 +107,13 @@ class HandlerWindow(ChildWindow):
     def run_handler(self, event=None, **kwargs):
         """Функция запуска обработчика"""
         res = self.widget_dct.pop('proxy', None)
-        print(res)
         if not res:
             tkmb.showwarning(parent=self, title=self.win_title, message='Не указан заказ или в заказе нет целевых тиражей.')
             return
         if self.file_handler is None:
             raise Exception('Файловый обработчик не переопределен в дочернем классе')
         kwargs['handler_option'] = self.widget_dct['handler_option'].get()
-        self.app_m.tm.create_task(self.file_handler, args=(res, ), kwargs=kwargs)
+        self.storage.tm.create_task(self.file_handler, args=(res, ), kwargs=kwargs)
         tkmb.showinfo(parent=self, title=self.win_title, message=f'Заказ {res.order} поставлен в очередь обработки')
         self.reset_to_default()
 

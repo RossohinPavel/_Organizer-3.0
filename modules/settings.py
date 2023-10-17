@@ -4,7 +4,7 @@ from ._safe_connect import SafeConnect
 __all__ = ('Settings', )
 
 
-@AppManager(write=True)
+@AppManager
 class Settings:
     """Предоставляет доступ к настройкам и сохраняет их текущие значения:
     - autolog - Инициализация записи лога файлов в автоматическом режиме
@@ -14,6 +14,7 @@ class Settings:
     - t_disc - Ссылка на серверный диск цифрового отдела и операторов фотопечати
     - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
     """
+    __new__ = AppManager.write_to_storage
     __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir', '__init'
     __s_con = SafeConnect('app.db')
     _alias = 'stg'

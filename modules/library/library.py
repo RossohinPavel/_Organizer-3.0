@@ -6,9 +6,10 @@ from modules._safe_connect import SafeConnect
 __all__ = ('Library', )
 
 
-@AppManager(write=True)
+@AppManager
 class Library:
     """Класс для работы с библиотекой продуктов"""
+    __new__ = AppManager.write_to_storage
     _alias = 'lib'
     __s_con = SafeConnect('library.db')
     categories = tuple(getattr(products, x) for x in products.__all__)
