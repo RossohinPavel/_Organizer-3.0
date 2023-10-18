@@ -172,4 +172,3 @@ class MainWindow(tk.Tk):
                 info_frame.contained_obj = obj_link
                 obj_link(info_frame).pack(fill='both', expand=1)
         return closure
-

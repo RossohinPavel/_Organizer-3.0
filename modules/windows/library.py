@@ -20,11 +20,12 @@ class LibraryWindow(ChildWindow):
         row = self.tree.identify_row(event.y)
         self.tree.selection_set(row)
         if row[-1].isdigit():
-            product = self.storage.lib.get(self.tree.item(row)['text'])
+            item = self.tree.item(row)
+            product = self.storage.lib.get(item['tags'][0], item['text'])
             text = f'{product.full_name}'
-            for k, v in product.__dict__.items():
+            for k in product.__slots__:
                 if k != 'full_name':
-                    text += f'\n{k}: {v}'
+                    text += f'\n{k}: {getattr(product, k)}'
             TipWindow(master=self, mouse_event=event, text=text)
 
     def show_main_widget(self):
@@ -49,11 +50,11 @@ class LibraryWindow(ChildWindow):
         """Метод для установки значений в тривью"""
         for i in self.tree.get_children(''):
             self.tree.delete(i)
-        for ind, obj in enumerate(self.storage.lib.categories, 1):   # Устанавливаем категории
-            self.tree.insert('', 'end', iid=obj.__name__, text=obj.rus_name, tags=obj.__name__)
-        for ind, value in enumerate(sorted(self.storage.lib.headers.items()), 1):     # Вставляем продукты в категории
-            name, category = value
-            self.tree.insert(str(category), 'end', iid=f'{category}{ind}', text=name, tags=category)
+        for category, values in self.storage.lib.headers.items():
+            cat_name, rus_name = category.__name__, category.rus_name
+            self.tree.insert('', 'end', iid=cat_name, text=rus_name, tags=[cat_name, rus_name])
+            for i, name in enumerate(sorted(values), 1):
+                self.tree.insert(cat_name, 'end', iid=f'{cat_name}{i}', text=name, tags=[cat_name, rus_name])
 
     def init_lib(self, module: str):
         """Замыкание для наделения кнопок соответствующими функциями
@@ -66,11 +67,11 @@ class LibraryWindow(ChildWindow):
                 tkmb.showerror(parent=self, title='Ошибка', message='Не выбрана категория или продукт')
                 return
             item = self.tree.item(index[0])
-            category, product = item['tags'][0], item['text']
+            category, product = item['tags'], item['text']
             if module != 'delete':
                 self.wait_window(AssistWindow(self, module=module, category=category, product=product))
             else:
-                self.__delete_from_lib(category, product)
+                self.__delete_from_lib(category[0], product)
             self.update_treeview_values()
         return wrapper
 
@@ -106,15 +107,15 @@ class AssistWindow(ChildWindow):
         dct = {'Album': (498, 528), 'Canvas': (498, 278), 'Journal': (498, 278), 'Layflat': (498, 425),
                'Photobook': (498, 488), 'Photofolder': (498, 381), 'Subproduct': (498, 238)}
         self.module = kwargs.pop('module')
-        self.category = kwargs.pop('category')
+        self.category, rus_name = kwargs.pop('category')
         self.product = kwargs.pop('product')
         self.width, self.height = dct[self.category]
         self.product_vars = {}  # Словарь для хранения переменных виджетов
         self.product_obj = None
         super().__init__(*args, **kwargs)
+        self.title({'add': 'Добавление', 'copy': 'Копирование', 'change': 'Изменение'}[self.module] + ' продукта: ' + rus_name)
 
     def main(self, *args, **kwargs):
-        self.title({'add': 'Добавление продукта', 'copy': 'Копирование продукта', 'change': 'Изменение продукта'}[self.module])
         self.product_obj = self.storage.Library.get_blank(self.category)
         self.show_main_widgets()
         if self.module != 'add':
@@ -127,20 +128,20 @@ class AssistWindow(ChildWindow):
         self.__show_entry('full_name', self.show_m_frame('Введите полное имя продукта')().container, **{'width': 80})
         mf = {'options': self.show_m_frame('Общие особенности продукта'),
               'cover_type': self.show_m_frame('Тип сборки обложки'),
-              'cover_val': self.show_m_frame('Особенности сборки обложки'),
+              'cover_val': self.show_m_frame('Технические размеры обложки'),
               'print_mat': self.show_m_frame('Печатный материал'),
               'individual': self.show_m_frame('Индивидуальные особенности продукта')}
         funcs = {'entry': self.__show_entry, 'radio': self.__show_radio,
                  'combo': self.__show_combobox, 'check': self.__show_check}
         sides = {'left': [], 'right': []}
         for frm in self.__FRAMES:
-            if frm in self.product_obj.__dict__:
+            if frm in self.product_obj.__slots__:
                 m_name, child, side, kwargs = self.__FRAMES[frm]
                 if not isinstance(mf[m_name], LabeledFrame):
                     mf[m_name] = mf[m_name]()
                     sides['left'] = [{'row': i, 'column': 0} for i in range(3)]
                     sides['right'] = [{'row': i, 'column': 1} for i in range(3)]
-                kwargs.update({'values': self.product_obj.__dict__[frm], 'padx': 1.48, **sides[side].pop(0)})
+                kwargs.update({'values': getattr(self.product_obj, frm), 'padx': 1.48, **sides[side].pop(0)})
                 funcs[child](frm, mf[m_name].container, **kwargs)
 
     def show_m_frame(self, text):
@@ -199,10 +200,11 @@ class AssistWindow(ChildWindow):
 
     def insert_values_from_lib(self):
         """Метод для вставки полученных значений в бд"""
-        for key, value in self.storage.Library.get(self.product).__dict__.items():
-            if key == 'full_name' and self.module == 'copy':
+        obj = self.storage.lib.get(self.category, self.product)
+        for slot in obj.__slots__:
+            if slot == 'full_name' and self.module == 'copy':
                 continue
-            self.product_vars[key].set(value)
+            self.product_vars[slot].set(getattr(obj, slot))
 
     def get_values_from_widgets(self) -> bool:
         """Метод для получения информации из менюшек и установки их в product_obj
@@ -215,7 +217,7 @@ class AssistWindow(ChildWindow):
                 return False
             if key in numbered_var:
                 value = int(value) if value.isdigit() else 0
-            self.product_obj.__dict__[key] = value
+            setattr(self.product_obj, key, value)
         return True
 
     def write_to_library(self):

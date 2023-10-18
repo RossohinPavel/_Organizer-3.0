@@ -1,7 +1,9 @@
 from functools import lru_cache
-import modules.library.products as products
-from modules.app_manager import AppManager
-from modules._safe_connect import SafeConnect
+from ..app_manager import AppManager
+from .._safe_connect import SafeConnect
+from .properties import Blank
+from .products import *
+
 
 __all__ = ('Library', )
 
@@ -12,81 +14,86 @@ class Library:
     __new__ = AppManager.write_to_storage
     _alias = 'lib'
     __s_con = SafeConnect('library.db')
-    categories = tuple(getattr(products, x) for x in products.__all__)
-
-    @classmethod
-    def get_product_headers(cls) -> dict:
-        """Возвращает словрь имен продуктов в виде {имя продукта: категория}"""
-        dct = {}
-        with cls.__s_con:
-            for category in (x.__name__ for x in cls.categories):
-                cls.__s_con.cursor.execute(f"SELECT full_name FROM {category}")
-                dct.update((name[0], category) for name in cls.__s_con.cursor.fetchall())
-        return dct
-
-    @classmethod
-    def get_blank(cls, category: str) -> object:
-        """Возвращает объект продукта, который наполнен значениями по умолчанию"""
-        return getattr(products, category)(True)
+    headers = {}
 
     def __init__(self):
-        self.headers = self.get_product_headers()
-
-    def add(self, prod_obj):
-        """Метод добавления продукта в библиотеку
-        :param prod_obj: Объект Продукта"""
         with self.__s_con:
-            keys = ', '.join(f'{x}' for x in prod_obj.__dict__.keys())
-            values = ', '.join(f'\'{x}\'' if type(x) == str else f'{x}' for x in prod_obj.__dict__.values())
-            self.__s_con.cursor.execute(f'INSERT INTO {prod_obj.__class__.__name__} ({keys}) VALUES ({values})')
-            self.__s_con.connect.commit()
+            self.__update_product_headers()
+
+    def add(self, product: Product):
+        """Метод добавления продукта в библиотеку
+        :param product: Объект Продукта"""
+        with self.__s_con as con:
+            req = ', '.join('?' * len(product.__slots__))
+            val = tuple(getattr(product, s) for s in product.__slots__)
+            con.cursor.execute(f'INSERT INTO {product.category} {product.__slots__} VALUES ({req})', val)
+            con.connect.commit()
+            self.__update_product_headers()
         self.get.cache_clear()
-        self.headers = self.get_product_headers()
-    
-    def change(self, prod_obj):
+
+    def change(self, prod_obj: object):
         """Внесение изменений в ячейку
         :param prod_obj: Объект Продукта"""
-        with self.__s_con:
-            sql_req = ', '.join(f'{k} = \"{v}\"' if type(v) == str else f'{k} = {v}' for k, v in prod_obj.__dict__.items())
-            self.__s_con.cursor.execute(f'UPDATE {prod_obj.__class__.__name__} SET {sql_req} WHERE full_name=\'{prod_obj.full_name}\'')
-            self.__s_con.connect.commit()
+        with self.__s_con as con:
+            req = ', '.join(f'{s}=?' for s in prod_obj.__slots__)
+            val = tuple(getattr(prod_obj, s) for s in prod_obj.__slots__)
+            con.cursor.execute(f'UPDATE {prod_obj.category} SET {req} WHERE full_name=\'{prod_obj.full_name}\'', val)
+            con.connect.commit()
         self.get.cache_clear()
-        self.headers = self.get_product_headers()
-    
-    def check_unique(self, prod_obj) -> bool:
+
+    def check_unique(self, product: Product) -> bool:
         """Вспомогательная функция для библиотеки. Проверка на уникальность продукта"""
-        with self.__s_con:
-            self.__s_con.cursor.execute(f'SELECT * FROM {prod_obj.__class__.__name__} WHERE full_name=\'{prod_obj.full_name}\'')
+        with self.__s_con as con:
+            con.cursor.execute(f'SELECT full_name FROM {product.category} WHERE full_name=?', (product.full_name, ))
             return not self.__s_con.cursor.fetchone()
-    
+
+    @classmethod
+    def __update_product_headers(cls):
+        """Обновляет словрь имен продуктов в виде {имя продукта: категория}. Использовать только внутри менеджера"""
+        for category in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
+            cls.__s_con.cursor.execute(f'SELECT full_name FROM {category.__name__}')
+            cls.headers[category] = tuple(n[0] for n in cls.__s_con.cursor.fetchall())
+
     def delete(self, category: str, full_name: str):
         """Удаление продукта из библиотеки.
         :param category: Категория продукта / название таблицы
         :param full_name: Имя продукта
         """
         with self.__s_con:
-            self.__s_con.cursor.execute(f'DELETE FROM {category} WHERE full_name=\'{full_name}\'')
+            self.__s_con.cursor.execute(f'DELETE FROM {category} WHERE full_name=?', (full_name, ))
             self.__s_con.connect.commit()
+            self.__update_product_headers()
         self.get.cache_clear()
-        self.headers = self.get_product_headers()
-    
+
     @lru_cache
-    def get(self, name: str) -> object:
+    def get(self, category: str | Product,  name: str) -> object:
         """Метод для получения объекта продукта по передоваемому имени. Возрващает объект или None."""
-        with self.__s_con:
-            for category in (x.__name__ for x in self.categories):
-                self.__s_con.cursor.execute(f'SELECT * FROM {category} WHERE full_name="{name}"')
-                res = self.__s_con.cursor.fetchone()
-                if res:
-                    obj = getattr(products, category)()
-                    self.__s_con.cursor.execute(f'PRAGMA table_info("{category}")')
-                    table_name = self.__s_con.cursor.fetchall()
-                    for i in range(1, len(res)):
-                        obj.__dict__[table_name[i][1]] = res[i]
-                    return obj
+        category = self.__from_str(category)
+        with self.__s_con as con:
+            con.cursor.execute(f'SELECT * FROM {category.__name__} WHERE full_name=?', (name, ))
+            res = con.cursor.fetchone()
+            obj = category()
+            for i, slot in enumerate(obj.__slots__, 1):
+                setattr(obj, slot, res[i])
+            return obj
+
+    @classmethod
+    def get_blank(cls, category: str | Product) -> object:
+        """Возвращает объект продукта, который наполнен значениями по умолчанию"""
+        return Blank(cls.__from_str(category)).create_blank()
 
     def get_product_obj_from_name(self, name: str) -> object | None:
         """Возвращает объект продукта с которым связан тираж, если этот продукт есть в библиотеке"""
-        for product_name in self.headers:
-            if name.endswith(product_name):
-                return self.get(product_name)
+        for category, products in self.headers.items():
+            for product in products:
+                if name.endswith(product):
+                    return self.get(category, product)
+
+    @classmethod
+    def __from_str(cls, category: str | Product) -> Product:
+        """Вспомогательная ф-я для получения класса продукта по соответствующей строке"""
+        if isinstance(category, str):
+            for product in cls.headers:
+                if product.__name__ == category:
+                    return product
+        return category
