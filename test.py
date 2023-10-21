@@ -1,7 +1,12 @@
-import sqlite3
+from dataclasses import dataclass
 
 
+@dataclass
+class Test:
+    test: str = None
+    __slot__ = 'test'
 
-with sqlite3.connect('data/library.db') as connect:
-    cursor = connect.cursor()
-    cursor.execute('INSERT INTO Canvas (full_name, product_format) VALUES (?, ?)', ('test', 'test'))
+
+test = Test()
+
+print(test.__dict__)

@@ -94,7 +94,7 @@ class Blank:
                          'Journal': pg_poly,
                          'Photofolder': cvr_poly[2:],
                          'Canvas': ('CottonCanvas',),
-                         'Subproduct': pg_poly + ('MagnetycVinyl', )},
+                         'Subproduct': pg_poly + ('MagnetycVinyl', 'Silk SRA4')},
                'page': {'Photobook': pg_photo,
                         'Layflat': pg_poly[:-2],
                         'Album': pg_poly,

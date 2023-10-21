@@ -22,7 +22,7 @@ class CoverHandler:
         target = 'Covers'
         if comp in ('Копии', 'О_О'):
             target = 'Constant'
-        return tuple(f'{target}/{c}' for c in os.listdir(f'{path}/{target}') if re_fullmatch(r'cover_\d{3}\.jpg', c))
+        return tuple(f'{target}/{c}' for c in os.listdir(f'{path}/{target}') if re_fullmatch(r'cover_(\d{3}|\d+_pcs)\.jpg', c))
 
 
 class CoverMarkerHandler(CoverHandler):
@@ -30,6 +30,7 @@ class CoverMarkerHandler(CoverHandler):
         self.storage.pf.header.set(f'Обработка обложек в заказе {obj.order}')
         for edt, prd in obj.target.items():
             src_path = f'{self.storage.stg.z_disc}/{obj.creation_date}/{obj.order}/{edt.name}'
+            dst_path = f'{self.storage.stg.o_disc}/{obj.creation_date}/{obj.order}/{edt.name}'
             for cover_name in self.get_covers_from_comparison(src_path, edt.comp):
                 self.storage.pf.status.set(f'{cover_name}')
                 with Image.open(f'{src_path}/{cover_name}') as cover_img:
@@ -48,6 +49,7 @@ class CoverMarkerHandler(CoverHandler):
                     draw.rectangle((cwidth - p_clapan, p_clapan, cwidth - p_clapan - p_clength, cheight - p_clapan), outline='#000000')
                     main_line = p_clapan + p_clength + p_joint
                     draw.rectangle((main_line, p_clapan, cwidth - main_line, cheight - p_clapan), outline='#000000')
-                    draw.rectangle((main_line - 50, p_clapan + 150, cwidth - main_line + 50, cheight - p_clapan - 150), fill='#FFFFFF')
+                    draw.rectangle((main_line, p_clapan + 150, cwidth - main_line, cheight - p_clapan - 150), fill='#FFFFFF')
                     self.cache[draw_name] = cover_img
-                draw_obj.save(f'{src_path}/{cover_name[:-4]}_1.jpg', quality='keep', dpi=(300, 300))
+                draw_obj.save(f'{dst_path}/{cover_name[:-4]}_1.jpg', quality='keep', dpi=(300, 300))
+        self.cache.clear()
