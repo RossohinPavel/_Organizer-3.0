@@ -6,8 +6,7 @@ __all__ = ['LibraryWindow']
 
 class LibraryWindow(ChildWindow):
     """Окно управления библиотекой"""
-    width = 397
-    height = 351
+    width, height = 397, 351
 
     def main(self, *args, **kwargs):
         self.title('Библиотека')

@@ -19,6 +19,6 @@ def run():
         connect.commit()
         cursor.execute(f'VACUUM')
 
-#
+
 # if __name__ == '__main__':
 #     run()

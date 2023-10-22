@@ -1,6 +1,6 @@
 from ._safe_connect import SafeConnect
 from .app_manager import AppManager
-from modules.orders_submission.base_dataclasses import *
+from modules.orders_repr.base_dataclasses import *
 
 
 __aLL__ = ('Log', )

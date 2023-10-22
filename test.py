@@ -1,12 +1,7 @@
-from dataclasses import dataclass
+import re
 
 
-@dataclass
-class Test:
-    test: str = None
-    __slot__ = 'test'
+test = '001'
+test1 = '002-3_pcs'
 
-
-test = Test()
-
-print(test.__dict__)
+print(re.findall(r'\d{3}-(\d+)_pcs', test1))

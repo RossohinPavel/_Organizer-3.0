@@ -1,6 +1,6 @@
 from ..source import *
 from ..frames.order_name_validate_frame import ONVFrame
-from ...orders_submission.proxy_file_handler import FileHandlerProxy
+from ...orders_repr.proxy_file_handler import FileHandlerProxy
 
 
 class HandlerWindow(ChildWindow):
