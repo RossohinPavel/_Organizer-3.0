@@ -20,12 +20,11 @@ class LibraryWindow(ChildWindow):
         row = self.tree.identify_row(event.y)
         self.tree.selection_set(row)
         if row[-1].isdigit():
-            item = self.tree.item(row)
-            product = self.storage.lib.get(item['tags'][0], item['text'])
+            product = self.storage.lib.get_product_obj_from_name(self.tree.item(row)['text'])
             text = f'{product.full_name}'
-            for k in product.__slots__:
-                if k != 'full_name':
-                    text += f'\n{k}: {getattr(product, k)}'
+            for a, v in product.items():
+                if a != 'full_name':
+                    text += f'\n{a}: {v}'
             TipWindow(master=self, mouse_event=event, text=text)
 
     def show_main_widget(self):
