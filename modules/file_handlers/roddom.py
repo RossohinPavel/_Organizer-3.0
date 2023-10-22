@@ -4,9 +4,9 @@ from re import search
 from ..app_manager import AppManager
 
 
-@AppManager
 class Roddom:
     __slots__ = 'path', 'order', '__make_txt', '__img_len'
+    storage = AppManager.storage
 
     def __init__(self, path: str, make_txt=True):
         self.__make_txt = make_txt

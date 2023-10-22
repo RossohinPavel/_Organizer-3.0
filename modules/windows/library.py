@@ -48,10 +48,14 @@ class LibraryWindow(ChildWindow):
 
     def update_treeview_values(self):
         """Метод для установки значений в тривью"""
+        dct = {'Album': 'Полиграфические альбомы, PUR, FlexBind', 'Canvas': 'Фотохолсты',
+               'Journal': 'Полиграфические фотожурналы', 'Layflat': 'Полиграфические фотокниги Layflat',
+               'Photobook': 'Фотокниги на Фотобумаге', 'Photofolder': 'Фотопапки', 'Subproduct': 'Остальное'}
         for i in self.tree.get_children(''):
             self.tree.delete(i)
         for category, values in self.storage.lib.headers.items():
-            cat_name, rus_name = category.__name__, category.rus_name
+            cat_name = category.__name__
+            rus_name = dct[cat_name]
             self.tree.insert('', 'end', iid=cat_name, text=rus_name, tags=[cat_name, rus_name])
             for i, name in enumerate(sorted(values), 1):
                 self.tree.insert(cat_name, 'end', iid=f'{cat_name}{i}', text=name, tags=[cat_name, rus_name])
@@ -77,7 +81,7 @@ class LibraryWindow(ChildWindow):
 
     def __delete_from_lib(self, category: str, full_name: str):
         """Удаление продукта по выбору в тривью из библиотеки"""
-        self.storage.Library.delete(category, full_name)
+        self.storage.lib.delete(category, full_name)
         tkmb.showinfo(parent=self, title="Удаление продукта", message=f'{full_name}\nУспешно удален из библиотеки')
 
 
@@ -107,19 +111,16 @@ class AssistWindow(ChildWindow):
         dct = {'Album': (498, 528), 'Canvas': (498, 278), 'Journal': (498, 278), 'Layflat': (498, 425),
                'Photobook': (498, 488), 'Photofolder': (498, 381), 'Subproduct': (498, 238)}
         self.module = kwargs.pop('module')
-        self.category, rus_name = kwargs.pop('category')
-        self.product = kwargs.pop('product')
-        self.width, self.height = dct[self.category]
+        category, rus_name = kwargs.pop('category')
+        product = kwargs.pop('product')
+        self.width, self.height = dct[category]
         self.product_vars = {}  # Словарь для хранения переменных виджетов
-        self.product_obj = None
         super().__init__(*args, **kwargs)
+        self.product_obj = self.storage.Library.get_blank(category)
         self.title({'add': 'Добавление', 'copy': 'Копирование', 'change': 'Изменение'}[self.module] + ' продукта: ' + rus_name)
-
-    def main(self, *args, **kwargs):
-        self.product_obj = self.storage.Library.get_blank(self.category)
         self.show_main_widgets()
         if self.module != 'add':
-            self.insert_values_from_lib()
+            self.insert_values_from_lib_to_widgets(product)
         self.show_buttons()
 
     def show_main_widgets(self):
@@ -134,15 +135,14 @@ class AssistWindow(ChildWindow):
         funcs = {'entry': self.__show_entry, 'radio': self.__show_radio,
                  'combo': self.__show_combobox, 'check': self.__show_check}
         sides = {'left': [], 'right': []}
-        for frm in self.__FRAMES:
-            if frm in self.product_obj.__slots__:
-                m_name, child, side, kwargs = self.__FRAMES[frm]
-                if not isinstance(mf[m_name], LabeledFrame):
-                    mf[m_name] = mf[m_name]()
-                    sides['left'] = [{'row': i, 'column': 0} for i in range(3)]
-                    sides['right'] = [{'row': i, 'column': 1} for i in range(3)]
-                kwargs.update({'values': getattr(self.product_obj, frm), 'padx': 1.48, **sides[side].pop(0)})
-                funcs[child](frm, mf[m_name].container, **kwargs)
+        for frm in tuple(self.product_obj)[1:]:
+            m_name, child, side, kwargs = self.__FRAMES[frm]
+            if not isinstance(mf[m_name], LabeledFrame):
+                mf[m_name] = mf[m_name]()
+                sides['left'] = [{'row': i, 'column': 0} for i in range(3)]
+                sides['right'] = [{'row': i, 'column': 1} for i in range(3)]
+            kwargs.update({'values': getattr(self.product_obj, frm), 'padx': 1.48, **sides[side].pop(0)})
+            funcs[child](frm, mf[m_name].container, **kwargs)
 
     def show_m_frame(self, text):
         """Замыкание для отрисовки мастер-фреймов"""
@@ -198,13 +198,13 @@ class AssistWindow(ChildWindow):
         MyButton(frame, text='Закрыть', width=10, command=self.destroy).place(x=415, y=0)
         frame.pack(expand=1, fill='x')
 
-    def insert_values_from_lib(self):
-        """Метод для вставки полученных значений в бд"""
-        obj = self.storage.lib.get(self.category, self.product)
-        for slot in obj.__slots__:
-            if slot == 'full_name' and self.module == 'copy':
+    def insert_values_from_lib_to_widgets(self, product):
+        """Метод для вставки полученных значений из бд в виджеты"""
+        obj = self.storage.lib.get_product_obj_from_name(product)
+        for attr, value in obj.items():
+            if attr == 'full_name' and self.module == 'copy':
                 continue
-            self.product_vars[slot].set(getattr(obj, slot))
+            self.product_vars[attr].set(value)
 
     def get_values_from_widgets(self) -> bool:
         """Метод для получения информации из менюшек и установки их в product_obj

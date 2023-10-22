@@ -16,10 +16,10 @@ class TrackerThread(Thread):
             sleep(self.tracker.delay)
 
 
-@AppManager
 class Tracker:
     """Абстрактный класс реализующий общую логику работы трекера"""
     delay = 180
+    storage = AppManager.storage
 
     def __init__(self):
         self.__thread = TrackerThread(self)

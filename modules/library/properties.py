@@ -2,14 +2,14 @@ class Blank:
     """Класс наделяющий объект продукта соответствующими свойствами"""
     __slots__ = 'product_obj'
 
-    def __init__(self, category):
-        self.product_obj = category()
+    def __init__(self, category_type):
+        self.product_obj = category_type()
 
     def create_blank(self) -> object:
         """Наделяет объект продукта свойствами и возвращает его"""
-        category = self.product_obj.__class__.__name__
-        for slot in self.product_obj.__slots__:
-            eval(f'self._{slot}(category)')
+        category_name = self.product_obj.category
+        for attr in self.product_obj:
+            eval(f'self._{attr}(category_name)')
         return self.product_obj
 
     def _full_name(self, category: str):

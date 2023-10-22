@@ -33,22 +33,17 @@ class Storage:
 
 class AppManager:
     """Класс-декоратор. """
-    __slots__ = tuple()
     storage = Storage()
 
-    def __new__(cls, type_obj: type) -> type:
-        """Наделяем класс хранилищем storage"""
-        type_obj.storage = cls.storage
-        return type_obj
-
     @classmethod
-    def write_to_storage(cls, instance, *args, **kwargs) -> callable:
+    def write_to_storage(cls, alias='') -> callable:
         """Замена ф-ии __new__ в декорируемом классе. записывает Объект в Storage и возвращает его.
         Реализует моносостояние"""
-        if instance.__name__ not in cls.storage:
-            name = f'{instance.__name__}={getattr(instance, "_alias", "")}'
-            setattr(cls.storage, name, super().__new__(instance))
-        return getattr(cls.storage, instance.__name__)
+        def wrapper(instance, *args, **kwargs):
+            if instance.__name__ not in cls.storage:
+                setattr(cls.storage, f'{instance.__name__}={alias}', object.__new__(instance))
+            return getattr(cls.storage, instance.__name__)
+        return wrapper
 
     @classmethod
     def create_group(cls, group_name: str, alias: str = '') -> Group:

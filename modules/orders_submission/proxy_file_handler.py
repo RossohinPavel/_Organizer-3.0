@@ -1,9 +1,9 @@
 from ..app_manager import AppManager
 
 
-@AppManager
 class FileHandlerProxy:
     """Представление заказа для обработчиков файлов"""
+    storage = AppManager.storage
     __slots__ = 'order', 'creation_date', 'target', 'miss'
 
     def __new__(cls, order_name: str, predicate: callable):

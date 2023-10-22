@@ -52,7 +52,7 @@ class SettingsWindow(ChildWindow):
         frame.pack(fill='x')
         self.__dict__['autolog'] = tk.BooleanVar(master=self, value=self.storage.stg.autolog)
         chbtn1 = ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
-                                        variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
+                                 variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
         chbtn1.pack(anchor='nw')
 
     def show_directory_widgets(self):

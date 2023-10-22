@@ -8,11 +8,10 @@ from .products import *
 __all__ = ('Library', )
 
 
-@AppManager
 class Library:
     """Класс для работы с библиотекой продуктов"""
-    __new__ = AppManager.write_to_storage
-    _alias = 'lib'
+    storage = AppManager.storage
+    __new__ = AppManager.write_to_storage('lib')
     __s_con = SafeConnect('library.db')
     headers = {}
 
@@ -24,9 +23,9 @@ class Library:
         """Метод добавления продукта в библиотеку
         :param product: Объект Продукта"""
         with self.__s_con as con:
-            req = ', '.join('?' * len(product.__slots__))
-            val = tuple(getattr(product, s) for s in product.__slots__)
-            con.cursor.execute(f'INSERT INTO {product.category} {product.__slots__} VALUES ({req})', val)
+            attrs = tuple(product)
+            req = ', '.join('?' * len(attrs))
+            con.cursor.execute(f'INSERT INTO {product.category} {attrs} VALUES ({req})', tuple(product.values()))
             con.connect.commit()
             self.__update_product_headers()
         self.get.cache_clear()
@@ -35,8 +34,8 @@ class Library:
         """Внесение изменений в ячейку
         :param prod_obj: Объект Продукта"""
         with self.__s_con as con:
-            req = ', '.join(f'{s}=?' for s in prod_obj.__slots__)
-            val = tuple(getattr(prod_obj, s) for s in prod_obj.__slots__)
+            req = ', '.join(f'{s}=?' for s in prod_obj)
+            val = tuple(prod_obj.values())
             con.cursor.execute(f'UPDATE {prod_obj.category} SET {req} WHERE full_name=\'{prod_obj.full_name}\'', val)
             con.connect.commit()
         self.get.cache_clear()
@@ -46,13 +45,6 @@ class Library:
         with self.__s_con as con:
             con.cursor.execute(f'SELECT full_name FROM {product.category} WHERE full_name=?', (product.full_name, ))
             return not self.__s_con.cursor.fetchone()
-
-    @classmethod
-    def __update_product_headers(cls):
-        """Обновляет словрь имен продуктов в виде {имя продукта: категория}. Использовать только внутри менеджера"""
-        for category in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
-            cls.__s_con.cursor.execute(f'SELECT full_name FROM {category.__name__}')
-            cls.headers[category] = tuple(n[0] for n in cls.__s_con.cursor.fetchall())
 
     def delete(self, category: str, full_name: str):
         """Удаление продукта из библиотеки.
@@ -66,21 +58,22 @@ class Library:
         self.get.cache_clear()
 
     @lru_cache
-    def get(self, category: str | Product,  name: str) -> object:
+    def get(self, category: Product, name: str) -> object:
         """Метод для получения объекта продукта по передоваемому имени. Возрващает объект или None."""
-        category = self.__from_str(category)
         with self.__s_con as con:
             con.cursor.execute(f'SELECT * FROM {category.__name__} WHERE full_name=?', (name, ))
             res = con.cursor.fetchone()
             obj = category()
-            for i, slot in enumerate(obj.__slots__, 1):
-                setattr(obj, slot, res[i])
+            for i, attr in enumerate(obj, 1):
+                setattr(obj, attr, res[i])
             return obj
 
     @classmethod
-    def get_blank(cls, category: str | Product) -> object:
+    def get_blank(cls, category_name: str) -> object:
         """Возвращает объект продукта, который наполнен значениями по умолчанию"""
-        return Blank(cls.__from_str(category)).create_blank()
+        for category in cls.headers:
+            if category.__name__ == category_name:
+                return Blank(category).create_blank()
 
     def get_product_obj_from_name(self, name: str) -> object | None:
         """Возвращает объект продукта с которым связан тираж, если этот продукт есть в библиотеке"""
@@ -90,10 +83,8 @@ class Library:
                     return self.get(category, product)
 
     @classmethod
-    def __from_str(cls, category: str | Product) -> Product:
-        """Вспомогательная ф-я для получения класса продукта по соответствующей строке"""
-        if isinstance(category, str):
-            for product in cls.headers:
-                if product.__name__ == category:
-                    return product
-        return category
+    def __update_product_headers(cls):
+        """Обновляет словрь имен продуктов в виде {имя продукта: категория}. Использовать только внутри менеджера"""
+        for category in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
+            cls.__s_con.cursor.execute(f'SELECT full_name FROM {category.__name__}')
+            cls.headers[category] = tuple(n[0] for n in cls.__s_con.cursor.fetchall())

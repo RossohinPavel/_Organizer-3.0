@@ -6,11 +6,10 @@ from modules.orders_submission.base_dataclasses import *
 __aLL__ = ('Log', )
 
 
-@AppManager
 class Log:
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
-    __new__ = AppManager.write_to_storage
-    _alias = 'log'
+    storage = AppManager.storage
+    __new__ = AppManager.write_to_storage('log')
     __s_con = SafeConnect('log.db')
 
     def update_records(self, lst: list):

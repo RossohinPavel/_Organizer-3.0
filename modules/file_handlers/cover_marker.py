@@ -4,8 +4,9 @@ from ..app_manager import AppManager
 from PIL import Image, ImageDraw, ImageFont
 
 
-@AppManager
 class CoverHandler:
+    storage = AppManager.storage
+
     def __init__(self):
         self.cache = {}
         self.__name__ = self.__class__.__name__
