@@ -18,7 +18,7 @@ class TrackerThread(Thread):
 
 class Tracker:
     """Абстрактный класс реализующий общую логику работы трекера"""
-    delay = 180
+    delay = 150
     storage = AppManager.storage
 
     def __init__(self):

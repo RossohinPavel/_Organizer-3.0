@@ -12,20 +12,24 @@ def create_clear_log():
                                 price REAL
                                 )""")
         log.cursor().execute("""CREATE TABLE Editions (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        order_name TEXT,
-                                        name TEXT,
-                                        covers INT,
-                                        pages INT,
-                                        ccount TEXT,
-                                        comp TEXT
-                                        )""")
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                order_name TEXT,
+                                name TEXT,
+                                covers INT,
+                                pages INT,
+                                ccount TEXT,
+                                comp TEXT
+                                )""")
         log.cursor().execute("""CREATE TABLE Photos (
-                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        order_name TEXT,
-                                        name TEXT,
-                                        count INT
-                                        )""")
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                order_name TEXT,
+                                name TEXT,
+                                count INT
+                                )""")
+        log.cursor().execute("""INSERT INTO Orders (name, creation_date, customer_name, customer_address, price)
+                                VALUES (?, ?, ?, ?, ?)""", ('000000', '2020-01-01', 'Admin', 'Home', 66.6))
+        log.cursor().execute("""INSERT INTO Editions (order_name, name, covers, pages, ccount, comp)
+                                VALUES (?, ?, ?, ?, ?, ?)""", ('000000', 'Test-Фотопечать SRA3 170гр горизонт 40', 1, 0, None, None))
 
 
 if __name__ == '__main__':

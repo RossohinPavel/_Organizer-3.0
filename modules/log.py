@@ -64,3 +64,7 @@ class Log:
                 else:
                     order.content = res
 
+    def get_newest_order_name(self) -> str:
+        with self.__s_con as con:
+            con.cursor.execute('SELECT MAX(name) FROM Orders')
+            return con.cursor.fetchone()[0]

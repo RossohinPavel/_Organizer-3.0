@@ -3,49 +3,33 @@ import os
 from collections import Counter
 
 from .base_dataclasses import *
-from .file_grabber import EditionGrabberIterator
+from modules.grabbers import EditionGrabberIterator
 
-__all__ = ('OrderProxy', 'EditionProxy', 'PhotoProxy', 'OrderInfoProxy')
-
-
-class OrderProxy:
-    """Прокси класс для обновления информации в датаклассе объекта заказа"""
-    __slots__ = 'delete_flag', 'path', 'order'
-
-    def __init__(self, path, creation_date, name):
-        self.delete_flag = False
-        self.path = f'{path}/{creation_date}/{name}'
-        self.order = Order(name, creation_date)
-
-    def __repr__(self):
-        return f'Proxy <Order={self.order.name}>'
-
-    def __hash__(self):
-        return hash(self.order.name)
-
-    def __eq__(self, other):
-        res = self.order.name == other
-        if res:
-            self.delete_flag = False
-        return res
+__all__ = ('Order', 'EditionProxy', 'PhotoProxy', 'OrderInfoProxy')
 
 
 class ProxyObserver:
-    __slots__ = 'update_flag', 'name', 'path', 'dc_obj'
+    __slots__ = 'update_flag', '_counter', 'name', 'path', 'dc_obj'
 
     def __init__(self, order_obj, path, name):
         self.update_flag = True
+        self._counter = 0
         self.name = name
         self.path = f'{path}/{name}'
         self.dc_obj = self.init_observer(order_obj, name)
 
-    def init_observer(self, order_obj, name):
+    @staticmethod
+    def init_observer(order_obj, name):
         """Инициализирует датакласс dc, прикрепляет его к order_obj и возвращает его"""
-        raise Exception('Ф-я init_observer должна быть переопределена в дочернем классе с сохранением структуры')
+        return order_obj
 
     def update_info(self):
         """Обновление информации в датаклассе."""
+        if self._counter == 8:
+            self._counter = 0
+            self.update_flag = True
         if not self.update_flag:
+            self._counter += 1
             return
         res = self.get_info()
         if self.check_info(res):
@@ -65,15 +49,16 @@ class ProxyObserver:
         """Установка информации соответствующему атрибуту"""
         raise Exception(f'ф-я set_info должна быть переопределена в {self.__class__.__name__}')
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.name == other
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.__class__.__name__} <{self.name}>'
 
 
 class EditionProxy(ProxyObserver):
-    def init_observer(self, order_obj, name):
+    @staticmethod
+    def init_observer(order_obj, name):
         obj = Edition(order_obj.name, name)
         order_obj.content += (obj, )
         return obj
@@ -141,9 +126,6 @@ class EditionProxy(ProxyObserver):
 class PhotoProxy(ProxyObserver):
     paper_type = {'Глянцевая': 'Fuji Gl', 'Матовая': 'Fuji Mt'}
 
-    def init_observer(self, order_obj, name):
-        return order_obj
-
     def get_info(self):
         """Ф-я подсчета фотопечати в заказе."""
         path = f'{self.path}/_ALL/Фотопечать'
@@ -168,7 +150,7 @@ class PhotoProxy(ProxyObserver):
                 obj.count += res
         return tuple(lst)
 
-    def check_info(self, res):
+    def check_info(self, res) -> bool:
         return self.dc_obj.photo == res
 
     def set_info(self, res):
@@ -176,8 +158,6 @@ class PhotoProxy(ProxyObserver):
 
 
 class OrderInfoProxy(ProxyObserver):
-    def init_observer(self, order_obj, name):
-        return order_obj
 
     def get_info(self):
         """Парсим completed.htm с целью нахождения нужной нам информации"""
@@ -195,7 +175,7 @@ class OrderInfoProxy(ProxyObserver):
                 price = p_price[0]
         return name, address, price
 
-    def check_info(self, res):
+    def check_info(self, res) -> bool:
         return (self.dc_obj.customer_name, self.dc_obj.customer_address, self.dc_obj.price) == res
 
     def set_info(self, res):

@@ -15,6 +15,14 @@ class Order:
     photo: tuple = field(default_factory=tuple)
     content: tuple = field(default_factory=tuple)
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.name == other
+        return self.__dict__ == other.__dict__
+
+    def __hash__(self):
+        return hash(self.name)
+
 
 @dataclass
 class Edition:

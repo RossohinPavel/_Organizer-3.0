@@ -1,7 +1,15 @@
-import re
+class Test:
+    __slots__ = 'test'
+
+    def __init__(self):
+        self.test = 1
 
 
-test = '001'
-test1 = '002-3_pcs'
+class Test1(Test):
+    __slots__ = ()
 
-print(re.findall(r'\d{3}-(\d+)_pcs', test1))
+    def __init__(self):
+        self.test = 2
+
+t = Test1()
+print(t.test.__dict__)
