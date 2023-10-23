@@ -52,16 +52,16 @@ class HandlerWindow(ChildWindow):
     def show_target_edition_widgets(self, container):
         """Отрисовка виджета тиражей, который будут обработаны"""
         combo = ttk.Combobox(master=container, state='disabled', width=40)
-        combo.set('Целевые тиражи')
+        combo.set('Целевые тиражи:')
         combo.pack(padx=1)
-        combo.bind('<<ComboboxSelected>>', lambda event: combo.set('Целевые тиражи'))
+        combo.bind('<<ComboboxSelected>>', lambda event: combo.set('Целевые тиражи:'))
         self.widget_dct['target_combo'] = combo
 
     def show_miss_edition_widgets(self, container):
         """Отрисовка виджета тиражей, которые будут пропущены обработчиком"""
         combo = ttk.Combobox(master=container, state='disabled', width=40)
-        combo.set('Нераспознанные тиражи')
-        combo.bind('<<ComboboxSelected>>', lambda event: combo.set('Нераспознанные тиражи'))
+        combo.set('Будут пропущенны:')
+        combo.bind('<<ComboboxSelected>>', lambda event: combo.set('Будут пропущенны:'))
         combo.pack(padx=1, pady=3)
         self.widget_dct['miss_combo'] = combo
 
@@ -76,33 +76,26 @@ class HandlerWindow(ChildWindow):
         if proxy is None:
             self.widget_dct['text_var'].set(f'Не могу найти заказ {order_name}')
             return
-        self.update_target_combo(proxy)
-        self.update_miss_combo(proxy)
+        self.update_combo(proxy)
 
-    def handler_predicate(self, product_obj):
-        """В дочернем классе должна возвращать True/False в зависимости от типа обработки"""
+    def handler_predicate(self, product_obj) -> object | None:
+        """На вход поступает продукт из библиотеки или None.
+        Возвращает продукт из библиотеки, если он соответсвует типу обработчика. В противном случае - возвращает None"""
         raise Exception('Функция handler_predicate не переопределена в дочернем классе')
 
-    def update_target_combo(self, proxy):
+    def update_combo(self, proxy):
         """Обновление значений виджета целевых тиражей. Так же записывает прокси объект в общий словарь"""
-        state = 'readonly'
-        if proxy.target:
-            self.widget_dct['text_var'].set(f'Обработка {proxy.order}')
-            self.widget_dct['target_combo'].config(values=tuple(x.name for x in proxy.target))
+        target, miss = [], []
+        for i in range(len(proxy.content)):
+            target.append(proxy.content[i].name) if proxy.products[i] else miss.append(proxy.content[i].name)
+        if target:
+            self.widget_dct['text_var'].set(f'Обработка {proxy.name}')
+            self.widget_dct['target_combo'].config(values=target, state='readonly')
             self.widget_dct['proxy'] = proxy
         else:
-            state = 'disabled'
-            self.widget_dct['text_var'].set(f'В заказе {proxy.order} нет целевых тиражей')
-        self.widget_dct['target_combo'].config(state=state)
-
-    def update_miss_combo(self, proxy):
-        """Обновление виджета нераспознанных тиражей"""
-        state = 'readonly'
-        if proxy.miss:
-            self.widget_dct['miss_combo'].config(values=proxy.miss)
-        else:
-            state = 'disabled'
-        self.widget_dct['miss_combo'].config(state=state)
+            self.widget_dct['text_var'].set(f'В заказе {proxy.name} нет целевых тиражей')
+        if miss:
+            self.widget_dct['miss_combo'].config(values=miss, state='readonly')
 
     def run_handler(self, event=None, **kwargs):
         """Функция запуска обработчика"""
@@ -114,7 +107,7 @@ class HandlerWindow(ChildWindow):
             raise Exception('Файловый обработчик не переопределен в дочернем классе')
         kwargs['handler_option'] = self.widget_dct['handler_option'].get()
         self.storage.tm.create_task(self.file_handler, args=(res, ), kwargs=kwargs)
-        tkmb.showinfo(parent=self, title=self.win_title, message=f'Заказ {res.order} поставлен в очередь обработки')
+        tkmb.showinfo(parent=self, title=self.win_title, message=f'Заказ {res.name} поставлен в очередь обработки')
         self.reset_to_default()
 
     def reset_to_default(self):

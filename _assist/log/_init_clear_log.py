@@ -32,5 +32,5 @@ def create_clear_log():
                                 VALUES (?, ?, ?, ?, ?, ?)""", ('000000', 'Test-Фотопечать SRA3 170гр горизонт 40', 1, 0, None, None))
 
 
-if __name__ == '__main__':
-    create_clear_log()
+# if __name__ == '__main__':
+#     create_clear_log()

@@ -13,5 +13,9 @@ class CoverMarker(HandlerWindow):
     handler_option_text = 'Добавление бэкпринта'
     file_handler = CoverMarkerHandler()
 
-    def handler_predicate(self, product_obj):
-        return product_obj.__class__.__name__ in ('Album', 'Layflat', 'Photobook') and product_obj.cover_type in ('Книга', 'Планшет')
+    def handler_predicate(self, product_obj) -> object | None:
+        if product_obj is None:
+            return None
+        if product_obj.category in ('Album', 'Layflat', 'Photobook') and product_obj.cover_type in ('Книга', 'Планшет'):
+            return product_obj
+        return None

@@ -36,8 +36,7 @@ class OrdersGrabberIterator(GrabberIterator):
 class EditionGrabberIterator(GrabberIterator):
     """Предоставляет итератор по именам каталогов и именам файлов в тираже.
     Возвращает значения в виде кортежа, (<имя каталога>, итератор по именам файлов).
-    В папки экземпляры захватывает только развороты.
-    В папки Constant и Covers захватывает все подходящие изображения."""
+    Захватывает все изображения из папок экземпляров и Constant"""
     __slots__ = 'path'
 
     def _grab(self) -> (str, callable):
@@ -47,3 +46,11 @@ class EditionGrabberIterator(GrabberIterator):
                 yield catalog, (x for x in listdir(f'{c_path}') if fullmatch(r'(cover|\d{3}_)_\d{3}(-\d+_pcs)?.jpg', x))
             if catalog == 'Constant':
                 yield catalog, (x for x in listdir(f'{c_path}') if fullmatch(r'(cover|\d{3})_\d+_pcs.jpg', x))
+
+
+class EditionGrabber:
+    """Предостовляет различные функции для выборки изображений из тиража"""
+    __slots__ = 'edition'
+
+    def __init__(self, path: str):
+        self.edition = {name: tuple(imgs) for name, imgs in EditionGrabberIterator(path)}
