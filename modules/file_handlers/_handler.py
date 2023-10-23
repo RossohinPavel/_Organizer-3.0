@@ -1,5 +1,6 @@
 from ..app_manager import AppManager
 from ..grabbers import EditionGrabber
+from math import ceil as m_ceil
 
 
 class Handler:
@@ -17,7 +18,11 @@ class Handler:
     @staticmethod
     def mm_to_pixel(mm: int) -> int:
         """Возвращает значение в пикселях при разрешении в 300 dpi"""
-        return int(mm * 11.808)
+        return m_ceil(mm * 11.808)
+
+    @staticmethod
+    def pixel_to_mm(pixel: int) -> int:
+        return m_ceil(pixel / 11.808)
 
     def __call__(self, obj, **kwargs):
         self.proxy = obj
@@ -26,6 +31,7 @@ class Handler:
         self.storage.pf.status.set('Подготовка изображений')
         self.storage.pf.pb['maximum'] = 1
         self.proxy.files = tuple(self.get_images_to_proxy_obj())
+        self.preparing_images_for_processing()
         self.storage.pf.pb['value'] += 1
         self.total = self.storage.pf.pb['maximum'] = self.get_total_sum_of_images()
         self.storage.pf.pb['value'] = 0
@@ -45,14 +51,21 @@ class Handler:
             else:
                 yield None
 
+    def preparing_images_for_processing(self):
+        """Абстрактная ф-я. Подготовка изображений до их непосредственной обработки.
+        Планируется, что она будет использоваться для наделения кэша объектами изображений из Constant"""
+        pass
+
     def get_total_sum_of_images(self) -> int:
         """В дочернем классе должна возвращать сумму изображений"""
         raise Exception('Функция get_total_sum_of_images должна быть переопределена в дочернем классе')
 
     def run(self):
+        """Запускает основную логику обработчика файлов"""
         raise Exception('Функция run должна быть переопределена в дочернем классе')
 
     def finish(self):
+        """По завершении, очищаем обработчик"""
         self.proxy = None
         self.handler_option = None
         self.total = 0
