@@ -32,7 +32,6 @@ class OrdersTracker(Tracker):
         self.storage.pf.status.set('5/5: Очитска списка от старых заказов')
         self.__clearing_orders()
         self.storage.pf.pb['value'] += 1
-        print(len(self.__orders))
 
     def manual(self):
         for proxy_lst in self.__orders.values():
