@@ -4,23 +4,19 @@ from math import ceil as m_ceil
 
 
 class Handler:
-    __slots__ = 'proxy', 'cache', '__name__', '__doc__'
+    __slots__ = '__name__', '__doc__', 'proxy', 'cache',
     storage = AppManager.storage
 
     def __init__(self):
-        self.proxy = None
-        self.cache = {}
         self.__name__ = self.__class__.__name__
         self.__doc__ = self.__class__.__doc__
+        self.proxy = None
+        self.cache = {}
 
     @staticmethod
     def mm_to_pixel(mm: int) -> int:
         """Возвращает значение в пикселях при разрешении в 300 dpi"""
         return m_ceil(mm * 11.808)
-
-    @staticmethod
-    def pixel_to_mm(pixel: int) -> int:
-        return m_ceil(pixel / 11.808)
 
     def __call__(self, obj, **kwargs):
         self.proxy = obj
