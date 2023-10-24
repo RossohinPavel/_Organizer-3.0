@@ -1,4 +1,4 @@
-from .handler import HandlerWindow
+from ._handler import HandlerWindow
 from ...file_handlers import CoverMarkerHandler
 
 
