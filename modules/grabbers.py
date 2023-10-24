@@ -39,7 +39,7 @@ class EditionGrabberIterator(GrabberIterator):
     Захватывает все изображения из папок экземпляров и Constant"""
     __slots__ = 'path'
 
-    def _grab(self) -> (str, callable):
+    def _grab(self) -> (str, (str, )):
         for catalog in listdir(self.path):
             c_path = f'{self.path}/{catalog}'
             if fullmatch(r'\d{3}(-\d+_pcs)?', catalog):
@@ -54,3 +54,28 @@ class EditionGrabber:
 
     def __init__(self, path: str):
         self.edition = {name: tuple(imgs) for name, imgs in EditionGrabberIterator(path)}
+
+    def variable_cover_iter(self):
+        """Предоставляет генератор для итерации по индивидуальным обложкам
+        Возвращает имя экземпляра, имя обложки и количетсво разворотов в экземпляре"""
+        for ex, images in self.edition.items():
+            if ex == 'Constant':
+                continue
+            for cover in reversed(images):
+                if cover.startswith('cover'):
+                    yield ex, cover, len(images) - 1
+                    break
+
+    def constant_cover_iter(self):
+        """Предоставляет генератор для итерации по постоянным обложкам.
+        Возвращает имя экземпляра, она же папка Constnt, имя обложки и наибольшее количество разворотов в экземпляре"""
+        count = 0
+        for ex, images in self.edition.items():
+            len_ex = len(images) - 1
+            if len_ex > count:
+                count = len_ex
+            if ex == 'Constant':
+                for cover in reversed(images):
+                    if cover.startswith('cover'):
+                        yield ex, cover, count
+                        break

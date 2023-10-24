@@ -1,2 +1,2 @@
 from .roddom import Roddom
-from .cover_marker import CoverMarkerHandler
+from .cover_handler import CoverMarkerHandler

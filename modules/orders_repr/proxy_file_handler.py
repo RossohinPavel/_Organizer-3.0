@@ -14,7 +14,7 @@ class FileHandlerProxy:
         obj = super().__new__(cls)
         obj.name = order.name
         obj.creation_date = order.creation_date
-        obj.content = order.content
-        obj.products = tuple(predicate(AppManager.storage.lib.get_product_obj_from_name(e.name)) for e in order.content)
-        obj.files = None
+        obj.content = list(order.content)
+        obj.products = list(predicate(AppManager.storage.lib.get_product_obj_from_name(e.name)) for e in order.content)
+        obj.files = list()
         return obj

@@ -4,13 +4,11 @@ from math import ceil as m_ceil
 
 
 class Handler:
-    __slots__ = 'proxy', 'handler_option', 'total', 'cache', '__name__', '__doc__'
+    __slots__ = 'proxy', 'cache', '__name__', '__doc__'
     storage = AppManager.storage
 
     def __init__(self):
         self.proxy = None
-        self.handler_option = None
-        self.total = 0
         self.cache = {}
         self.__name__ = self.__class__.__name__
         self.__doc__ = self.__class__.__doc__
@@ -26,14 +24,14 @@ class Handler:
 
     def __call__(self, obj, **kwargs):
         self.proxy = obj
-        self.handler_option = kwargs
+        self.cache.update(kwargs)
         self.storage.pf.header.set(self.get_processing_frame_header())
         self.storage.pf.status.set('Подготовка изображений')
         self.storage.pf.pb['maximum'] = 1
-        self.proxy.files = tuple(self.get_images_to_proxy_obj())
+        self.get_images_to_proxy_obj()
         self.preparing_images_for_processing()
         self.storage.pf.pb['value'] += 1
-        self.total = self.storage.pf.pb['maximum'] = self.get_total_sum_of_images()
+        self.storage.pf.pb['maximum'] = self.get_total_sum_of_images()
         self.storage.pf.pb['value'] = 0
         self.run()
         self.finish()
@@ -43,13 +41,16 @@ class Handler:
         return f'Обработка заказа {self.proxy.name}'
 
     def get_images_to_proxy_obj(self) -> callable:
-        """Обновляет атрибут files у объекта self.proxy кортежем из объектов EditionGrabber или None"""
+        """Обновляет атрибуты content, products, files у proxy объекта. Убирает лишние тиражи"""
         path = f'{self.storage.stg.z_disc}/{self.proxy.creation_date}/{self.proxy.name}'
-        for i, edition in enumerate(self.proxy.content):
-            if self.proxy.products[i]:
-                yield EditionGrabber(f'{path}/{edition.name}')
+        index = 0
+        while index < len(self.proxy.content):
+            if self.proxy.products[index] is None:
+                del self.proxy.content[index]
+                del self.proxy.products[index]
             else:
-                yield None
+                self.proxy.files.append(EditionGrabber(f'{path}/{self.proxy.content[index].name}'))
+                index += 1
 
     def preparing_images_for_processing(self):
         """Абстрактная ф-я. Подготовка изображений до их непосредственной обработки.
@@ -67,6 +68,4 @@ class Handler:
     def finish(self):
         """По завершении, очищаем обработчик"""
         self.proxy = None
-        self.handler_option = None
-        self.total = 0
         self.cache.clear()
