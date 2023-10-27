@@ -74,7 +74,7 @@ class Blank:
 
     def _cover_joint(self, category: str):
         """Наделяет продукт кортежем значений шарнира обложки"""
-        self.product_obj.cover_joint = (10, 15, 18)
+        self.product_obj.cover_joint = (9, 10, 15, 18)
 
     @staticmethod
     def __print_mat(pos):

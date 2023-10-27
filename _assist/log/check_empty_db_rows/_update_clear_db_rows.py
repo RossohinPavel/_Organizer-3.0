@@ -42,7 +42,7 @@ else:
 
 with sqlite3.connect('../../../data/log.db') as connect:
     cursor = connect.cursor()
-    cursor.execute(f'SELECT * FROM Orders WHERE customer_name="Unknown" OR customer_name="Диспетчер ФотокнигиОптом" OR price=0.0')
+    cursor.execute(f'SELECT * FROM Orders WHERE customer_name="Unknown" OR customer_name="Диспетчер ФотокнигиОптом" OR customer_name="РОЗНИЦА КОЛИЗЕЙ" OR price=0.0')
     for line in reversed(cursor.fetchall()):
         if get_solutions(line) == 'д':
             new_line = get_new_data(line)

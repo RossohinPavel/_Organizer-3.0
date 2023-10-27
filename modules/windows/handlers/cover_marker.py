@@ -9,7 +9,7 @@ class CoverMarker(HandlerWindow):
                           'тиражи\nсогласно спецификации продукта. Для индивидуальных\nобложек файлы с сетками ' \
                           'будут сохранены в папке\nCovers, для одинаковых - Constant. При выборе опции\nобработки ' \
                           '\'Добавление бэкпринта\' на заднюю часть\nобложки будет нанесена информация о названии\n' \
-                          'тиража и особенностях сборки продукта.'
+                          'тиража и об особенностях сборки продукта.'
     handler_option_text = 'Добавление бэкпринта'
     file_handler = CoverMarkerHandler()
 
@@ -18,4 +18,3 @@ class CoverMarker(HandlerWindow):
             return None
         if product_obj.category in ('Album', 'Layflat', 'Photobook') and product_obj.cover_type in ('Книга', 'Планшет'):
             return product_obj
-        return None

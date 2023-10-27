@@ -1,6 +1,5 @@
 from ..app_manager import AppManager
 from ..grabbers import EditionGrabber
-from math import ceil as m_ceil
 
 
 class Handler:
@@ -15,8 +14,8 @@ class Handler:
 
     @staticmethod
     def mm_to_pixel(mm: int) -> int:
-        """Возвращает значение в пикселях при разрешении в 300 dpi"""
-        return m_ceil(mm * 11.808)
+        """Возвращает значение в пикселях при разрешении в 300 dpi."""
+        return mm * 11.811
 
     def __call__(self, obj, **kwargs):
         self.proxy = obj
