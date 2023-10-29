@@ -73,7 +73,7 @@ class EditionGrabber:
 
     def cover_from_constant_iter(self):
         """Предоставляет генератор для итерации по постоянным обложкам.
-        Возвращает имя экземпляра, она же папка Constnt, имя обложки и наибольшее количество разворотов в экземпляре"""
+        Возвращает Constant, имя обложки и наибольшее количество разворотов в экземпляре"""
         count = 0
         for ex, images in self.edition.items():
             if fullmatch(r'\d{3}(-\d+_pcs)?', ex):
