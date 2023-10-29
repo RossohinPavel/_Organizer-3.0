@@ -31,7 +31,7 @@ class MainWindow(tk.Tk):
         width, height = 444, 414
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
-        self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
+        self.bind_hotkeys()
         self.update_idletasks()
 
     @staticmethod
@@ -39,6 +39,16 @@ class MainWindow(tk.Tk):
         """Эвент для срабатывания Ctrl+V на русской раскладке"""
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
+
+    def bind_hotkeys(self):
+        """Бинд хоткеев основного меню приложения"""
+        self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
+        self.bind('<F1>', lambda x:  CoverMarkerWindow(self))
+        self.bind('<F2>', lambda x: PageDecoderWindow(master=self))
+        self.bind('<F3>', lambda x: self.show_add_btn_menu())
+        self.bind('<F5>', lambda x: self.update_info_frame(StickGenFrame)())
+        self.bind('<F6>', lambda x: self.update_info_frame(PlanerFrame)())
+        self.bind('<F7>', lambda x: self.update_info_frame(MailSamplesFrame)())
 
     def destroy(self) -> None:
         """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
