@@ -4,7 +4,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 class CoverMarkerHandler(Handler):
-    __slots__ = 'proxy', 'cache', '__name__', '__doc__'
+    __slots__ = 'proxy', 'cache', '__name__'
+    grabber_mode = 'Exemplar', 'Constant'
 
     def get_processing_frame_header(self) -> str:
         return f'Разметка обложек в заказе {self.proxy.name}'
@@ -15,7 +16,7 @@ class CoverMarkerHandler(Handler):
             if self.proxy.content[i].comp in ('Копии', 'О_О', None):
                 count += 1
             else:
-                count += len(tuple(f_g.variable_cover_iter()))
+                count += len(tuple(f_g.covers_from_ex_iter()))
         return count
 
     def run(self):
@@ -40,7 +41,7 @@ class CoverMarkerHandler(Handler):
             kwargs['carton_len'] = self.mm_to_pixel(self.proxy.products[i].carton_length)
             kwargs['joint'] = self.mm_to_pixel(self.proxy.products[i].cover_joint)
             # Получаем генератор для итерации по обложкам исходя из типа совмещения
-            cover_iter = f_g.constant_cover_iter if comp in ('Копии', 'О_О') else f_g.variable_cover_iter
+            cover_iter = f_g.cover_from_constant_iter if comp in ('Копии', 'О_О') else f_g.covers_from_ex_iter
             for ex, cover_name, ex_len in cover_iter():
                 # Записываем в словарь имя обложки и количество разворотов
                 kwargs['cover_name'], kwargs['ex_len'] = cover_name, ex_len

@@ -1,5 +1,5 @@
 from ._handler import HandlerWindow
 
 
-class PlacementByChannels(HandlerWindow):
+class PlacementByChannelsWindow(HandlerWindow):
     win_title = 'Размещение изображений по каналам'

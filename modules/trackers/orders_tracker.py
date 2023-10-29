@@ -1,7 +1,7 @@
 from os import listdir
 from os.path import isdir as osp_isdir
 from datetime import datetime, timedelta
-from ..grabbers import OrdersGrabberIterator
+from modules.file_handlers._grabbers import OrdersGrabberIterator
 from ._tracker import Tracker
 from modules.orders_repr.orders_tracker_proxies import *
 

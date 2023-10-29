@@ -1,7 +1,7 @@
 from ._handler import HandlerWindow
 
 
-class CoverGuideLiner(HandlerWindow):
+class CoverGuideLinerWindow(HandlerWindow):
     win_title = 'Отрисовка направляющих'
     handler_description = 'Разметка обложек по старой технологии.\nИспользуется для обложек, которые печатаются\n'\
                           'химическим способом (ЛЮКСы и книги с кожаным\nкорешком). На изображение будут нанесены\n'\

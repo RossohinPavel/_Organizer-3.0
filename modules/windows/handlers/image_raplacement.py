@@ -1,5 +1,5 @@
 from ._handler import HandlerWindow
 
 
-class ImageReplacement(HandlerWindow):
+class ImageReplacementWindow(HandlerWindow):
     win_title = 'Замена изображений'

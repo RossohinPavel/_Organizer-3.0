@@ -1,19 +1,20 @@
 from ..app_manager import AppManager
-from ..grabbers import EditionGrabber
+from modules.file_handlers._grabbers import EditionGrabber
 
 
 class Handler:
-    __slots__ = '__name__', '__doc__', 'proxy', 'cache',
+    """Абстрактный класс предостовляющий реализующий основную логику обработчиков"""
+    __slots__ = '__name__', 'proxy', 'cache',
     storage = AppManager.storage
+    grabber_mode = tuple()
 
     def __init__(self):
         self.__name__ = self.__class__.__name__
-        self.__doc__ = self.__class__.__doc__
         self.proxy = None
         self.cache = {}
 
     @staticmethod
-    def mm_to_pixel(mm: int) -> int:
+    def mm_to_pixel(mm: int) -> float:
         """Возвращает значение в пикселях при разрешении в 300 dpi."""
         return mm * 11.811
 
@@ -44,7 +45,7 @@ class Handler:
                 del self.proxy.content[index]
                 del self.proxy.products[index]
             else:
-                self.proxy.files.append(EditionGrabber(f'{path}/{self.proxy.content[index].name}'))
+                self.proxy.files.append(EditionGrabber(f'{path}/{self.proxy.content[index].name}', self.grabber_mode))
                 index += 1
 
     def preparing_images_for_processing(self):

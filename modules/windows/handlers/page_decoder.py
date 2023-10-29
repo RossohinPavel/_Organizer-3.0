@@ -1,7 +1,7 @@
 from ._handler import HandlerWindow
 
 
-class PageDecoder(HandlerWindow):
+class PageDecoderWindow(HandlerWindow):
     win_title = 'Раскодировка Альбомов, Журналов и FlexBind'
     handler_description = 'Раскодировка Альбомов, Журналов и FlexBind\nсогласно особенности продукта. '\
                           'В каталоге тиража\nбудет создана папка Decoded в которой будут\nсохранены поэкземплярно '\

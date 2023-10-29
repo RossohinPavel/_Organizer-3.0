@@ -72,15 +72,19 @@ class HandlerWindow(ChildWindow):
 
     def get_order(self, order_name):
         """Получение прокси объекта и выведение его элементов в виджете"""
-        proxy = FileHandlerProxy(order_name, self.handler_predicate)
+        proxy = FileHandlerProxy(order_name, self.__predicate)
         if proxy is None:
             self.widget_dct['text_var'].set(f'Не могу найти заказ {order_name}')
             return
+        self.reset_to_default()
         self.update_combo(proxy)
 
+    def __predicate(self, product_obj) -> object | None:
+        """Возвращает результат работы ф-ии handler_predicate или None, если продукта нет в библиотеке"""
+        return self.handler_predicate(product_obj) if product_obj else None
+
     def handler_predicate(self, product_obj) -> object | None:
-        """На вход поступает продукт из библиотеки или None.
-        Возвращает продукт из библиотеки, если он соответсвует типу обработчика. В противном случае - возвращает None"""
+        """Возвращает продукт, если он соответсвует типу обработчика. Иначе - возвращает None"""
         raise Exception('Функция handler_predicate не переопределена в дочернем классе')
 
     def update_combo(self, proxy):

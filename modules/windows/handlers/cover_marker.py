@@ -2,7 +2,7 @@ from ._handler import HandlerWindow
 from ...file_handlers import CoverMarkerHandler
 
 
-class CoverMarker(HandlerWindow):
+class CoverMarkerWindow(HandlerWindow):
     """Разметка обложки"""
     win_title = 'Разметка обложек'
     handler_description = 'Разметка обратной стороны для обложек.\nВ заказе будут обработаны все определившиеся ' \
@@ -14,7 +14,5 @@ class CoverMarker(HandlerWindow):
     file_handler = CoverMarkerHandler()
 
     def handler_predicate(self, product_obj) -> object | None:
-        if product_obj is None:
-            return None
         if product_obj.category in ('Album', 'Layflat', 'Photobook') and product_obj.cover_type in ('Книга', 'Планшет'):
             return product_obj

@@ -3,7 +3,8 @@ import os
 from collections import Counter
 
 from .base_dataclasses import *
-from modules.grabbers import EditionGrabberIterator
+from modules.file_handlers import EditionGrabberIterator
+
 
 __all__ = ('Order', 'EditionProxy', 'PhotoProxy', 'OrderInfoProxy')
 
@@ -68,7 +69,7 @@ class EditionProxy(ProxyObserver):
         cover_count = 0
         page_lst = []
         const = tuple()
-        for catalog, images in EditionGrabberIterator(self.path):
+        for catalog, images in EditionGrabberIterator(self.path, 'Exemplar', 'Constant'):
             if catalog != 'Constant':
                 cover_exist = False
                 page_count = 0
