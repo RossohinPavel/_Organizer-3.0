@@ -85,3 +85,17 @@ class EditionGrabber:
                     if cover.startswith('cover'):
                         yield ex, cover, count
                         break
+
+    def pages_from_ex_iter(self, constant=False, cover_included=False):
+        """Предрставляет генератор для итерации по разворотам экземпляра.
+        Возвращает имя экземпляра и генератор для итерации по именам разворотов.
+        Если constant=True, то итерация обрывается после выдачи 1 результата, так как развороты постоянные"""
+        for ex, images in self.edition.items():
+            if fullmatch(r'\d{3}(-\d+_pcs)?', ex):
+                yield ex, (x for x in images if not x.startswith('cover') or cover_included)
+                if constant:
+                    break
+
+    def images_from_constant_iter(self, cover_included=False):
+        if 'Constant' in self.edition:
+            yield from (x for x in self.edition['Constant'] if not x.startswith('cover') or cover_included)

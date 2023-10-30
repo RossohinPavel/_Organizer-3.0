@@ -1,3 +1,4 @@
+from math import ceil as m_ceil
 from os import makedirs as os_makedirs
 from PIL import Image, ImageDraw, ImageFont
 from modules.app_manager import AppManager
@@ -18,7 +19,7 @@ class Handler:
         self.middle_path = None
 
     @staticmethod
-    def mm_to_pixel(mm: int) -> float:
+    def mm_to_pixel(mm: int | float) -> float:
         """Возвращает значение в пикселях при разрешении в 300 dpi."""
         return mm * 11.811
 

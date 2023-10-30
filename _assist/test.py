@@ -1,10 +1,7 @@
-import re
+from PIL import Image, ImageDraw
 
 
-imgs = ['cover_001.jpg', 'cover_001-2_pcs.jpg', 'cover_1_pcs.jpg',
-        '001__001.jpg', '001__001-2_pcs.jpg', '001_1_pcs.jpg']
-
-
-for img in imgs:
-    if re.fullmatch(r'(cover|\d{3})_{1,2}(\d{3}|-?\d+_pcs){1,2}\.jpg', img):
-        print(img)
+with Image.open(f'D:\\тест\\Book\\2020-01-03\\250308\\1 ШКОЛА 4 В-Фотоальбом полиграфический 20x30 верт\\Constant\\003_5_pcs.jpg') as test_img:
+    test_img.load()
+l_side = test_img.crop((0, 0, test_img.width // 2, test_img.height))
+l_side.show()

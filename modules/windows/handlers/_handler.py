@@ -27,6 +27,13 @@ class HandlerWindow(ChildWindow):
         self.show_target_edition_widgets(frame.container)
         self.show_miss_edition_widgets(frame.container)
         self.show_buttons(frame.container)
+        self.bind('<KeyPress>', self.__enter_event)
+
+    def __enter_event(self, event):
+        entry = self.widget_dct['onvf']._entry
+        if entry != self.focus_get():
+            entry.focus_set()
+            entry.event_generate('<KeyPress>', keysym=event.keysym)
 
     def show_info_label(self, frame):
         """Отрисовка лейбла с подсказкой о том, что делает обработчик"""
