@@ -29,7 +29,6 @@ class PageDecoder(Handler):
         destination_path = f'{self.destination}/{edt_path}/Pages'
         os_makedirs(destination_path, exist_ok=True)
         kwargs['src_path'], kwargs['dst_path'] = f'{self.source}/{edt_path}', destination_path
-        self.storage.pf.status.set('Раскодировка изображений из Constant')
         # Распределяем тиражи по соответствующим функциям
         if product.category == 'Journal':
             self.journal_decoder(product, file_grabber, kwargs)
@@ -76,11 +75,8 @@ class PageDecoder(Handler):
 
     def album_decoder(self, product, file_grabber, kwargs):
         """Ф-я для раскодировки альбомов и FlexBind, где не нужно комбинировать раскодированные странички"""
-        # Раскодировка постоянных изображений и помещение этих объектов в кэш
-        cache = {}
-        for img_name in file_grabber.images_from_constant_iter():
-            path = f'{kwargs["src_path"]}/Constant/{img_name}'
-            cache[f'{img_name[:3]}'] = tuple(self.__get_decoded_album_pages(path, product))
+        # Разметка кэша именами постоянных изображений
+        cache = {name[:3]: None for name in file_grabber.images_from_constant_iter()}
         # Итерируемся по тиражу
         for ex, imgs in file_grabber.pages_from_ex_iter(kwargs['comp'] in ('Копии', 'В_О')):
             imgs = tuple(imgs)
@@ -98,10 +94,13 @@ class PageDecoder(Handler):
             # Итерируемся по изображениям
             for spread in imgs:
                 self.storage.pf.status.set(f'{self.storage.pf.pb["value"] + 1}/{self.storage.pf.pb["maximum"]} {spread} -- {kwargs["edt_name"]}')
-                if spread[5:8] in cache:
-                    cropped_spreads = (x.copy() for x in cache[spread[5:8]])
-                else:
+                spread_pos = spread[5:8]
+                cropped_spreads = cache.get(spread_pos, None)
+                if cropped_spreads is None:
                     cropped_spreads = self.__get_decoded_album_pages(f'{kwargs["src_path"]}/{ex}/{spread}', product)
+                    if spread_pos in cache:     # Записываем постоянные изображения в кэш
+                        cropped_spreads = tuple(cropped_spreads)
+                        cache[spread_pos] = cropped_spreads
                 for page in cropped_spreads:
                     page.save(f'{dst_path}/page{page_count}.jpg', quality=100, dpi=(300, 300))
                     page_count += 1
