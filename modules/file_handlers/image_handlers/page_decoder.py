@@ -34,9 +34,9 @@ class PageDecoder(Handler):
             self.journal_decoder(product, file_grabber, kwargs)
         if product.category == 'Album':
             # Оборачиваем нужные атрибуты в пиксельные значения
-            product.dc_overlap = m_ceil(self.mm_to_pixel(product.dc_overlap))
-            product.dc_top_indent = m_ceil(self.mm_to_pixel(product.dc_top_indent))
-            product.dc_left_indent = m_ceil(self.mm_to_pixel(product.dc_left_indent))
+            kwargs['dc_overlap'] = m_ceil(self.mm_to_pixel(product.dc_overlap))
+            kwargs['dc_top_indent'] = m_ceil(self.mm_to_pixel(product.dc_top_indent))
+            kwargs['dc_left_indent'] = m_ceil(self.mm_to_pixel(product.dc_left_indent))
             self.album_decoder(product, file_grabber, kwargs)
             if product.dc_break:
                 self.break_decoder(kwargs)
@@ -50,33 +50,35 @@ class PageDecoder(Handler):
         white_image = Image.new('RGB', (2400, 2400), 'white')
         if text:
             draw_text = ImageDraw.Draw(white_image)
-            draw_text.text((235, 2125), text=text, fill="gray", font=ImageFont.truetype("arial.ttf", 80))
+            draw_text.text((235, 2125), text=text, fill="#C0C0C0", font=ImageFont.truetype("arial.ttf", 80))
         white_image.save(path, quality=100, dpi=(300, 300))
 
     @staticmethod
-    def __get_decoded_album_pages(path, product):
+    def __get_decoded_album_pages(path, kwargs):
         """Открывает изображение, кропает его и возвращает получившиеся стороны"""
         with Image.open(path) as image:
             image.load()
         # Кропаем поступившие изображения
-        l_side = image.crop((0, 0, image.width // 2 + product.dc_overlap, image.height))
+        l_side = image.crop((0, 0, image.width // 2 + kwargs['dc_overlap'], image.height))
         # Создаем новый задник
-        new_l_side = Image.new('RGB', (l_side.width + product.dc_left_indent, l_side.height + product.dc_top_indent), 'white')
+        new_l_side = Image.new('RGB', (l_side.width + kwargs['dc_left_indent'], l_side.height + kwargs['dc_left_indent']), 'white')
         # Вставляем Левую сторону на новый задник
-        new_l_side.paste(l_side, (0, product.dc_top_indent))
+        new_l_side.paste(l_side, (0, kwargs['dc_top_indent']))
         l_side.close()
         yield new_l_side
         # Повторяем с правой стороной зеркально
-        r_side = image.crop((image.width // 2 - product.dc_overlap, 0, image.width, image.height))
+        r_side = image.crop((image.width // 2 - kwargs['dc_overlap'], 0, image.width, image.height))
         image.close()
-        new_r_side = Image.new('RGB', (r_side.width + product.dc_left_indent, r_side.height + product.dc_top_indent), 'white')
-        new_r_side.paste(r_side, (product.dc_left_indent, product.dc_top_indent))
+        new_r_side = Image.new('RGB', (r_side.width + kwargs['dc_left_indent'], r_side.height + kwargs['dc_top_indent']), 'white')
+        new_r_side.paste(r_side, (kwargs['dc_left_indent'], kwargs['dc_top_indent']))
         yield new_r_side
 
     def album_decoder(self, product, file_grabber, kwargs):
         """Ф-я для раскодировки альбомов и FlexBind, где не нужно комбинировать раскодированные странички"""
-        # Разметка кэша именами постоянных изображений
-        cache = {name[:3]: None for name in file_grabber.images_from_constant_iter()}
+        cache = {}
+        if kwargs['comp'] is not None: # Разметка кэша именами постоянных изображений, если в тираже больше 1 экземпляра
+            for name in file_grabber.images_from_constant_iter():
+                cache[name[:3]] = None
         # Итерируемся по тиражу
         for ex, imgs in file_grabber.pages_from_ex_iter(kwargs['comp'] in ('Копии', 'В_О')):
             imgs = tuple(imgs)
@@ -97,7 +99,7 @@ class PageDecoder(Handler):
                 spread_pos = spread[5:8]
                 cropped_spreads = cache.get(spread_pos, None)
                 if cropped_spreads is None:
-                    cropped_spreads = self.__get_decoded_album_pages(f'{kwargs["src_path"]}/{ex}/{spread}', product)
+                    cropped_spreads = self.__get_decoded_album_pages(f'{kwargs["src_path"]}/{ex}/{spread}', kwargs)
                     if spread_pos in cache:     # Записываем постоянные изображения в кэш
                         cropped_spreads = tuple(cropped_spreads)
                         cache[spread_pos] = cropped_spreads
