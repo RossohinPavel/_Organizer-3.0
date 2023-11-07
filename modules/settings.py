@@ -13,7 +13,7 @@ class Settings:
     - t_disc - Ссылка на серверный диск цифрового отдела и операторов фотопечати
     - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
     """
-    storage = AppManager.storage
+
     __new__ = AppManager.write_to_storage('stg')
     __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir', '__init'
     __s_con = SafeConnect('app.db')
@@ -23,7 +23,7 @@ class Settings:
         self.__init = False
         with self.__s_con as conn:
             conn.cursor.execute('SELECT name, data FROM Images')    # Получение картинок, использующихся в приложении
-            self.storage.mw.set_app_img(conn.cursor.fetchall())
+            AppManager.storage.mw.set_app_img(conn.cursor.fetchall())
             conn.cursor.execute('SELECT name, data FROM Settings')
             for name, value in conn.cursor.fetchall():
                 setattr(self, name, value)
@@ -33,9 +33,9 @@ class Settings:
         """Обновляем файл настроек при изменении атрибутов объекта"""
         super().__setattr__(key, value)
         if key == 'autolog':
-            self.storage.tr.ot.init_auto(value)
+            AppManager.storage.tr.ot.init_auto(value)
             if not value:
-                self.storage.txt_vars.orders_trk.set('Выключен')
+                AppManager.storage.txt_vars.orders_trk.set('Выключен')
         self.__update_settings(key, value)
 
     def __update_settings(self, key, value):

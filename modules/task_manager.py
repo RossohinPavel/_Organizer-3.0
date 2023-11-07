@@ -29,7 +29,7 @@ class TaskManager:
     @classmethod
     def create_task(cls, func: callable, args: tuple = (), kwargs: dict | None = None):
         """Создание задачи. Задача будет поставлена в очередь вызовов. Если очередь пуста, задача запустится немедленно.
-        :param func: Cсылка на функцию
+        :param func: Ссылка на функцию
         :param args: Именованные аргументы к функции
         :param kwargs: Позиционные аргументы к функции"""
         Thread(target=cls.__get_task(func), args=args, kwargs=kwargs, daemon=True).start()
