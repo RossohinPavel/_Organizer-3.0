@@ -43,7 +43,7 @@ class MainWindow(tk.Tk):
     def bind_hotkeys(self):
         """Бинд хоткеев основного меню приложения"""
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
-        self.bind('<F1>', lambda x:  CoverMarkerWindow(self))
+        self.bind('<F1>', lambda x: CoverMarkerWindow(self))
         self.bind('<F2>', lambda x: PageDecoderWindow(master=self))
         self.bind('<F3>', lambda x: self.show_add_btn_menu())
         self.bind('<F5>', lambda x: self.update_info_frame(StickGenFrame)())

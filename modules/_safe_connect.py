@@ -1,4 +1,4 @@
-import sqlite3
+from sqlite3 import connect, Connection, Cursor
 from threading import Lock
 
 
@@ -9,12 +9,13 @@ class SafeConnect:
     def __init__(self, db_name: str):
         self.__db_name = db_name
         self.__lock = Lock()
-        self.connect = self.cursor = None
+        self.connect: Connection | None = None
+        self.cursor: Cursor | None = None
 
     def __enter__(self):
         """При входе в менеджер создаем подключение к бд и получаем её курсор. Блокируем сторонний доступ"""
         self.__lock.acquire()
-        self.connect = sqlite3.connect(f'data/{self.__db_name}')
+        self.connect = connect(f'data/{self.__db_name}')
         self.cursor = self.connect.cursor()
         return self
 

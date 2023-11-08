@@ -12,28 +12,28 @@ class MailSamples:
 
     def get_headers(self) -> list:
         """Получение заголовков текстовых шаблонов"""
-        with self.__s_con:
-            self.__s_con.cursor.execute('SELECT id, tag, name FROM Samples')
-            return sorted(self.__s_con.cursor.fetchall(), key=lambda x: x[1])
+        with self.__s_con as sc:
+            sc.cursor.execute('SELECT id, tag, name FROM Samples')
+            return sorted(sc.cursor.fetchall(), key=lambda x: x[1])
 
     def get_sample(self, sample_id: int) -> list:
         """Получение текста шаблоне"""
-        with self.__s_con:
-            self.__s_con.cursor.execute('SELECT data FROM Samples WHERE id=?', (sample_id, ))
-            return self.__s_con.cursor.fetchone()[0]
+        with self.__s_con as sc:
+            sc.cursor.execute('SELECT data FROM Samples WHERE id=?', (sample_id, ))
+            return sc.cursor.fetchone()[0]
 
     def del_sample(self, sample_id: int):
         """Удаление шаблона из хранилища"""
-        with self.__s_con:
-            self.__s_con.cursor.execute('DELETE FROM Samples WHERE id=?', (sample_id, ))
-            self.__s_con.connect.commit()
+        with self.__s_con as sc:
+            sc.cursor.execute('DELETE FROM Samples WHERE id=?', (sample_id, ))
+            sc.connect.commit()
 
     def save(self, sample_id: int | None, tag: str, name: str, sample: str):
         """Сохранение текстового шаблона в бд"""
-        with self.__s_con:
+        with self.__s_con as sc:
             values = (tag, name, sample, sample_id)
             if sample_id is not None:
-                self.__s_con.cursor.execute(f'UPDATE Samples SET tag=?, name=?, data=? WHERE id=?', values)
+                sc.cursor.execute(f'UPDATE Samples SET tag=?, name=?, data=? WHERE id=?', values)
             else:
-                self.__s_con.cursor.execute(f'INSERT INTO Samples (tag, name, data) VALUES (?, ?, ?)', values[:-1])
-            self.__s_con.connect.commit()
+                sc.execute(f'INSERT INTO Samples (tag, name, data) VALUES (?, ?, ?)', values[:-1])
+            sc.connect.commit()
