@@ -1,11 +1,13 @@
-from typing import TYPE_CHECKING
+import tkinter as tk
+import tkinter.ttk as ttk
 
 
-if TYPE_CHECKING:
-    from test import Test
+root = tk.Tk()
+
+pb = ttk.Progressbar(root, length=200)
+pb.pack()
+
+root.mainloop()
 
 
-class Test1:
-    def test1_method(self):
-        print('call')
-        return
+

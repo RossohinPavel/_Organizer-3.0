@@ -1,12 +1,10 @@
 from ..source import *
-from modules.app_manager import AppManager
 
 
 class ProcessingFrame(LabeledFrame):
-    storage = AppManager.storage
-    __new__ = AppManager.write_to_storage('pf')
-    
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""
+    __instance = None
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queue = tk.IntVar(master=self, value=0)

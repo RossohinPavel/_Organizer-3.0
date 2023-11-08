@@ -1,22 +1,18 @@
-from ..app_manager import *
 from .source import *
-from .frames import *
-from .handlers import *
-from .roddom import RoddomWindow
+# from .frames import *
+# from .handlers import *
+# from .roddom import RoddomWindow
 
 
 class MainWindow(tk.Tk):
-    """Основное окно приложения"""
-    storage = AppManager.storage
-    __new__ = AppManager.write_to_storage('mw')
-
     def __init__(self):
+        """Основное окно приложения"""
         super().__init__()
         self.set_main_graph_settings()
-        self.txt_vars = AppManager.create_group('txt_vars')   # Инициализация объекта для хранения текстовых переменных.
+        # self.txt_vars = AppManager.create_group('txt_vars')   # Инициализация объекта для хранения текстовых переменных.
         self.show_log_tracker_frame()
         self.show_processing_line()
-        self.show_common_line()
+        # self.show_common_line()
 
     def set_app_img(self, img_tuple: tuple[str, bytes]):
         """Устанавливаем изображения, который будут использоваться в программе. Первое значение будет установлено как
@@ -43,12 +39,12 @@ class MainWindow(tk.Tk):
     def bind_hotkeys(self):
         """Бинд хоткеев основного меню приложения"""
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
-        self.bind('<F1>', lambda x: CoverMarkerWindow(self))
-        self.bind('<F2>', lambda x: PageDecoderWindow(master=self))
-        self.bind('<F3>', lambda x: self.show_add_btn_menu())
-        self.bind('<F5>', lambda x: self.update_info_frame(StickGenFrame)())
-        self.bind('<F6>', lambda x: self.update_info_frame(PlanerFrame)())
-        self.bind('<F7>', lambda x: self.update_info_frame(MailSamplesFrame)())
+        self.bind('<F1>', lambda _: CoverMarkerWindow(self))
+        self.bind('<F2>', lambda _: PageDecoderWindow(master=self))
+        self.bind('<F3>', lambda _: self.show_add_btn_menu())
+        self.bind('<F5>', lambda _: self.update_info_frame(StickGenFrame)())
+        self.bind('<F6>', lambda _: self.update_info_frame(PlanerFrame)())
+        self.bind('<F7>', lambda _: self.update_info_frame(MailSamplesFrame)())
 
     def destroy(self) -> None:
         """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
@@ -69,7 +65,7 @@ class MainWindow(tk.Tk):
         orders_trk = tk.StringVar(master=container, value='Выключен')
         ttk.Label(master=container, textvariable=orders_trk).pack(side='left')
         ttk.Frame(master=container, relief='solid').pack(side='right', fill='y')
-        self.txt_vars.orders_trk = orders_trk
+        # self.txt_vars.orders_trk = orders_trk
 
     def show_processing_line(self):
         """Отображение фреймов для обработки файлов"""
@@ -122,8 +118,8 @@ class MainWindow(tk.Tk):
     def show_processing_frame(frame):
         """Отрисовка фрейма отображения прогресса обработки файлов"""
         ttk.Frame(master=frame, relief='solid').pack(side='left', fill='y')
-        proc_frm = ProcessingFrame(master=frame, text='Заданий в очереди:')
-        proc_frm.pack(side='left', fill='both', expand=1)
+        # proc_frm = ProcessingFrame(master=frame, text='Заданий в очереди:')
+        # proc_frm.pack(side='left', fill='both', expand=1)
         ttk.Frame(master=frame, relief='solid').pack(side='right', fill='y')
 
     def show_common_line(self):

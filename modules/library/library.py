@@ -1,5 +1,6 @@
 from functools import lru_cache
-from ..app_manager import AppManager
+from typing import Self
+
 from .._safe_connect import SafeConnect
 from .properties import Blank
 from .products import *
@@ -10,10 +11,14 @@ __all__ = ('Library', )
 
 class Library:
     """Класс для работы с библиотекой продуктов"""
-    storage = AppManager.storage
-    __new__ = AppManager.write_to_storage('lib')
+    __instance = None
     __s_con = SafeConnect('library.db')
     headers = {}
+
+    def __new__(cls) -> Self:
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     def __init__(self):
         with self.__s_con:

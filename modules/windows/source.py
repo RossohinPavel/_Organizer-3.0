@@ -99,8 +99,8 @@ class TipWindow(tk.Toplevel):
 
 
 class LabeledFrame(ttk.Frame):
-    """Конструктор для фрейма с надписью"""
     def __init__(self, *args, text='', **kwargs):
+        """Конструктор для фрейма с надписью"""
         super().__init__(*args, padding=(3, 7 if text else 3, 3, 3), **kwargs)
         self.container = ttk.Frame(master=self, borderwidth=1, padding=2, relief='solid')
         self.container.pack(fill='both', expand=1)

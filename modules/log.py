@@ -1,6 +1,5 @@
+from typing import Self
 from ._safe_connect import SafeConnect
-from .app_manager import AppManager
-from modules.orders_repr.base_dataclasses import *
 
 
 __aLL__ = ('Log', )
@@ -8,9 +7,13 @@ __aLL__ = ('Log', )
 
 class Log:
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
-    storage = AppManager.storage
-    __new__ = AppManager.write_to_storage('log')
+    __instance = None
     __s_con = SafeConnect('log.db')
+
+    def __new__(cls) -> Self:
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     def update_records(self, lst: list):
         """Сборная ф-я для обновления библиотеки"""
