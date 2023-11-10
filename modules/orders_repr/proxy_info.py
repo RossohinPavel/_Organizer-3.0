@@ -1,9 +1,5 @@
-from ..app_manager import AppManager
-
-
 class InfoProxy:
     __slots__ = 'order', 'product_comp'
-    storage = AppManager.storage
 
     def __new__(cls, order_name):
         """Пытаемся получить объект заказа из лога. Если удается, то на его основе создаем прокси объект"""

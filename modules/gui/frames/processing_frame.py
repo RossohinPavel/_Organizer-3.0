@@ -1,9 +1,16 @@
-from ..source import *
+from typing import Self
+from .._source import *
 
 
 class ProcessingFrame(LabeledFrame):
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""
+    __slots__ = 'queue'
     __instance = None
+
+    def __new__(cls, *args, **kwargs) -> Self:
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -14,8 +21,9 @@ class ProcessingFrame(LabeledFrame):
         self.status = tk.StringVar(master=self)
         self.pb = ttk.Progressbar(master=self.container, orient='horizontal', length=298)
         self._widgets = [ttk.Label(master=self.container, textvariable=self.header, width=49),
-                         ttk.Label(master=self.container, textvariable=self.status, width=49),
-                         self.pb]
+                        ttk.Label(master=self.container, textvariable=self.status, width=49),
+                        self.pb]
+        self.__exit__()
 
     def __enter__(self):
         """При входе в менеджер, размещаем виджеты"""

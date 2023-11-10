@@ -1,3 +1,4 @@
+from typing import Self
 from ._safe_connect import SafeConnect
 
 
@@ -5,30 +6,30 @@ class MailSamples:
     __instance = None
     __s_con = SafeConnect('app.db')
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls) -> Self:
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
         return cls.__instance
 
-    def get_headers(self) -> list:
+    def get_headers(self) -> list[str]: #type: ignore
         """Получение заголовков текстовых шаблонов"""
         with self.__s_con as sc:
             sc.cursor.execute('SELECT id, tag, name FROM Samples')
-        return sorted(sc.cursor.fetchall(), key=lambda x: x[1])
+            return sorted(sc.cursor.fetchall(), key=lambda x: x[1])
 
-    def get_sample(self, sample_id: int) -> list:
+    def get_sample(self, sample_id: int) -> str: #type: ignore
         """Получение текста шаблоне"""
         with self.__s_con as sc:
             sc.cursor.execute('SELECT data FROM Samples WHERE id=?', (sample_id, ))
-        return sc.cursor.fetchone()[0]
+            return sc.cursor.fetchone()[0]
 
-    def del_sample(self, sample_id: int):
+    def del_sample(self, sample_id: int) -> None: 
         """Удаление шаблона из хранилища"""
         with self.__s_con as sc:
             sc.cursor.execute('DELETE FROM Samples WHERE id=?', (sample_id, ))
             sc.connect.commit()
 
-    def save(self, sample_id: int | None, tag: str, name: str, sample: str):
+    def save(self, sample_id: int | None, tag: str, name: str, sample: str) -> None:
         """Сохранение текстового шаблона в бд"""
         with self.__s_con as sc:
             values = (tag, name, sample, sample_id)

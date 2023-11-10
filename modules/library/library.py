@@ -18,11 +18,9 @@ class Library:
     def __new__(cls) -> Self:
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
+            with cls.__s_con:
+                cls.__update_product_headers()
         return cls.__instance
-
-    def __init__(self):
-        with self.__s_con:
-            self.__update_product_headers()
 
     def add(self, product: Product):
         """Метод добавления продукта в библиотеку

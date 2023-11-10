@@ -1,6 +1,3 @@
-from ..app_manager import AppManager
-
-
 class FileHandlerProxy:
     """Представление заказа для обработчиков файлов"""
     __slots__ = 'name', 'creation_date', 'content', 'products', 'files'

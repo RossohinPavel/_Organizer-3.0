@@ -1,4 +1,4 @@
-from ..source import *
+from .._source import *
 from re import match as re_match
 
 

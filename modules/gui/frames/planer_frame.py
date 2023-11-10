@@ -1,4 +1,4 @@
-from ..source import *
+from .._source import *
 
 
 class PlanerFrame(LabeledFrame):

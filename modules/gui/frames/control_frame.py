@@ -1,6 +1,5 @@
-from ..source import *
-from ..settings import SettingsWindow as StgWin
-from ..library import LibraryWindow as LibWin
+from .._source import *
+from ..windows import SettingsWindow as StgWin
 
 
 class ControlFrame(LabeledFrame):

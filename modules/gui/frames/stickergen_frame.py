@@ -1,4 +1,4 @@
-from ..source import *
+from .._source import *
 from .order_name_validate_frame import ONVFrame
 from modules.orders_repr.proxy_info import StickerGenProxy
 
