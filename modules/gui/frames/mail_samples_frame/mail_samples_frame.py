@@ -1,5 +1,5 @@
 from ..._source import *
-from typing import Callable
+from typing import Callable, Type
 from ....mail_samples import MailSamples
 from .init_sample_window import InitSampleWindow
 from .sample_edit_window import SampleEditWindow
@@ -47,7 +47,7 @@ class MailSamplesFrame(LabeledFrame):
         menu.add_command(label='Посмотреть', state=state, command=lambda: self.see_sample(event))
         menu.post(x=event.x_root, y=event.y_root)
 
-    def edit_sample(self, mode: str, func: Callable | None) -> Callable[[], None]:
+    def edit_sample(self, mode: str, func: Callable[[], tuple] | None) -> Callable[[], None]:
         """Замыкание для вызова окна редактирования/добавления шаблона"""
         if func is None:
             func = lambda: (None, '#Таг', '#Демонстрационный шаблон', None) #type: ignore

@@ -23,16 +23,15 @@ class ProcessingFrame(LabeledFrame):
         self._widgets = [ttk.Label(master=self.container, textvariable=self.header, width=49),
                         ttk.Label(master=self.container, textvariable=self.status, width=49),
                         self.pb]
-        self.__exit__()
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
         place = 4
         for widget in self._widgets:
             widget.place(x=1, y=place)
             place += 24
 
-    def __exit__(self, *args):
+    def __exit__(self, *args) -> None:
         """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""
         self.header.set('__Имя модуля/номер заказа__')
         self.status.set('__Статус/имя тиража__')

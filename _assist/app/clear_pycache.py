@@ -13,4 +13,4 @@ def recursive_deleting(path: str) -> None:
 
 
 if __name__ == '__main__':
-    recursive_deleting(__file__.rsplit('\\', maxsplit=3)[0])
+    recursive_deleting('../..')

@@ -20,7 +20,7 @@ class SafeConnect:
         self.cursor = self.connect.cursor()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, *args) -> bool:
         """При выходе из менеджера, закрываем подключение и снимаем блок доступа."""
         self.__lock.release()
         self.connect.close()

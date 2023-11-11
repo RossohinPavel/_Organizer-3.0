@@ -54,7 +54,7 @@ class SampleEditWindow(ChildWindow):
             text = ''.join(text)
         self.widget_lst[2].insert('1.0', text)
 
-    def rclick_event(self, event: tk.Event):
+    def rclick_event(self, event: tk.Event) -> None:
         """Событие для выделения слово литералами в тексте шаблона"""
         try:
             word = self.widget_lst[-1].selection_get()

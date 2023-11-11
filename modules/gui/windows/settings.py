@@ -47,7 +47,7 @@ class SettingsWindow(ChildWindow):
 
     def show_mode_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления режимов работы программы"""
-        def select_cb(var_name) -> None:
+        def select_cb(var_name: str) -> None:
             setattr(AppManager.stg, var_name, self.__dict__[var_name].get())
 
         frame = LabeledFrame(master=self, text='Режимы работы программы')
@@ -65,8 +65,7 @@ class SettingsWindow(ChildWindow):
         self.show_directory_frame(frame.container, 'left', 'Диск загрузки заказов \'Z\'', 'z_disc', (1, 1))
         self.show_directory_frame(frame.container, 'right', 'Диск печати заказов \'О\'', 'o_disc', (2, 1))
 
-    def show_directory_frame(self, container: ttk.Frame, 
-                             side: Literal['left', 'right', 'top', 'bottom'], 
+    def show_directory_frame(self, container: ttk.Frame, side: Literal['left', 'right', 'top', 'bottom'], 
                              text: str, stg_attr: str, btn_pdx: tuple[int, int]) -> None:
         """Отрисовка виджетов управления рабочими папками"""
         def update_dir() -> None:

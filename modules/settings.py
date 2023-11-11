@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, Any
 from ._safe_connect import SafeConnect
 from ._appmanager import AppManager
 
@@ -32,7 +32,7 @@ class Settings:
             cls.__instance = obj
         return cls.__instance
 
-    def __setattr__(self, key, value) -> None:
+    def __setattr__(self, key: str, value: Any) -> None:
         """Обновляем файл настроек при изменении атрибутов объекта"""
         super().__setattr__(key, value)
         # if key == 'autolog':
@@ -42,7 +42,7 @@ class Settings:
         if self.__instance:
             self.__update_settings(key, value)
 
-    def __update_settings(self, key, value) -> None:
+    def __update_settings(self, key: str, value: Any) -> None:
         """Обновляет настройки в базе данных если прилождение инициализировано"""
         with self.__scon as sc:
             sc.cursor.execute('UPDATE Settings SET data=? WHERE name=?', (value, key))

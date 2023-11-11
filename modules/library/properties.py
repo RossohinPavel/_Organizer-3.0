@@ -1,83 +1,74 @@
-class Blank:
-    """Класс наделяющий объект продукта соответствующими свойствами"""
-    __slots__ = 'product_obj'
+from typing import Literal
 
-    def __init__(self, category_type):
-        self.product_obj = category_type()
 
-    def create_blank(self) -> object:
-        """Наделяет объект продукта свойствами и возвращает его"""
-        category_name = self.product_obj.category
-        for attr in self.product_obj:
-            eval(f'self._{attr}(category_name)')
-        return self.product_obj
+class Properties:
+    """Описание свойств продуктов"""
+    __slots__ = '__product_type'
 
-    def _full_name(self, category: str):
-        self.product_obj.full_name = ''
+    def __init__(self, category: str):
+        self.__product_type = category
 
-    def _segment(self, category: str):
+    def __call__(self, property: str) -> list[str] | tuple[str]:
+        return eval(f'self._{property}()')
+
+    def _segment(self) -> list[str]:
         """Наделяет продукт кортежем значений сегмента для соответствующей категории"""
-        self.product_obj.segment = ()
-        if category in ('Photobook', 'Layflat', 'Album', 'Canvas'):
-            self.product_obj.segment += ('Премиум',)
-        if category in ('Photobook', 'Layflat', 'Album', 'Journal', 'Photofolder', 'Subproduct'):
-            self.product_obj.segment += ('Тираж',)
+        segment = []
+        if self.__product_type in ('Photobook', 'Layflat', 'Album', 'Canvas'):
+           segment.append('Премиум')
+        if self.__product_type in ('Photobook', 'Layflat', 'Album', 'Journal', 'Photofolder', 'Subproduct'):
+            segment.append('Тираж')
+        return segment
 
-    def _short_name(self, category: str):
+    def _short_name(self) -> tuple[str, ...]:   # type: ignore
         """Наделяет продукт кортежем значений псевдонимов для соответствующей категории"""
-        names = {'Photobook': ('КС', 'ЛЮКС', 'кКожа', 'КК', 'ПС'),
-                 'Layflat': ('ППК', 'ПК'),
-                 'Album': ('ФБ', 'ПА', 'ПУР'),
-                 'Journal': ('Журнал',),
-                 'Photofolder': ('Дуо', 'Дуо гор', 'Трио'),
-                 'Canvas': ('+холсты',),
-                 'Subproduct': ('+полигр фото', '+открытки', '+магниты')}
-        self.product_obj.short_name = names[category]
+        match self.__product_type:
+            case 'Photobook': return ('КС', 'ЛЮКС', 'кКожа', 'КК', 'ПС')
+            case 'Layflat': return ('ППК', 'ПК')
+            case 'Album': return ('ФБ', 'ПА', 'ПУР')
+            case 'Journal': return ('Журнал',)
+            case 'Photofolder': return ('Дуо', 'Дуо гор', 'Трио')
+            case 'Canvas': return ('+холсты',)
+            case 'Subproduct': return ('+полигр фото', '+открытки', '+магниты')
 
-    def _product_format(self, category: str):
+    def _product_format(self) -> tuple[str, ...]:   # type: ignore
         """Наделяет продукт кортежем значений возможных форматов продуктов для соответствующей категории"""
         bf = ('10x10', '15x15', '15x20в', '20x15г', '20x20', '20x30в', '30x20г', '25x25', '30x30', '40x30г', '30x40в')
         canvas = ('30x45 верт', '30x45 гориз', '40x40', '40x60 верт', '40x60 гориз', '45x45', '50x50', '50x75 верт',
                   '50x75 гориз', '60x60', '60x90 верт', '60x90 гориз', '80x80', '80x120 верт', '80x120 гориз')
-        formats = {'Photobook': bf[:-1],
-                   'Layflat': bf[4:9],
-                   'Album': bf[4:],
-                   'Journal': bf[4:6],
-                   'Photofolder': bf[5:7],
-                   'Canvas': canvas}
-        self.product_obj.product_format = formats[category]
+        match self.__product_type:
+            case 'Photobook': return bf[:-1]
+            case 'Layflat': return bf[4:9]
+            case 'Album': return bf[4:]
+            case 'Journal': return bf[4:6]
+            case 'Photofolder': return bf[5:7]
+            case 'Canvas': return canvas
 
-    def _book_option(self, category: str):
+    def _book_option(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений опций сборки продуктов для соответствующей категории"""
-        self.product_obj.book_option = ('б/у', 'с/у', 'с/у1.2')
+        return ('б/у', 'с/у', 'с/у1.2')
 
-    def _lamination(self, category: str):
+    def _lamination(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений типов ламинации для соответствующей категории"""
-        self.product_obj.lamination = ('гля', 'мат')
+        return ('гля', 'мат')
 
-    def _cover_type(self, category: str):
+    def _cover_type(self) -> tuple[str, ...]:   # type: ignore
         """Наделяет продукт кортежем значений типов обложки для соответствующей категории"""
         ct = ('Книга', 'Планшет', 'Люкс', 'Кожаный корешок', 'Кожаная обложка')
-        self.product_obj.cover_type = {'Photobook': ct, 'Layflat': ct[:2], 'Album': ct[:1]}[category]
+        match self.__product_type:
+            case 'Photobook': return ct
+            case 'Layflat': return ct[:2]
+            case 'Album': return ct[:1]
 
-    def _carton_length(self, category: str):
-        """Установка значения длинны картона"""
-        self.product_obj.carton_length = 0
-
-    def _carton_height(self, category: str):
-        """Установка значения высоты картона"""
-        self.product_obj.carton_height = 0
-
-    def _cover_clapan(self, category: str):
+    def _cover_flap(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений клапана обложки"""
-        self.product_obj.cover_clapan = (15, 20)
+        return ('15', '20')
 
-    def _cover_joint(self, category: str):
+    def _cover_joint(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений шарнира обложки"""
-        self.product_obj.cover_joint = (9, 10, 15, 18)
+        return ('9', '10', '15', '18')
 
-    @staticmethod
-    def __print_mat(pos):
+    def __print_mat(self, pos: Literal['cover', 'page']) -> tuple[str, ...]: # type: ignore
         """Общая ф-я печатного материала"""
         cvr_photo = ('Fuji CA Matte 203x406', 'Fuji CA Matte 203x500', 'Fuji CA Matte 203x570', 'Fuji CA Matte 254x400',
                      'Fuji CA Matte 254x470', 'Fuji CA Matte 254x500', 'Fuji CA Matte 254x620', 'Fuji CA Matte 254x700',
@@ -88,49 +79,31 @@ class Blank:
                     'Fuji CA Matte 305x610', 'Fuji CA Matte 305x810')
         pg_poly = ('Sappi SRA3', 'Sappi 320x620', 'UPM SRA4 150', 'UPM SRA4 170', 'UPM SRA4 250', 'UPM SRA3 170',
                    'UPM SRA3 250', 'Flex Bind 330x330', 'Flex Bind 320x450')
-        dct = {'cover': {'Photobook': cvr_photo + cvr_poly,
-                         'Layflat': cvr_poly,
-                         'Album': cvr_poly,
-                         'Journal': pg_poly,
-                         'Photofolder': cvr_poly[2:],
-                         'Canvas': ('CottonCanvas',),
-                         'Subproduct': pg_poly + ('MagnetycVinyl', 'Silk SRA4')},
-               'page': {'Photobook': pg_photo,
-                        'Layflat': pg_poly[:-2],
-                        'Album': pg_poly,
-                        'Journal': pg_poly[:-2]}
-               }
-        return dct[pos]
+        match self.__product_type:
+            case 'Photobook' if pos == 'cover': return cvr_photo + cvr_poly     # Материал для обложек
+            case 'Layflat' if pos == 'cover': return cvr_poly
+            case 'Album' if pos == 'cover': return cvr_poly
+            case 'Journal' if pos == 'cover': return pg_poly
+            case 'Photofolder' if pos == 'cover': return cvr_poly[2:]
+            case 'Canvas' if pos == 'cover': return ('CottonCanvas',)
+            case 'Subproduct' if pos == 'cover': return pg_poly + ('MagnetycVinyl', 'Silk SRA4')
+            case 'Photobook' if pos == 'page': return pg_photo                  # Материал для разворотов
+            case 'Layflat' if pos == 'page': return pg_poly[:-2]
+            case 'Album' if pos == 'page': return  pg_poly
+            case 'Journal' if pos == 'page': return pg_poly[:-2]
 
-    def _cover_print_mat(self, category: str):
+    def _cover_print_mat(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений печатного материала обложек"""
-        self.product_obj.cover_print_mat = self.__print_mat('cover')[category]
+        return self.__print_mat('cover')
 
-    def _page_print_mat(self, category: str):
+    def _page_print_mat(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений печатного материала разворотов"""
-        self.product_obj.page_print_mat = self.__print_mat('page')[category]
+        return self.__print_mat('page')
 
-    def _cover_canal(self, category: str):
+    def _cover_canal(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений каналов печати обложки"""
-        self.product_obj.cover_canal = ('36', '160', '161', '162', '163', '164', '165', '166', '204', '205', '214',
-                                        '240', '242', '243', '245', '266', 'POLI')
+        return ('36', '160', '161', '162', '163', '164', '165', '166', '204', '205', '214', '240', '242', '243', '245', '266', 'POLI')
 
-    def _page_canal(self, category: str):
+    def _page_canal(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем занчений каналов печати разворотов"""
-        self.product_obj.page_canal = ('201', '203', '204', '205', '207', '214', '271', '274', '275', '276')
-
-    def _dc_break(self, category: str):
-        """Установка значения разрыва при раскодировке"""
-        self.product_obj.dc_break = 0
-
-    def _dc_overlap(self, category: str):
-        """Установка значения нахлеста при раскодировке"""
-        self.product_obj.dc_overlap = 0
-
-    def _dc_top_indent(self, category: str):
-        """Установка значения отступа сверху при раскодировке"""
-        self.product_obj.dc_top_indent = 0
-
-    def _dc_left_indent(self, category: str):
-        """Установка значения отступа слева при раскодировке"""
-        self.product_obj.dc_left_indent = 0
+        return ('201', '203', '204', '205', '207', '214', '271', '274', '275', '276')
