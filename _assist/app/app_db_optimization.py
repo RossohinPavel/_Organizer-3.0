@@ -6,7 +6,8 @@ def main(db_path: str) -> None:
         cursor = connect.cursor()
         # Получаем все строки и сортируем их
         cursor.execute('SELECT tag, name, data FROM Samples')
-        rows = sorted(cursor.fetchall())
+        rows = cursor.fetchall()
+        rows.sort()
         # очищаем таблицу
         cursor.execute('DELETE FROM Samples')
         # обновляем sqlite_sequence, которая автоматически присваивает id
