@@ -136,6 +136,7 @@ class MainWindow(tk.Tk):
         ttk.Frame(master=widgets_container, relief='solid').pack(side='left', fill='y')
         right = ttk.Frame(master=widgets_container)
         right.pack(side='left', fill='both', expand=1)
+        setattr(right, 'container', None)
         setattr(self, 'info_frame', right)  # Добавляем атрибут на self, чтобы работало замыкание переключения виджетов
         self.show_information_buttons(left)
 
@@ -156,14 +157,12 @@ class MainWindow(tk.Tk):
     def update_info_frame(self, obj_link: Type[ttk.Frame]) -> Callable[[], None]:
         """Замыкание для реализации логики отрисовки информации на info_frame"""
         info_frame = getattr(self, 'info_frame')
-        current_widget = None
         def closure() -> None:
             for frame in info_frame.winfo_children():
                 frame.destroy()
-            nonlocal current_widget
-            if current_widget == obj_link:
-                current_widget = None
+            if info_frame.container == obj_link:
+                info_frame.container = None
             else:
-                current_widget = obj_link
+                info_frame.container = obj_link
                 obj_link(info_frame).pack(fill='both', expand=1)
         return closure
