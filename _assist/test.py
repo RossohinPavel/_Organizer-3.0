@@ -1,8 +1,12 @@
-from typing import NamedTuple
-
-class A(NamedTuple):
-    atr1: str
-    atr2: str
+import tkinter as tk
+import tkinter.ttk as ttk
 
 
-a = A()
+root = tk.Tk()
+
+pb = ttk.Progressbar(master=root)
+pb.pack()
+
+pb += 1
+
+root.mainloop()

@@ -19,7 +19,7 @@ class TaskManager:
 
     @classmethod
     def __get_task(cls, func: Callable[[Any], None]) -> Type[Callable[[Any], None]]:
-        """Декоратор, возвращающий ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
+        """Замыкание, возвращающее ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args: Any, **kwargs: Mapping[str, Any]):
             AppManager.pf.queue.set(AppManager.pf.queue.get() + 1)
             with cls.__lock, AppManager.pf:

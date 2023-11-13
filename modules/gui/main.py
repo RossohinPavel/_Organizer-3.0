@@ -117,6 +117,7 @@ class MainWindow(tk.Tk):
         """Отрисовка фрейма отображения прогресса обработки файлов"""
         proc_frm = ProcessingFrame(master=frame, text='Заданий в очереди:')
         AppManager.pf = proc_frm
+        proc_frm.__enter__()
         proc_frm.pack(side='left', fill='both', expand=1)
 
     def show_common_line(self) -> None:
