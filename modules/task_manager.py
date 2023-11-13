@@ -1,7 +1,7 @@
 from threading import Thread, Lock
 from typing import Callable, Any, Iterable, Mapping, Self, Type
 from .gui._source import tkmb
-from _appmanager import AppManager
+from ._appmanager import AppManager
 
 
 __all__ = ('TaskManager', )

@@ -1,11 +1,9 @@
 from typing import TYPE_CHECKING, Self
 
 
-__all__ = ('AppManager', )
-
-
 if TYPE_CHECKING:   # Здесь пишем импорты для типизации менеджера
     from .library import Library
+    from .log import Log
     from .gui.main import MainWindow
     from .gui.frames import ProcessingFrame
     from tkinter import StringVar
@@ -16,7 +14,7 @@ if TYPE_CHECKING:   # Здесь пишем импорты для типизац
 class AppManagerStorage:
     """Класс собирающий в себя критические модули приложения"""
     # Объявляем слоты для ускорения доступа
-    __slots__ = 'lib', 'mw', 'orders_trk', 'pf', 'tm', 'stg'
+    __slots__ = 'lib', 'log', 'mw', 'orders_trk', 'pf', 'tm', 'stg'
     __instance = None
 
     def __new__(cls) -> Self:
@@ -26,6 +24,7 @@ class AppManagerStorage:
 
     def __init__(self) -> None:
         self.lib: Library
+        self.log: Log
         self.mw: MainWindow
         self.pf: ProcessingFrame    # Этот фрейм будет записан в мменеджер при инициализации основного окна
         self.orders_trk: StringVar
@@ -39,6 +38,8 @@ AppManager = AppManagerStorage()
  # Наполняем менеджер реальными объектами
 from .library import Library
 AppManager.lib = Library()
+from .log import Log
+AppManager.log = Log()
 from .gui.main import MainWindow
 AppManager.mw = MainWindow()
 from .task_manager import TaskManager

@@ -1,8 +1,5 @@
 from typing import NamedTuple, Self
-from _safe_connect import SafeConnect
-
-
-__aLL__ = ('Log', )
+from ._safe_connect import SafeConnect
 
 
 class Photo(NamedTuple):

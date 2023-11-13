@@ -4,9 +4,6 @@ from .._safe_connect import SafeConnect
 from .products import *
 
 
-__all__ = ('Library', )
-
-
 # Переменные для аннотации
 type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
 

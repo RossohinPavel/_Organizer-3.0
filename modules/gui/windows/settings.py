@@ -22,7 +22,7 @@ class SettingsWindow(ChildWindow):
         """Отрисовка виджетов для настройки глубины проверки лога"""
         msg = ('Рекомендуемая глубина ~ 100 заказов.', 'Ограничено свободным объемом ОЗУ.')
 
-        def get_entry_value() -> None:
+        def get_entry_value(event: tk.Event | None = None) -> None:
             value = entry_var.get()
             if value.isdigit():
                 AppManager.stg.log_check_depth = int(value)
@@ -37,6 +37,7 @@ class SettingsWindow(ChildWindow):
         update_label()
         entry_var = tk.StringVar(master=self)
         entry = ttk.Entry(master=frame.container, textvariable=entry_var, width=26)
+        entry.bind('<Return>', get_entry_value)
         btn = MyButton(master=frame.container, text='Задать', command=get_entry_value)
         info = ttk.Label(master=frame.container, text='\n'.join(msg))
         label.pack(side='top', anchor='nw')

@@ -16,7 +16,7 @@ class SafeConnect:
     def __enter__(self) -> Self:
         """При входе в менеджер создаем подключение к бд и получаем её курсор. Блокируем сторонний доступ"""
         self.__lock.acquire()
-        self.connect = connect(f'../data/{self.__db_name}')
+        self.connect = connect(f'data/{self.__db_name}')
         self.cursor = self.connect.cursor()
         return self
 
