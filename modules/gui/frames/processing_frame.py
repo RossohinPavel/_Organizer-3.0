@@ -38,11 +38,12 @@ class FileBar:
     
     def set(self, string: str = '') -> None:
         """Установка строкового значения в виджет текста"""
-        self._lbl.config(text=f'{self._pb['value'] + 1}/{self._pb['maximum']} -- {string}')
+        self._lbl.config(text=f'{int(self._pb['value']) + 1}/{self._pb['maximum']} -- {string}')
     
-    def __iadd__(self, num: int | float) -> None:
+    def __iadd__(self, num: int | float) -> Self:
         """Увеличиваем значение Progressbar'а через составное присваивание"""
         self._pb['value'] += num
+        return self
 
 
 class ProcessingFrame(LabeledFrame):
@@ -60,21 +61,22 @@ class ProcessingFrame(LabeledFrame):
         self.queue = tk.IntVar(master=self, value=0)
         ttk.Label(master=self, textvariable=self.queue).place(x=130, y=-9)
         self.header = tk.StringVar(master=self.container)
+        self._header_label = ttk.Label(master=self.container, textvariable=self.header, width=49)
         self.operation = tk.StringVar(master=self.container)
+        self._operation_label = ttk.Label(master=self.container, textvariable=self.operation, width=49)
         self.filebar = FileBar(master=self.container)
-        self._widgets = [ttk.Label(master=self.container, textvariable=self.header, width=49),
-                         ttk.Label(master=self.container, textvariable=self.operation, width=49),
-                         self.filebar]
 
     def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
-        for widget in self._widgets: 
-            widget.pack(expand=1, fill='x')
+        self._header_label.pack(expand=1, fill='x')
+        self._operation_label.pack(expand=1, fill='x')
+        self.filebar.pack(expand=1, fill='x')
 
     def __exit__(self, *args) -> None:
         """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""
         self.header.set('__Исполняемый модуль / Название Задачи__')
         self.operation.set('__Название операции__')
         self.filebar.reset()
-        for widget in self._widgets:
-            widget.pack_forget()
+        self._header_label.pack_forget()
+        self._operation_label.pack_forget()
+        self.filebar.pack_forget()

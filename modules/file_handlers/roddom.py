@@ -1,12 +1,11 @@
 from os import walk as os_walk, makedirs as os_makedirs
 from shutil import copy2 as sh_copy2
 from re import search
-from ..app_manager import AppManager
+from .._appmanager import AppManager
 
 
-class Roddom:
+class RoddomHandler:
     __slots__ = 'path', 'order', '__make_txt', '__img_len'
-    storage = AppManager.storage
 
     def __init__(self, path: str, make_txt=True):
         self.__make_txt = make_txt
@@ -32,15 +31,13 @@ class Roddom:
                 yield rel_path, root[-1]
 
     def to_print(self, path):
-        self.storage.pf.header.set(f'Роддом: {self.order}')
-        current, maximum = 0, self.__img_len
-        self.storage.pf.pb['maximum'] = maximum
-        self.storage.pf.pb['value'] = 0
+        AppManager.pf.header.set(f'Роддом: {self.order}')
+        AppManager.pf.operation.set('Копирование для печати')
+        AppManager.pf.filebar.maximum = self.__img_len
         for rel_path, files in self.__walk_on_order():
             new_path = f'{path}/{rel_path}'
             os_makedirs(new_path, exist_ok=True)
             for file in files:
-                current += 1
-                self.storage.pf.status.set(f'{current}/{maximum}: {file}')
+                AppManager.pf.filebar.set(file)
                 sh_copy2(f'{self.path}/{rel_path}/{file}', f'{new_path}/{file}')
-                self.storage.pf.pb['value'] += 1
+                AppManager.pf.filebar += 1

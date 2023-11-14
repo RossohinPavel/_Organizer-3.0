@@ -19,27 +19,38 @@ class Settings:
     def __new__(cls) -> Self:
         """Создание объекта Settings. Помимо этого, подтягивает из бд настройки и устанавливает их на объект"""
         if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-            cls.__set_start_settings_data()
+            obj = super().__new__(cls)
+            obj.__set_start_settings_data()
+            cls.__instance = obj
         return cls.__instance
+
+    def __init__(self) -> None:
+        self.autolog: int
+        self.log_check_depth: int
+        self.z_disc: str
+        self.o_disc: str
+        self.t_disc: str
+        self.roddom_dir: str
     
-    @classmethod
-    def __set_start_settings_data(cls):
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        """Обновляет атрибуты на объекте, запускает связанные с ними функции и обновляет базу данных"""
+        super().__setattr__(__name, __value)
+        match __name:
+            case 'autolog': pass
+        self.__update_db(__name, __value)
+    
+    def __set_start_settings_data(self) -> None:
         """Получение настроек из бд при открытии программы и установки их на obj"""
-        with cls.__scon as sc:
+        with self.__scon as sc:
             sc.cursor.execute('SELECT name, data FROM Images')      # Получение картинок, использующихся в приложении
             AppManager.mw.set_app_img(sc.cursor.fetchall())
             sc.cursor.execute('SELECT name, data FROM Settings')    # Получение и установка на объект остальных настроек
             for name, value in sc.cursor.fetchall():
-                super(cls, cls.__instance).__setattr__(name, value) #type: ignore
-
-    def __setattr__(self, key: str, value: Any) -> None:
-        """Обновляем файл настроек при изменении атрибутов объекта"""
-        super().__setattr__(key, value)     # Делегируем установку атрибутов
-        with self.__scon as sc:             # Обновляем данные в бд
-            sc.cursor.execute('UPDATE Settings SET data=? WHERE name=?', (value, key))
-            sc.connect.commit()
-        # if key == 'autolog':                # Дополнительнеы действия
-        #     AppManager.storage.tr.ot.init_auto(value)
-        #     if not value:
-        #         AppManager.storage.txt_vars.orders_trk.set('Выключен')
+                setattr(self, name, value)
+    
+    def __update_db(self, __name: str, __value: Any):
+        """Замыкание, для обновления базы данных"""
+        if self.__instance:
+            with self.__scon as sc:             # Обновляем данные в бд
+                sc.cursor.execute('UPDATE Settings SET data=? WHERE name=?', (__value, __name))
+                sc.connect.commit()

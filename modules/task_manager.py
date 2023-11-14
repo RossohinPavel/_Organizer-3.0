@@ -32,6 +32,6 @@ class TaskManager:
         return wrapper
 
     @classmethod
-    def create_task(cls, func: Callable[..., Any], args: Iterable[Any], kwargs: Mapping[str, Any] | None) -> None:
+    def create_task(cls, func: Type[Callable[[Any], None]], *args: Iterable[Any], **kwargs: Mapping[str, Any]) -> None:
         """Создание задачи. Задача будет поставлена в очередь вызовов. Если очередь пуста, задача запустится немедленно."""
         Thread(target=cls.__get_task(func), args=args, kwargs=kwargs, daemon=True).start()

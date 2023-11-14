@@ -3,10 +3,7 @@ from typing import Literal
 from ..._appmanager import AppManager
 
 
-__all__ = ('SettingsWindow', )
-
-
-class SettingsWindow(ChildWindow):
+class Settings(ChildWindow):
     """Окно основных настроек приложения"""
     width = 345
     height = 288
@@ -53,7 +50,7 @@ class SettingsWindow(ChildWindow):
 
         frame = LabeledFrame(master=self, text='Режимы работы программы')
         frame.pack(fill='x')
-        self.__dict__['autolog'] = tk.BooleanVar(master=self, value=AppManager.stg.autolog)
+        self.__dict__['autolog'] = tk.IntVar(master=self, value=AppManager.stg.autolog)
         chbtn1 = ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
                                  variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
         chbtn1.pack(anchor='nw')

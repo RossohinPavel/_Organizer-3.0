@@ -1,12 +1,26 @@
-import tkinter as tk
-import tkinter.ttk as ttk
+class Test:
+    def __init__(self) -> None:
+        self._mode = 0
+        self.inner_attr = 'test'
+
+    @property
+    def mode(self) -> int:
+        return self._mode
+    
+    @mode.setter
+    def mode(self, value: int):
+        self._mode = value
+        print(self.inner_attr)
 
 
-root = tk.Tk()
+t = Test()
 
-pb = ttk.Progressbar(master=root)
-pb.pack()
 
-pb += 1
+class Test2:
+    def __init__(self) -> None:
+        self.attr = t.mode
 
-root.mainloop()
+
+test2 = Test2()
+
+test2.attr = 1

@@ -1,9 +1,8 @@
 from ._source import *
 from typing import Callable, Sequence, Type
-from .frames import *
 from .._appmanager import AppManager
-# from .handlers import *
-# from .roddom import RoddomWindow
+from .frames import *
+from . import windows
 
 
 class MainWindow(tk.Tk):
@@ -99,17 +98,17 @@ class MainWindow(tk.Tk):
     def show_add_btn_menu(self) -> None:
         """Отрисовка меню под кнопкой Дополнительно"""
         add_menu = tk.Menu(tearoff=0)
-        add_menu.add_command(label="Обновить БД", command=AppManager.tr.ot.manual)
+        add_menu.add_command(label="Обновить БД") # AppManager.tr.ot.manual
         add_menu.add_separator()
-        add_menu.add_command(label='Направляющие', command=lambda: CoverGuideLinerWindow(master=self))
-        add_menu.add_command(label='Разместить по каналам', command=lambda: PlacementByChannelsWindow(master=self))
+        add_menu.add_command(label='Направляющие')  # command=lambda: CoverGuideLinerWindow(master=self)
+        add_menu.add_command(label='Разместить по каналам')     #command=lambda: PlacementByChannelsWindow(master=self)
         add_menu.add_separator()
-        add_menu.add_command(label='Холсты', command=lambda: CanvasHandlerWindow(master=self))
+        add_menu.add_command(label='Холсты')    # command=lambda: CanvasHandlerWindow(master=self)
         add_menu.add_separator()
-        add_menu.add_command(label='Замена', command=lambda: ImageReplacementWindow(master=self))
+        add_menu.add_command(label='Замена')    # command=lambda: ImageReplacementWindow(master=self)
         add_menu.add_command(label='Восстановление')
         add_menu.add_separator()
-        add_menu.add_command(label='Роддом', command=lambda: RoddomWindow(master=self))
+        add_menu.add_command(label='Роддом', command=lambda: windows.Roddom(master=self))
         add_menu.post(self.__dict__['add_btn'].winfo_rootx(), self.__dict__['add_btn'].winfo_rooty() + 25)
 
     @staticmethod
@@ -117,7 +116,6 @@ class MainWindow(tk.Tk):
         """Отрисовка фрейма отображения прогресса обработки файлов"""
         proc_frm = ProcessingFrame(master=frame, text='Заданий в очереди:')
         AppManager.pf = proc_frm
-        proc_frm.__enter__()
         proc_frm.pack(side='left', fill='both', expand=1)
 
     def show_common_line(self) -> None:

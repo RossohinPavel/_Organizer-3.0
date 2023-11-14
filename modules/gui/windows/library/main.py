@@ -4,7 +4,7 @@ from ...._appmanager import AppManager
 from .assist import AssistWindow
 
 
-class LibraryWindow(ChildWindow):
+class Library(ChildWindow):
     """Окно управления библиотекой"""
     width, height = 397, 351
 

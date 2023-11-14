@@ -1,1 +1,1 @@
-from .main import LibraryWindow
+from .main import Library
