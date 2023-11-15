@@ -32,7 +32,7 @@ class RoddomHandler:
 
     def to_print(self, path):
         AppManager.pf.header.set(f'Роддом: {self.order}')
-        AppManager.pf.operation.set('Копирование для печати')
+        AppManager.pf.operation.set('Копирование на печать')
         AppManager.pf.filebar.maximum = self.__img_len
         for rel_path, files in self.__walk_on_order():
             new_path = f'{path}/{rel_path}'

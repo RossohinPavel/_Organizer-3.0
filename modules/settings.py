@@ -1,4 +1,4 @@
-from typing import Self, Any
+from typing import Any
 from ._safe_connect import SafeConnect
 from ._appmanager import AppManager
 
@@ -13,16 +13,8 @@ class Settings:
     - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
     """
     __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir'
-    __instance = None
-    __scon = SafeConnect('app.db')
-
-    def __new__(cls) -> Self:
-        """Создание объекта Settings. Помимо этого, подтягивает из бд настройки и устанавливает их на объект"""
-        if cls.__instance is None:
-            obj = super().__new__(cls)
-            obj.__set_start_settings_data()
-            cls.__instance = obj
-        return cls.__instance
+    __scon = SafeConnect('app.db')  # Для удобства, вынесем эти атрибуты в атрибуты класса
+    __is_init = False
 
     def __init__(self) -> None:
         self.autolog: int
@@ -31,12 +23,14 @@ class Settings:
         self.o_disc: str
         self.t_disc: str
         self.roddom_dir: str
+        self.__set_start_settings_data()
+        Settings.__is_init = True
     
     def __setattr__(self, __name: str, __value: Any) -> None:
         """Обновляет атрибуты на объекте, запускает связанные с ними функции и обновляет базу данных"""
         super().__setattr__(__name, __value)
         match __name:
-            case 'autolog': pass
+            case 'autolog': AppManager.ot.init_auto(__value)
         self.__update_db(__name, __value)
     
     def __set_start_settings_data(self) -> None:
@@ -50,7 +44,7 @@ class Settings:
     
     def __update_db(self, __name: str, __value: Any):
         """Замыкание, для обновления базы данных"""
-        if self.__instance:
+        if self.__is_init:
             with self.__scon as sc:             # Обновляем данные в бд
                 sc.cursor.execute('UPDATE Settings SET data=? WHERE name=?', (__value, __name))
                 sc.connect.commit()

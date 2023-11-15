@@ -1,4 +1,4 @@
-from typing import NamedTuple, Self
+from typing import NamedTuple
 from ._safe_connect import SafeConnect
 
 
@@ -30,13 +30,10 @@ class Order(NamedTuple):
 
 class Log:
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
-    __instance = None
-    __s_con = SafeConnect('log.db')
+    __slots__ = '__s_con'
 
-    def __new__(cls) -> Self:
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
+    def __init__(self) -> None:
+        self.__s_con = SafeConnect('log.db')
 
     # def update_records(self, lst: list):
     #     """Сборная ф-я для обновления библиотеки"""

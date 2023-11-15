@@ -51,7 +51,7 @@ class MainWindow(tk.Tk):
         """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
         ttl = 'Очередь задач не пуста'
         msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
-        if AppManager.pf.queue.get() > 0:
+        if AppManager.txtvars.queue.get() > 0:
             if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
                 return
         super().destroy()
@@ -64,7 +64,7 @@ class MainWindow(tk.Tk):
         ttk.Label(master=container, text='Трекер заказов:').pack(anchor='nw', side='left')
         orders_trk = tk.StringVar(master=container, value='Выключен')
         ttk.Label(master=container, textvariable=orders_trk).pack(side='left')
-        AppManager.orders_trk = orders_trk
+        AppManager.txtvars.ot = orders_trk
 
     def show_processing_line(self) -> None:
         """Отображение заголовка и фреймов файловой обработки"""
@@ -88,17 +88,17 @@ class MainWindow(tk.Tk):
     def show_processing_buttons(self, frame: ttk.Frame) -> None:
         """Отрисовка фрейма кнопок запуска обработчика файлов"""
         btn1 = MyButton(master=frame, text='Разметка обложек', command=lambda: CoverMarkerWindow(self), width=15)
-        btn1.pack(padx=7, pady=(5, 0))
+        btn1.pack(padx=7, pady=(6, 0))
         btn2 = MyButton(master=frame, text='Раскодировка', command=lambda: PageDecoderWindow(master=self), width=15)
-        btn2.pack(padx=7, pady=(5, 0))
+        btn2.pack(padx=7, pady=(5, 5))
         btn3 = MyButton(master=frame, text='Дополнительно', command=self.show_add_btn_menu, width=15)
-        btn3.pack(padx=7, pady=5)
+        btn3.pack(padx=7, pady=(0, 6))
         self.__dict__['add_btn'] = btn3
 
     def show_add_btn_menu(self) -> None:
         """Отрисовка меню под кнопкой Дополнительно"""
         add_menu = tk.Menu(tearoff=0)
-        add_menu.add_command(label="Обновить БД") # AppManager.tr.ot.manual
+        add_menu.add_command(label="Обновить БД", command=AppManager.ot.manual) # AppManager.tr.ot.manual
         add_menu.add_separator()
         add_menu.add_command(label='Направляющие')  # command=lambda: CoverGuideLinerWindow(master=self)
         add_menu.add_command(label='Разместить по каналам')     #command=lambda: PlacementByChannelsWindow(master=self)
@@ -117,6 +117,9 @@ class MainWindow(tk.Tk):
         proc_frm = ProcessingFrame(master=frame, text='Заданий в очереди:')
         AppManager.pf = proc_frm
         proc_frm.pack(side='left', fill='both', expand=1)
+        queue = tk.IntVar(master=frame, value=0)
+        AppManager.txtvars.queue = queue
+        ttk.Label(master=frame, textvariable=queue).place(x=132, y=-2)
 
     def show_common_line(self) -> None:
         """Отображение остальных фреймов для работы с заказами, клиентами и др"""

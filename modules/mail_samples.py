@@ -1,15 +1,11 @@
-from typing import Self
 from ._safe_connect import SafeConnect
 
 
 class MailSamples:
-    __instance = None
-    __s_con = SafeConnect('app.db')
+    __slots__ = '__s_con'
 
-    def __new__(cls) -> Self:
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
+    def __init__(self) -> None:
+        self.__s_con = SafeConnect('app.db')
 
     def get_headers(self) -> list[str]: #type: ignore
         """Получение заголовков текстовых шаблонов"""

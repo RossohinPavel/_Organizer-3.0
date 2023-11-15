@@ -10,16 +10,13 @@ type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Su
 
 class Library:
     """Класс для работы с библиотекой продуктов"""
-    __instance = None
+    __slots__ = 'headers'
     __s_con = SafeConnect('library.db')
-    headers: dict[Type[Product], tuple[str, ...]] = {}
 
-    def __new__(cls) -> Self:
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-            with cls.__s_con:
-                cls.__update_product_headers()
-        return cls.__instance
+    def __init__(self) -> None:
+        self.headers: dict[Type[Product], tuple[str, ...]] = {}
+        with self.__s_con:
+            self.__update_product_headers()
 
     def add(self, product: Product) -> None:
         """Метод добавления продукта в библиотеку"""
@@ -70,9 +67,8 @@ class Library:
             for product in products:
                 if name.endswith(product): return self.__get(category, product)
 
-    @classmethod
-    def __update_product_headers(cls) -> None:
+    def __update_product_headers(self) -> None:
         """Обновляет словрь имен продуктов в виде {имя продукта: категория}. Использовать только внутри менеджера"""
         for category in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
-            cls.__s_con.cursor.execute(f'SELECT full_name FROM {category.__name__}')
-            cls.headers[category] = tuple(n[0] for n in cls.__s_con.cursor.fetchall())
+            self.__s_con.cursor.execute(f'SELECT full_name FROM {category.__name__}')
+            self.headers[category] = tuple(n[0] for n in self.__s_con.cursor.fetchall())

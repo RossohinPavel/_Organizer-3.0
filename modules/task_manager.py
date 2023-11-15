@@ -1,5 +1,5 @@
 from threading import Thread, Lock
-from typing import Callable, Any, Iterable, Mapping, Self, Type
+from typing import Callable, Any, Iterable, Mapping, Type
 from .gui._source import tkmb
 from ._appmanager import AppManager
 
@@ -9,29 +9,25 @@ __all__ = ('TaskManager', )
 
 class TaskManager:
     """Планировщик, предоставляющий доступ для создания параллельных потоков для программы"""
-    __instance = None
-    __lock = Lock()
+    __slots__ = '__lock'
 
-    def __new__(cls) -> Self:
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
+    def __init__(self) -> None:
+        self.__lock = Lock()
 
-    @classmethod
-    def __get_task(cls, func: Callable[[Any], None]) -> Type[Callable[[Any], None]]:
+    def __get_task(self, func: Callable[[Any], None]) -> Type[Callable[[Any], None]]:
         """Замыкание, возвращающее ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args: Any, **kwargs: Mapping[str, Any]):
-            AppManager.pf.queue.set(AppManager.pf.queue.get() + 1)
-            with cls.__lock, AppManager.pf:
+            AppManager.txtvars.queue.set(AppManager.txtvars.queue.get() + 1)
+            with self.__lock, AppManager.pf:
                 try:
                     func(*args, **kwargs)
                 except Exception as exc:
-                    tkmb.showerror('Ошибка', message=str(exc))
-            AppManager.pf.queue.set(AppManager.pf.queue.get() - 1)
+                    tkmb.showerror('Ошибка', message=f'{repr(exc)}')
+                    raise exc
+            AppManager.txtvars.queue.set(AppManager.txtvars.queue.get() - 1)
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 
-    @classmethod
-    def create_task(cls, func: Type[Callable[[Any], None]], *args: Iterable[Any], **kwargs: Mapping[str, Any]) -> None:
+    def create_task(self, func: Type[Callable[[Any], None]], *args: Iterable[Any], **kwargs: Mapping[str, Any]) -> None:
         """Создание задачи. Задача будет поставлена в очередь вызовов. Если очередь пуста, задача запустится немедленно."""
-        Thread(target=cls.__get_task(func), args=args, kwargs=kwargs, daemon=True).start()
+        Thread(target=self.__get_task(func), args=args, kwargs=kwargs, daemon=True).start()

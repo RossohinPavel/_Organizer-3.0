@@ -1,26 +1,38 @@
+import timeit
+import sys
+
+
 class Test:
-    def __init__(self) -> None:
-        self._mode = 0
-        self.inner_attr = 'test'
+    def __init__(self, name) -> None:
+        self.name = name
 
-    @property
-    def mode(self) -> int:
-        return self._mode
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __eq__(self, __value: object) -> bool:
+        if isinstance(__value, Test):
+            __value = __value.name
+        return self.name == __value
     
-    @mode.setter
-    def mode(self, value: int):
-        self._mode = value
-        print(self.inner_attr)
 
+test_lst = [Test(f'test{i}') for i in range(1000)]
 
-t = Test()
+def test_list():
+    if 'test' not in test_lst:
+        test_lst.append(Test('test'))
+    if 'test1' not in test_lst:
+        test_lst.append(Test('test'))
 
+print(timeit.timeit(test_list, number=1000))
+print(sys.getsizeof(test_lst) + sum(sys.getsizeof(x) for x in test_lst))
 
-class Test2:
-    def __init__(self) -> None:
-        self.attr = t.mode
+test_st = {Test(f'test{i}' for i in range(1000))}
 
+def test_set():
+    if 'test' not in test_lst:
+        test_st.add(Test('test'))
+    if 'test1' not in test_lst:
+        test_lst.append(Test('test'))
 
-test2 = Test2()
-
-test2.attr = 1
+print(timeit.timeit(test_set, number=1000))
+print(sys.getsizeof(test_st) + sum(sys.getsizeof(x) for x in test_st))

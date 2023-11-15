@@ -58,8 +58,6 @@ class ProcessingFrame(LabeledFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Отрисовка лейбла очереди
-        self.queue = tk.IntVar(master=self, value=0)
-        ttk.Label(master=self, textvariable=self.queue).place(x=130, y=-9)
         self.header = tk.StringVar(master=self.container)
         self._header_label = ttk.Label(master=self.container, textvariable=self.header, width=49)
         self.operation = tk.StringVar(master=self.container)
