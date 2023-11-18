@@ -1,5 +1,3 @@
-env\Scripts\activate
-
-python3.12 modules/main.py
-
-deactivate
+call .env\Scripts\activate.bat
+python modules\main.py
+pause
