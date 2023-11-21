@@ -1,7 +1,7 @@
 from os import walk as os_walk, makedirs as os_makedirs
 from shutil import copy2 as sh_copy2
 from re import search
-from .._appmanager import AppManager
+from appmanager import AppManager
 
 
 class RoddomHandler:

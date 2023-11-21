@@ -1,6 +1,6 @@
 from functools import lru_cache
-from typing import Self, Type, NoReturn
-from .._safe_connect import SafeConnect
+from typing import Type, NoReturn
+from safe_connect import SafeConnect
 from .products import *
 
 

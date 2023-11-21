@@ -1,6 +1,6 @@
-from ..._source import *
+from gui._source import *
 from typing import Callable, Type
-from ....mail_samples import MailSamples
+from mail_samples import MailSamples
 from .init_sample_window import InitSampleWindow
 from .sample_edit_window import SampleEditWindow
 

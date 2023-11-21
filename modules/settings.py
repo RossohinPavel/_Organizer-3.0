@@ -1,6 +1,6 @@
 from typing import Any
-from ._safe_connect import SafeConnect
-from ._appmanager import AppManager
+from safe_connect import SafeConnect
+from appmanager import AppManager
 
 
 class Settings:
@@ -29,15 +29,15 @@ class Settings:
     def __setattr__(self, __name: str, __value: Any) -> None:
         """Обновляет атрибуты на объекте, запускает связанные с ними функции и обновляет базу данных"""
         super().__setattr__(__name, __value)
-        match __name:
-            case 'autolog': AppManager.ot.init_auto(__value)
+        # match __name:
+            # case 'autolog': AppManager.ot.init_auto(__value)
         self.__update_db(__name, __value)
     
     def __set_start_settings_data(self) -> None:
         """Получение настроек из бд при открытии программы и установки их на obj"""
         with self.__scon as sc:
             sc.cursor.execute('SELECT name, data FROM Images')      # Получение картинок, использующихся в приложении
-            AppManager.mw.set_app_img(sc.cursor.fetchall())
+            # AppManager.mw.set_app_img(sc.cursor.fetchall())
             sc.cursor.execute('SELECT name, data FROM Settings')    # Получение и установка на объект остальных настроек
             for name, value in sc.cursor.fetchall():
                 setattr(self, name, value)

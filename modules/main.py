@@ -1,4 +1,4 @@
-from _appmanager import AppManager
+from appmanager import AppManager
 
 
 # Предполагается, что в далеком будущем))) будет более осмысленная точка входа. 

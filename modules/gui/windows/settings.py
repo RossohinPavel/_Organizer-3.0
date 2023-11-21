@@ -1,79 +1,64 @@
-from .._source import *
+from gui._source import *
 from typing import Literal
-from ..._appmanager import AppManager
 
 
 class Settings(ChildWindow):
     """Окно основных настроек приложения"""
-    width = 345
-    height = 288
+    win_title = 'Настройки'
+    win_geometry = Geometry('345x288', '295x352')
 
     def main(self, *args, **kwargs) -> None:
-        self.title('Настройки')
         self.show_log_check_depth_widgets()
-        self.show_mode_widgets()
         self.show_directory_widgets()
-        MyButton(master=self, text='Закрыть', command=self.destroy, width=23).pack(anchor='se', pady=(2, 4), padx=4)
+        ctk.CTkButton(master=self, text='Закрыть', command=self.destroy).pack(anchor='se', pady=5, padx=5)
 
     def show_log_check_depth_widgets(self) -> None:
         """Отрисовка виджетов для настройки глубины проверки лога"""
         msg = ('Рекомендуемая глубина ~ 100 заказов.', 'Ограничено свободным объемом ОЗУ.')
 
-        def get_entry_value(event: tk.Event | None = None) -> None:
+        def get_entry_value(event: tkinter.Event | None = None) -> None:
             value = entry_var.get()
             if value.isdigit():
                 AppManager.stg.log_check_depth = int(value)
                 update_label()
-            entry.delete(0, tk.END)
+            entry.delete(0, 'end')
 
         def update_label() -> None:
-            label.config(text=f'Текущее значение: {AppManager.stg.log_check_depth} заказов (папок)')
+            value_lbl.configure(text=f'Текущее значение: {AppManager.stg.log_check_depth} заказов (папок)')
 
-        frame = LabeledFrame(master=self, text='Глубина проверки лога')
-        label = ttk.Label(master=frame.container)
+        header = ctk.CTkFrame(master=self)
+        header.pack(fill='x', expand=1)
+        ctk.CTkLabel(master=header, text='Глубина проверки лога').pack(anchor='nw', padx=25)
+        value_lbl = ctk.CTkLabel(master=self)
+        value_lbl.pack(anchor='nw', padx=5)
         update_label()
-        entry_var = tk.StringVar(master=self)
-        entry = ttk.Entry(master=frame.container, textvariable=entry_var, width=26)
+        frame = ctk.CTkFrame(master=self, fg_color='transparent')
+        frame.pack(fill='x', expand=1)
+        entry_var = ctk.StringVar(master=self)
+        entry = ctk.CTkEntry(master=frame, textvariable=entry_var)
         entry.bind('<Return>', get_entry_value)
-        btn = MyButton(master=frame.container, text='Задать', command=get_entry_value)
-        info = ttk.Label(master=frame.container, text='\n'.join(msg))
-        label.pack(side='top', anchor='nw')
-        info.pack(side='bottom', anchor='nw')
-        entry.pack(side='left', padx=(1, 4), pady=3)
-        btn.pack(side='right', expand=1, fill='x', padx=(0, 1))
-        frame.pack(fill='x')
-
-    def show_mode_widgets(self) -> None:
-        """Сборная ф-я для отрисовки виджетов управления режимов работы программы"""
-        def select_cb(var_name: str) -> None:
-            setattr(AppManager.stg, var_name, self.__dict__[var_name].get())
-
-        frame = LabeledFrame(master=self, text='Режимы работы программы')
-        frame.pack(fill='x')
-        self.__dict__['autolog'] = tk.IntVar(master=self, value=AppManager.stg.autolog)
-        chbtn1 = ttk.Checkbutton(master=frame.container, text='Автоматическое слежение за заказами',
-                                 variable=self.__dict__['autolog'], command=lambda: select_cb('autolog'))
-        chbtn1.pack(anchor='nw')
+        entry.pack(side='left', padx=5, fill='x', expand=1)
+        btn = ctk.CTkButton(master=frame, text='Задать', command=get_entry_value)
+        btn.pack(side='right', expand=1, fill='x', padx=(0, 5))
+        ctk.CTkLabel(master=self, text='\n'.join(msg)).pack(anchor='nw', padx=5)
 
     def show_directory_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
-        frame = LabeledFrame(master=self, text='Рабочие директории')
-        frame.pack()
-        self.show_directory_frame(frame.container, 'bottom', 'Диск операторов фотопечати \'Т\'', 't_disc', (1, 2))
-        self.show_directory_frame(frame.container, 'left', 'Диск загрузки заказов \'Z\'', 'z_disc', (1, 1))
-        self.show_directory_frame(frame.container, 'right', 'Диск печати заказов \'О\'', 'o_disc', (2, 1))
+        header = ctk.CTkFrame(master=self)
+        header.pack(fill='x', expand=1)
+        ctk.CTkLabel(master=header, text='Рабочие директории').pack(anchor='nw', padx=25)
+        self.show_directory_frame('Диск операторов фотопечати \'Т\'', 't_disc')
+        self.show_directory_frame('Диск загрузки заказов \'Z\'', 'z_disc')
+        self.show_directory_frame('Диск печати заказов \'О\'', 'o_disc')
 
-    def show_directory_frame(self, container: ttk.Frame, side: Literal['left', 'right', 'top', 'bottom'], 
-                             text: str, stg_attr: str, btn_pdx: tuple[int, int]) -> None:
+    def show_directory_frame(self, text: str, stg_attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
         def update_dir() -> None:
             path = tkfd.askdirectory(parent=self, initialdir=getattr(AppManager.stg, stg_attr), title=f'Выберите: {text}')
             if path:
                 setattr(AppManager.stg, stg_attr, path)
-                btn.config(text=getattr(AppManager.stg, stg_attr))
-
-        top_frame = ttk.Frame(master=container)
-        top_frame.pack(side=side, anchor='nw')
-        ttk.Label(master=top_frame, text=text).pack(anchor='nw')
-        btn = MyButton(master=top_frame, width=22, text=getattr(AppManager.stg, stg_attr), command=update_dir)
-        btn.pack(anchor='nw', padx=btn_pdx, pady=(0, 1))
+                btn.configure(text=getattr(AppManager.stg, stg_attr))
+        
+        ctk.CTkLabel(master=self, text=text).pack(anchor='nw', padx=5)
+        btn = ctk.CTkButton(master=self, text=getattr(AppManager.stg, stg_attr), command=update_dir)
+        btn.pack(fill='x', expand=1, padx=5)

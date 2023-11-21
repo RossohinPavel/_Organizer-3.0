@@ -1,8 +1,8 @@
 from typing import Callable, Any, Iterator, Literal
-from ...._appmanager import AppManager
-from ..._source import *
-from ....library.properties import Properties
-from ....library.library import Product
+from appmanager import AppManager
+from gui._source import *
+from library.properties import Properties
+from library.library import Product
 
 
 class AssistWindow(ChildWindow):

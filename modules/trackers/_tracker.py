@@ -1,7 +1,7 @@
 from threading import Thread
 from time import sleep as tsleep, time as ttime
 from typing import Any, Callable, Type, NoReturn
-from .._appmanager import AppManager
+from appmanager import AppManager
 
 
 class Tracker:

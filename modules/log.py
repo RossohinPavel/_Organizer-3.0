@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from ._safe_connect import SafeConnect
+from safe_connect import SafeConnect
 
 
 class Photo(NamedTuple):

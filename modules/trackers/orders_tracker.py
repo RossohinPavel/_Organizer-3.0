@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from ._tracker import Tracker
-from ..grabbers import orders_grabber_iterator
-from ..proxies.orders_tracker import *
+from grabbers import orders_grabber_iterator
+from proxies.orders_tracker import *
 
 
 class OrdersTracker(Tracker):

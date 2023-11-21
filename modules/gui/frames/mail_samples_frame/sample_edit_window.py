@@ -1,6 +1,6 @@
-from ..._source import *
+from gui._source import *
 from typing import Sequence
-from ....mail_samples import MailSamples
+from mail_samples import MailSamples
 
 
 class SampleEditWindow(ChildWindow):

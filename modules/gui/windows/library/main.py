@@ -1,6 +1,6 @@
 from typing import Callable, Literal, Any
 from ..._source import *
-from ...._appmanager import AppManager
+from appmanager import AppManager
 from .assist import AssistWindow
 
 
