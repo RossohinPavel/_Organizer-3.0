@@ -2,29 +2,29 @@ from typing import Self
 from .._source import *
 
 
-# class FileBar:
-#     """Интерфейс для управления лейблом и прогрессбаром"""
-#     __slots__ = ('_lbl', '_pb')
+class FileBar:
+    """Интерфейс для управления лейблом и прогрессбаром"""
+    __slots__ = ('_lbl', '_pb')
 
-#     def __init__(self, master: tk.Misc | None) -> None:
-#         self._lbl = ttk.Label(master, width=49)
-#         self._pb = ttk.Progressbar(master, orient='horizontal')
+    def __init__(self, master: ctk.CTkFrame) -> None:
+        self._lbl = ctk.CTkLabel(master, width=25)
+        self._pb = ctk.CTkProgressBar(master, height=15, border_width=1)
     
-#     def reset(self) -> None:
-#         """Сбрасывает состояние Label и Progressbar до стартовых значений"""
-#         self._lbl.config(text='__Имя файла__')
-#         self._pb['value'] = 0
-#         self._pb['maximum'] = 0
+    def reset(self) -> None:
+        """Сбрасывает состояние Label и Progressbar до стартовых значений"""
+        self._lbl.configure(text='__Имя файла__')
+        self._pb['value'] = 0
+        self._pb['maximum'] = 0
 
-#     def pack(self, *args, **kwargs) -> None:
-#         """Размещение по алгоритму метода pack виджетов ttk.Label и ttk.Progressbar"""
-#         self._lbl.pack(*args, **kwargs)
-#         self._pb.pack(*args, **kwargs)
+    def pack(self) -> None:
+        """Размещение по алгоритму метода pack виджетов ttk.Label и ttk.Progressbar"""
+        self._lbl.pack(anchor='nw', padx=5)
+        self._pb.pack(anchor='nw', padx=5, pady=5, fill='x', expand=1)
     
-#     def pack_forget(self) -> None:
-#         """Затирание виджетов"""
-#         self._lbl.pack_forget()
-#         self._pb.pack_forget()
+    def pack_forget(self) -> None:
+        """Затирание виджетов"""
+        self._lbl.pack_forget()
+        self._pb.pack_forget()
     
 #     @property
 #     def maximum(self) -> float:
@@ -46,22 +46,22 @@ from .._source import *
 #         return self
 
 
-class ProcessingFrame(ctk.CTkFrame):
+class ProcessingFrame:
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""  
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, frame: ctk.CTkFrame):
         # Отрисовка лейбла очереди
-        self.header = ctk.StringVar(master=self)
-        self._header_label = ctk.CTkLabel(master=self.container, textvariable=self.header, width=49)
-        self.operation = tk.StringVar(master=self.container)
-        self._operation_label = ttk.Label(master=self.container, textvariable=self.operation, width=49)
-        self.filebar = FileBar(master=self.container)
+        self.header = ctk.StringVar(master=frame)
+        self._header_label = ctk.CTkLabel(master=frame, textvariable=self.header, width=25)
+        self.operation = ctk.StringVar(master=frame)
+        self._operation_label = ctk.CTkLabel(master=frame, textvariable=self.header, width=25)
+        self.filebar = FileBar(master=frame)
+        self.__exit__()
 
     def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
-        self._header_label.pack(expand=1, fill='x')
-        self._operation_label.pack(expand=1, fill='x')
-        self.filebar.pack(expand=1, fill='x')
+        self._header_label.pack(padx=5, anchor='nw')
+        self._operation_label.pack(padx=5, anchor='nw')
+        self.filebar.pack()
 
     def __exit__(self, *args) -> None:
         """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""

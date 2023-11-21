@@ -1,4 +1,4 @@
-# from .control_frame import ControlFrame
+from .control_frame import control_frame
 # from .mail_samples_frame import MailSamplesFrame
 # from .planer_frame import PlanerFrame
 # from .stickergen_frame import StickGenFrame
