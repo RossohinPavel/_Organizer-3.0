@@ -1,38 +1,48 @@
-import timeit
-import sys
+from typing import Any, Self, Type, Callable
+
+
+class IDescriptor:
+    """Дескриптор для хранения значений переменных, и вызова добавленных функций"""
+    __slots__ = '_value', '_callbacks'
+
+    def __init__(self) -> None:
+        self._value: Any = None
+        self._callbacks = ()
+
+    def __set__(self, instance, value: Any) -> None:
+        """Присвоенное значение будет передано в каждую ф-ю из спискка _callbacks"""
+        self._value = value
+        for call in self._callbacks:
+            call(value)
+
+    def __get__(self, instance, instance_class):
+        return self._value
+    
+    def add_callback(self, callable: Type[Callable[[Any, Any], Any]]) -> None:
+        """Добавляет функцию в список вызовов"""
+        self._callbacks += (callable, )
 
 
 class Test:
-    def __init__(self, name) -> None:
-        self.name = name
+    def some_func(self, value):
+        print(self, value)
 
-    def __hash__(self) -> int:
-        return hash(self.name)
 
-    def __eq__(self, __value: object) -> bool:
-        if isinstance(__value, Test):
-            __value = __value.name
-        return self.name == __value
-    
+class Test1:
+    def some_func(self, value):
+        print(self, value)
 
-test_lst = [Test(f'test{i}') for i in range(1000)]
 
-def test_list():
-    if 'test' not in test_lst:
-        test_lst.append(Test('test'))
-    if 'test1' not in test_lst:
-        test_lst.append(Test('test'))
+class Storage:
+    attr = IDescriptor()
+    attr.add_callback(Test.some_func)
+    attr.add_callback(Test1.some_func)
 
-print(timeit.timeit(test_list, number=1000))
-print(sys.getsizeof(test_lst) + sum(sys.getsizeof(x) for x in test_lst))
 
-test_st = {Test(f'test{i}' for i in range(1000))}
+t1 = Test()
+t2 = Test1()
 
-def test_set():
-    if 'test' not in test_lst:
-        test_st.add(Test('test'))
-    if 'test1' not in test_lst:
-        test_lst.append(Test('test'))
+s = Storage()
+s.attr = True
 
-print(timeit.timeit(test_set, number=1000))
-print(sys.getsizeof(test_st) + sum(sys.getsizeof(x) for x in test_st))
+print(s.attr)
