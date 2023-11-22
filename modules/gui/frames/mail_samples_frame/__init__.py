@@ -1,1 +1,1 @@
-from .mail_samples_frame import MailSamplesFrame
+from .mail_samples_frame import mail_samples_frame

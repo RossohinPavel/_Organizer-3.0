@@ -3,14 +3,17 @@ from os.path import isdir
 from shutil import rmtree
 
 
-def recursive_deleting(path: str) -> None:
-    for cat in listdir(path):
-        if cat == '__pycache__':
-            rmtree(f'{path}/__pycache__')
-        else:
-            if isdir(path + '/' + cat):
-                recursive_deleting(path + '/' + cat)
-
+def recursive_deleting() -> None:
+    def inner(path: str):
+        for cat in listdir(path):
+            if cat == '__pycache__':
+                rmtree(f'{path}/__pycache__')
+            else:
+                if isdir(path + '/' + cat):
+                    inner(path + '/' + cat)
+    inner('../../_assist')
+    inner('../../data')
+    inner('../../modules')
 
 if __name__ == '__main__':
-    recursive_deleting('../..')
+    recursive_deleting()

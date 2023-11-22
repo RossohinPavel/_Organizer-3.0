@@ -1,12 +1,6 @@
-import customtkinter as ctk
-import tkinter
-from tkinter import messagebox as tkmb
-from tkinter import filedialog as tkfd
-from typing import NamedTuple, Self, Any, Optional, Union, Tuple
+import ttkbootstrap as tb
+from typing import Callable, NamedTuple, Any
 from appmanager import AppManager
-
-
-ctk.set_appearance_mode('dark')
 
 
 class Geometry(NamedTuple):    
@@ -14,38 +8,38 @@ class Geometry(NamedTuple):
     lin: str
 
 
-class ChildWindow(ctk.CTkToplevel):
-    """Конструктор для дочерних окон"""
-    win_geometry: Geometry = Geometry('100x100', '100x100')
-    win_title = None
+# class ChildWindow(ctk.CTkToplevel):
+#     """Конструктор для дочерних окон"""
+#     win_geometry: Geometry = Geometry('100x100', '100x100')
+#     win_title = None
 
-    def __new__(cls, *args, **kwargs) -> Self:
-        if cls.win_title is None:       
-            cls.win_title = cls.__name__    # Задаем имя окна от класса, на основе которого оно создается.
-        return super().__new__(cls)
+#     def __new__(cls, *args, **kwargs) -> Self:
+#         if cls.win_title is None:       
+#             cls.win_title = cls.__name__    # Задаем имя окна от класса, на основе которого оно создается.
+#         return super().__new__(cls)
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.title(self.win_title)
-        self.bind('<Escape>', lambda x: self.destroy())
-        self.set_geometry()             # Устанавливаем геометрию окна до основной отрисовки   
-        self.main(*args, **kwargs)   
-        self.wait_visibility()
-        self.focus_set()
-        self.grab_set()
+#     def __init__(self, *args, **kwargs) -> None:
+#         super().__init__(*args, **kwargs)
+#         self.title(self.win_title)
+#         self.bind('<Escape>', lambda x: self.destroy())
+#         self.set_geometry()             # Устанавливаем геометрию окна до основной отрисовки   
+#         self.main(*args, **kwargs)   
+#         self.wait_visibility()
+#         self.focus_set()
+#         self.grab_set()
         
-    def main(self, *args, **kwargs) -> None:
-        """Абстрактная ф-я для сборки других ф-й. Запускается в момент инициализации объекта.
-        В основном, служит для сборки ф-й отрисовки дочерних виджетов."""
-        pass
+#     def main(self, *args, **kwargs) -> None:
+#         """Абстрактная ф-я для сборки других ф-й. Запускается в момент инициализации объекта.
+#         В основном, служит для сборки ф-й отрисовки дочерних виджетов."""
+#         pass
 
-    def set_geometry(self) -> None:
-        """Установка размеров окна и центрирование его относительно центрального"""
-        width, height = map(int, getattr(self.win_geometry, AppManager.SYSTEM).split('x'))
-        place_x = ((self.master.winfo_width() - width) // 2) + self.master.winfo_x()
-        place_y = ((self.master.winfo_height() - height) // 2) + self.master.winfo_y()
-        self.geometry(f"{width}x{height}+{place_x}+{place_y}")
-        self.resizable(False, False)
+#     def set_geometry(self) -> None:
+#         """Установка размеров окна и центрирование его относительно центрального"""
+#         width, height = map(int, getattr(self.win_geometry, AppManager.SYSTEM).split('x'))
+#         place_x = ((self.master.winfo_width() - width) // 2) + self.master.winfo_x()
+#         place_y = ((self.master.winfo_height() - height) // 2) + self.master.winfo_y()
+#         self.geometry(f"{width}x{height}+{place_x}+{place_y}")
+#         self.resizable(False, False)
 
 
 # class TipWindow(tk.Toplevel):
