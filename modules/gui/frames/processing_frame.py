@@ -1,73 +1,25 @@
-from typing import Self
 from .._source import *
-
-
-class FileBar:
-    """Интерфейс для управления лейблом и прогрессбаром"""
-    __slots__ = ('_lbl', '_pb')
-
-    def __init__(self, master: ctk.CTkFrame) -> None:
-        self._lbl = ctk.CTkLabel(master, width=330, anchor='w')
-        self._pb = ctk.CTkProgressBar(master, height=15, border_width=1)
-    
-    def reset(self) -> None:
-        """Сбрасывает состояние Label и Progressbar до стартовых значений"""
-        self._lbl.configure(text='__Имя файла__')
-        self._pb['value'] = 0
-        self._pb['maximum'] = 0
-
-    def pack(self) -> None:
-        """Размещение по алгоритму метода pack виджетов ttk.Label и ttk.Progressbar"""
-        self._lbl.pack(anchor='nw', padx=5)
-        self._pb.pack(anchor='nw', pady=5, padx=5, fill='x', expand=1)
-    
-    def pack_forget(self) -> None:
-        """Затирание виджетов"""
-        self._lbl.pack_forget()
-        self._pb.pack_forget()
-    
-    @property
-    def maximum(self) -> float:
-        """Получение значения maximum Progressbar'а"""
-        return self._pb['maximum']
-    
-    @maximum.setter
-    def maximum(self, value: int | float) -> None:
-        """Установка значения maximum Progressbar'а"""
-        self._pb['maximum'] = value
-    
-    def set(self, string: str = '') -> None:
-        """Установка строкового значения в виджет текста"""
-        self._lbl.config(text=f'{int(self._pb['value']) + 1}/{self._pb['maximum']} -- {string}')
-    
-    def __iadd__(self, num: int | float) -> Self:
-        """Увеличиваем значение Progressbar'а через составное присваивание"""
-        self._pb['value'] += num
-        return self
 
 
 class ProcessingFrame:
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""  
-    def __init__(self, frame: ctk.CTkFrame):
+    def __init__(self, frame: tb.Labelframe):
         # Отрисовка лейбла очереди
-        self.header = ctk.StringVar(master=frame)
-        self._header_label = ctk.CTkLabel(master=frame, textvariable=self.header, width=330, anchor='w')
-        self.operation = ctk.StringVar(master=frame)
-        self._operation_label = ctk.CTkLabel(master=frame, textvariable=self.operation, width=330, anchor='w')
-        self.filebar = FileBar(master=frame)
+        self.header = tb.StringVar(master=frame)
+        self._header_label = tb.Label(master=frame, textvariable=self.header, anchor='w', width=22, background='red')
+        self.operation = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name', style='dark')
+        self.file = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name')
         self.__exit__()
 
     def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
-        self._header_label.pack(anchor='nw', padx=5)
-        self._operation_label.pack(anchor='nw', padx=5)
-        self.filebar.pack()
+        self._header_label.pack()
+        self.operation.pack()
+        self.file.pack()
 
     def __exit__(self, *args) -> None:
         """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""
-        self.header.set('__Исполняемый модуль / Название Задачи__')
-        self.operation.set('__Название операции__')
-        self.filebar.reset()
+        self.header.set('__Имодуль__')
         self._header_label.pack_forget()
-        self._operation_label.pack_forget()
-        self.filebar.pack_forget()
+        self.operation.pack_forget()
+        self.file.pack_forget()

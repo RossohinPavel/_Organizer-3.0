@@ -1,15 +1,6 @@
-import customtkinter as tk
+def test_func(pos_arg, name_arg='test', **kwargs):
+    print(test_func.__type_params__)
+    print(kwargs)
 
 
-root = tk.CTk()
-
-frame = tk.CTkScrollableFrame(master=root)
-frame.pack()
-
-
-for i in range(20):
-    tk.CTkButton(master=frame, text=f'tesx{i}').pack()
-
-
-
-root.mainloop()
+t = test_func(1, 'name', test='test')
