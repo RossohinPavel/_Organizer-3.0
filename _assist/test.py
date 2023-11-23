@@ -1,19 +1,40 @@
-import ttkbootstrap as ttk
-from ttkbootstrap.dialogs import Querybox
+import ttkbootstrap as tb
+
 
  
-root = ttk.Window()
-root.title("METANIT.COM")
+root = tb.Window()
 root.geometry("250x200") 
 
-def func():
-    t = Querybox.get_string()
+var = tb.StringVar(root)
+
+t = tb.Menubutton(root, text='test')
+t.pack()
+
+im = tb.Menu(t)
+
+
+im.add_command(label='test')
+t['menu'] = im
+
+def func(*args):
+    global im
+    print('sss')
+    im.destroy()
+
+
+def func1(*args):
+    global im
+    print('33')
+    im = tb.Menu(t)
+    im.add_command(label='test')
+    t['menu'] = im
+    t.event_generate('<<Invoke>>')
 
 
 
-test = ttk.Button(root, text='test', command=func)
+t.bind('<ButtonPress-1>', func)
+t.bind('<ButtonPress-3>', func1)
 
-test.pack()
 
 
 root.mainloop()
