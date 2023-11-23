@@ -1,6 +1,19 @@
-def test_func(pos_arg, name_arg='test', **kwargs):
-    print(test_func.__type_params__)
-    print(kwargs)
+import ttkbootstrap as ttk
+from ttkbootstrap.dialogs import Querybox
+
+ 
+root = ttk.Window()
+root.title("METANIT.COM")
+root.geometry("250x200") 
+
+def func():
+    t = Querybox.get_string()
 
 
-t = test_func(1, 'name', test='test')
+
+test = ttk.Button(root, text='test', command=func)
+
+test.pack()
+
+
+root.mainloop()

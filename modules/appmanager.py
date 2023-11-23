@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from log import Log
     from gui.main import MainWindow
     from gui.frames import ProcessingFrame
-    from customtkinter import StringVar, IntVar
+    from ttkbootstrap import StringVar, IntVar
     from task_manager import TaskManager
     from trackers.orders_tracker import OrdersTracker
     from settings import Settings

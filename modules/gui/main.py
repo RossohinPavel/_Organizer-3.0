@@ -13,10 +13,14 @@ class MainWindow(tb.Window):
 
     def __init__(self) -> None:
         super().__init__(title='Органайзер 3.1.0 PRE ALPHA')
+        # Используем инициализатор стилей после того, как отработал __init__
+        style_init()
+        # Отрисовываем остальные виджеты
         self.set_main_graph_settings()
         self.show_header_frames()
         self.show_processing_column()
         self.show_common_line()
+        
     
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""
@@ -67,7 +71,7 @@ class MainWindow(tb.Window):
         menu = tb.Menu(container)
         for name in style.theme_names():
             menu.add_radiobutton(label=name)
-        btn = tb.Menubutton(container, text='Темы', style="dark-outline", menu=menu)
+        btn = tb.Menubutton(container, text='Темы', style='mini.dark.Outline.TMenubutton', menu=menu)
         btn.pack(side='right')
     
     def show_processing_column(self) -> None:
@@ -128,13 +132,9 @@ class MainWindow(tb.Window):
         tab = tb.Notebook(master=self)
         tab.pack(padx=(0, 5), pady=(8, 5), side='right', anchor='n', fill='y')
         tab1 = tb.Frame(tab)
-        tab2 = tb.Frame(tab)
-        tab3 = tb.Frame(tab)
-
-        lbl = tb.Label(tab1, text='test')
-        lbl.pack()
+        tab2 = tb.Label(tab, text='test', background='red')
 
         tab.add(tab1, text='Информация')
-        tab.add(tab2, text='Планировщик')
-        tab.add(tab3, text='Общение')
+        tab.add(tab2, text='Планировщик', padding=5)
+        tab.add(frames.MailSamplesFrame(tab).container, text='Общение', padding=5)
         tab.add(frames.ControlFrame(tab), text='Управление')

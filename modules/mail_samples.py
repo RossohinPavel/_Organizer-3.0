@@ -7,19 +7,19 @@ class MailSamples:
     def __init__(self) -> None:
         self.__s_con = SafeConnect('app.db')
 
-    def get_headers(self) -> list[str]: #type: ignore
+    def get_headers(self) -> list[tuple[int, str, str]]: #type: ignore
         """Получение заголовков текстовых шаблонов"""
         with self.__s_con as sc:
             sc.cursor.execute('SELECT id, tag, name FROM Samples')
-            return sorted(sc.cursor.fetchall(), key=lambda x: x[1])
+            return sorted(sc.cursor.fetchall(), key=lambda x: (x[1], x[2]))
 
-    def get_sample(self, sample_id: int) -> str: #type: ignore
-        """Получение текста шаблоне"""
+    def get(self, sample_id: int) -> tuple[str, str, str]: #type: ignore
+        """Получение тага, названия и текста шаблона"""
         with self.__s_con as sc:
-            sc.cursor.execute('SELECT data FROM Samples WHERE id=?', (sample_id, ))
-            return sc.cursor.fetchone()[0]
+            sc.cursor.execute('SELECT tag, name, data FROM Samples WHERE id=?', (sample_id, ))
+            return sc.cursor.fetchone()
 
-    def del_sample(self, sample_id: int) -> None: 
+    def delete(self, sample_id: int) -> None: 
         """Удаление шаблона из хранилища"""
         with self.__s_con as sc:
             sc.cursor.execute('DELETE FROM Samples WHERE id=?', (sample_id, ))
