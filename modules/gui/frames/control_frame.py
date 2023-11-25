@@ -12,7 +12,6 @@ class ControlFrame(tb.Frame):
         container = tb.Frame(self)
         container.pack(fill='both', expand=1)
         tb.Label(container, text='Спасибо').pack(expand=1, side='left')
-        tb.Frame(container, width=1, height=410).pack(side='right')
     
     def print_geometry(self):
         print(self.master.master.winfo_geometry())

@@ -27,6 +27,7 @@ class SampleButton(tb.OptionMenu):
         self.bind('<ButtonPress-3>', lambda _: self.init_sample())
 
     def init(self, value: str | tb.StringVar) -> None:
+        """Обработка нажатия в меню"""
         match value:
             case self._c_init: self.init_sample()
             case self._c_change: pass

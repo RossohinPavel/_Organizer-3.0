@@ -4,9 +4,10 @@ from . import frames
 
 
 class MainWindow(tb.Window):
-    WIN_GEOMETRY = Side(444, 414)
-    LIN_GEOMETRY = Side(548, 533)
+    WIN_GEOMETRY = Geometry(527, 511)
+    LIN_GEOMETRY = Geometry(548, 533)
 
+    # Определяем тип ОС
     match AppManager.SYSTEM:
         case 'win': _geometry = WIN_GEOMETRY
         case 'lin' | _: _geometry = LIN_GEOMETRY
@@ -54,6 +55,7 @@ class MainWindow(tb.Window):
     #     self.update_idletasks()
 
     def show_header_frames(self) -> None:
+        """Отрисовка фрейма - заголовка окна"""
         container = tb.Frame(master=self, padding=(5, 6, 5, 0))
         container.pack(fill='x')
         self.show_log_tracker_widgets(container)
@@ -67,6 +69,7 @@ class MainWindow(tb.Window):
         # # AppManager.txtvars.ot = orders_trk
 
     def show_theme_switcher(self, container: tb.Frame):
+        """Отрисовка свитчера тем"""
         style = tb.Style()
         menu = tb.Menu(container)
         for name in style.theme_names():
@@ -102,6 +105,7 @@ class MainWindow(tb.Window):
     def show_add_btn_menu(self, container: tb.Labelframe) -> None:
         """Отрисовка меню под кнопкой Дополнительно"""
         def init(value) -> None:
+            """Обработка выбора в меню"""
             match value:
                 case 'Обновить БД': pass
                 case 'Направляющие': pass
@@ -113,6 +117,7 @@ class MainWindow(tb.Window):
             variable.set('Дополнительно')
         
         def event(event=None) -> None:
+            """Ф-я хоткея"""
             menu.event_generate('<ButtonPress-1>')
             menu.event_generate('<ButtonRelease-1>')
 

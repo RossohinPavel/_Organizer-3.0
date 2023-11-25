@@ -5,25 +5,26 @@ from typing import Callable, NamedTuple, Any, Mapping, Type
 from appmanager import AppManager
 
 
-class Side(NamedTuple):
+class Geometry(NamedTuple):
+    """Для описании геометрии окон, фреймов и т.д."""
     width: int
     height: int
 
 
 class ChildWindow(tb.Toplevel):
     """Конструктор для дочерних окон"""
-    WIN_GEOMETRY = Side(100, 100)
-    LIN_GEOMETRY = Side(100, 100)
+    WIN_GEOMETRY = Geometry(100, 100)
+    LIN_GEOMETRY = Geometry(100, 100)
 
-    # 
+    # Размечаем окно согласно выбранной ОС
     match AppManager.SYSTEM:
         case 'win': _geometry = WIN_GEOMETRY
         case 'lin' | _: _geometry = LIN_GEOMETRY
 
-    #
+    # Переменная для хранения имени окна
     win_title = None
 
-    #
+    # Список обязательных атирбутов для инициализации tb.Toplevel
     __TK_KWARGS = ('title', 
                    'iconphoto', 
                    'size', 
@@ -40,6 +41,7 @@ class ChildWindow(tb.Toplevel):
     
     def __init__(self, master: tkinter.Misc, /, **kwargs: Mapping[str, Any]) -> None:
         title = self.win_title if self.win_title else self.__class__.__name__
+        # Фильтруем атрибуты, чтобы лишние не были переданы в инициализатор окна
         my_kwargs = {x: y for x, y in kwargs.items() if x not in self.__TK_KWARGS}
         super().__init__(master=master, title=title, **kwargs)   #type: ignore
         self.bind('<Escape>', lambda _: self.destroy())
@@ -65,7 +67,8 @@ class ChildWindow(tb.Toplevel):
 
 
 def style_init():
+    """Ф-я для инициализации общих используемых стилей. Вызывается после инициализации основного объекта ttkbootstrap."""
     style = tb.Style()
-    style.configure('mini.Outline.TMenubutton', padding=(5, 0, 0, 0))
-    style.configure('mini.dark.Outline.TMenubutton', padding=(5, 0, 0, 0))
+    style.configure('mini.Outline.TMenubutton', padding=(5, 1, 0, 1))
+    style.configure('mini.dark.Outline.TMenubutton', padding=(5, 1, 0, 1))
     style.configure('db.TFrame', background='red')

@@ -6,14 +6,14 @@ class ProcessingFrame:
     def __init__(self, frame: tb.Labelframe):
         # Отрисовка лейбла очереди
         self.header = tb.StringVar(master=frame)
-        self._header_label = tb.Label(master=frame, textvariable=self.header, anchor='w', width=22, background='red')
+        self._header_label = tb.Label(master=frame, textvariable=self.header, anchor='w', width=22)
         self.operation = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name', style='dark')
         self.file = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name')
         self.__exit__()
 
     def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
-        self._header_label.pack()
+        self._header_label.pack(pady=(0, 2))
         self.operation.pack()
         self.file.pack()
 
