@@ -1,8 +1,11 @@
 import tkinter
 import ttkbootstrap as tb
 from tkinter import messagebox as tkmb
+from tkinter import filedialog as tkfd
 from typing import Callable, NamedTuple, Any, Mapping, Type, Literal
 from appmanager import AppManager
+
+
 
 
 class Geometry(NamedTuple):
@@ -74,12 +77,6 @@ def style_init():
     """Ф-я для инициализации общих используемых стилей. Вызывается после инициализации основного объекта ttkbootstrap."""
     style = tb.Style()
     # Стиль миникнопок - менюшек
-    style.configure(
-        'mini.Outline.TMenubutton', 
-        padding=(5, 1, 0, 1),
-        )
+    style.configure('mini.Outline.TMenubutton', padding=(5, 1, 0, 1),)
     # Отладочный стиль для Frame
-    style.configure(
-        'db.TFrame', 
-        background='red'
-        )
+    style.configure('db.TFrame', background='red')

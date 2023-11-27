@@ -61,11 +61,13 @@ match os.name:
 # AppManager.lib = Library()
 # from log import Log
 # AppManager.log = Log()
-from gui.main import MainWindow
-AppManager.mw = MainWindow()
 # from task_manager import TaskManager
 # AppManager.tm = TaskManager()
 # from trackers.orders_tracker import OrdersTracker
 # AppManager.ot = OrdersTracker()
 from settings import Settings
-AppManager.stg = Settings()     # Самый последний инициализируемый модуль
+AppManager.stg = Settings()     
+from gui.main import MainWindow
+AppManager.mw = MainWindow()    # Самый последний инициализируемый модуль
+
+

@@ -1,24 +1,72 @@
 from .._source import *
-from ..windows import *
 
 
 class ControlFrame(tb.Frame):
+    """Фрейм основных настроек приложения"""
     def __init__(self, master: Any):
-        super().__init__(master, padding=(5, 5, 4, 5))
-        self.show_greetings_lbl()
+        super().__init__(master)
+        self.show_log_check_depth_widgets()
+        self.show_directory_widgets()
         self.show_buttons()
 
-    def show_greetings_lbl(self):
-        container = tb.Frame(self)
-        container.pack(fill='both', expand=1)
-        tb.Label(container, text='Спасибо').pack(expand=1, side='left')
+    def show_log_check_depth_widgets(self) -> None:
+        """Отрисовка виджетов для настройки глубины проверки лога"""
+        msg = ('Рекомендуемая глубина ~ 100 заказов.', 'Ограничено свободным объемом ОЗУ.')
+
+        def get_entry_value(event: tkinter.Event | None = None) -> None:
+            """Получение информации из entry виджета и сохранение их в настроки"""
+            value = entry_var.get()
+            if value.isdigit():
+                AppManager.stg.log_check_depth = int(value)
+                update_label()
+            entry.delete(0, 'end')
+
+        def update_label() -> None:
+            """Обновление информации на лейбле"""
+            value_lbl.configure(text=f'Текущее значение: {AppManager.stg.log_check_depth} заказов (папок)')
+        
+        log_frm = tb.LabelFrame(self, text='Глубина проверки лога')
+        log_frm.pack(fill='both', padx=5)
+        value_lbl = tb.Label(log_frm)
+        value_lbl.pack(anchor='nw', padx=5)
+        update_label()
+        entry_var = tb.StringVar(master=log_frm)
+        entry = tb.Entry(log_frm, textvariable=entry_var)
+        # Рисуем лейбл раньше с позицией bottom чтобы он правильно отобразился в фрейме
+        tb.Label(log_frm, text='\n'.join(msg)).pack(anchor='nw', padx=5, side='bottom')
+        # Виджеты со сторонами left и right рисуем после bottom
+        entry.bind('<Return>', get_entry_value)
+        entry.pack(side='left', padx=5, fill='x', expand=1)
+        btn = tb.Button(log_frm, text='Задать', command=get_entry_value)
+        btn.pack(side='right', expand=1, fill='x', padx=(0, 5))
     
-    def print_geometry(self):
-        print(self.master.master.winfo_geometry())
+    def show_directory_widgets(self) -> None:
+        """Сборная ф-я для отрисовки виджетов управления папками заказов"""
+        dir_frm = tb.LabelFrame(self, text='Рабочие директории')
+        dir_frm.pack(fill='both', padx=5)
+        self.show_directory_frame(dir_frm, 'Диск операторов фотопечати \'Т\'', 't_disc')
+        self.show_directory_frame(dir_frm, 'Диск загрузки заказов \'Z\'', 'z_disc')
+        self.show_directory_frame(dir_frm, 'Диск печати заказов \'О\'', 'o_disc')
+
+    def show_directory_frame(self, master: tb.LabelFrame, text: str, stg_attr: str) -> None:
+        """Отрисовка виджетов управления рабочими папками"""
+        def update_dir() -> None:
+            """Получение информации из файлового диалога"""
+            path = tkfd.askdirectory(parent=self, initialdir=getattr(AppManager.stg, stg_attr), title=f'Выберите: {text}')
+            if path:
+                setattr(AppManager.stg, stg_attr, path)
+                btn.configure(text=path)
+        
+        tb.Label(master, text=text).pack(anchor='nw', padx=5)
+        btn = tb.Button(master,text=getattr(AppManager.stg, stg_attr), width=24, command=update_dir)
+        btn.pack(fill='x', expand=1, padx=5, pady=(0, 5))
+    
+    def print_geometry(self): print(self.master.master.winfo_geometry())
 
     def show_buttons(self):
+        """Отрисовка кнопок управления"""
         container = tb.Frame(self)
-        container.pack(fill='x')
-        tb.Button(container, text='Библиотека', width=13).pack(side='left')
-        tb.Button(container, text='Настройки', width=13).pack(side='right', padx=(0, 1))
-        tb.Button(container, text='P_G', width=5, command=self.print_geometry).pack(side='right', padx=5)
+        container.pack(fill='both', padx=5, pady=5, expand=1)
+        tb.Button(container, text='P_G', width=5, command=self.print_geometry).pack(anchor='s', expand=1, pady=(0, 5))
+        tb.Button(container, text='Библиотека', width=13).pack(anchor='s')
+

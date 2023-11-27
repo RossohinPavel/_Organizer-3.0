@@ -13,7 +13,7 @@ class Settings:
     - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
     """
     __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir'
-    __scon = SafeConnect('app.db')  # Для удобства, вынесем эти атрибуты в атрибуты класса
+    __scon = SafeConnect('app.db')  
     __is_init = False
 
     def __init__(self) -> None:
