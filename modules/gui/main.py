@@ -5,7 +5,7 @@ from . import frames
 
 class MainWindow(tb.Window):
     WIN_GEOMETRY = Geometry(527, 511)
-    LIN_GEOMETRY = Geometry(548, 533)
+    LIN_GEOMETRY = Geometry(547, 527)
 
     # Определяем тип ОС
     match AppManager.SYSTEM:
@@ -21,7 +21,6 @@ class MainWindow(tb.Window):
         self.show_header_frames()
         self.show_processing_column()
         self.show_common_line()
-        
     
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""
@@ -74,7 +73,7 @@ class MainWindow(tb.Window):
         menu = tb.Menu(container)
         for name in style.theme_names():
             menu.add_radiobutton(label=name)
-        btn = tb.Menubutton(container, text='Темы', style='mini.dark.Outline.TMenubutton', menu=menu)
+        btn = tb.Menubutton(container, text='Темы', style='mini.Outline.TMenubutton', menu=menu, cursor='hand2')
         btn.pack(side='right')
     
     def show_processing_column(self) -> None:

@@ -6,6 +6,12 @@ class MailSamples:
 
     def __init__(self) -> None:
         self.__s_con = SafeConnect('app.db')
+    
+    def create(self, tag: str, name: str, text: str) -> None:
+        """Сохранение нового текстового шаблона в бд"""
+        with self.__s_con as sc:
+            sc.cursor.execute(f'INSERT INTO Samples (tag, name, data) VALUES (?, ?, ?)', (tag, name, text))
+            sc.connect.commit()
 
     def get_headers(self) -> list[tuple[int, str, str]]: #type: ignore
         """Получение заголовков текстовых шаблонов"""
@@ -24,13 +30,9 @@ class MailSamples:
         with self.__s_con as sc:
             sc.cursor.execute('DELETE FROM Samples WHERE id=?', (sample_id, ))
             sc.connect.commit()
-
-    def save(self, sample_id: int | None, tag: str, name: str, sample: str) -> None:
-        """Сохранение текстового шаблона в бд"""
+    
+    def update(self, sample_id: int, tag: str, name: str, text: str) -> None:
+        """Обновление текстового шаблона в бд"""
         with self.__s_con as sc:
-            values = (tag, name, sample, sample_id)
-            if sample_id is not None:
-                sc.cursor.execute(f'UPDATE Samples SET tag=?, name=?, data=? WHERE id=?', values)
-            else:
-                sc.cursor.execute(f'INSERT INTO Samples (tag, name, data) VALUES (?, ?, ?)', values[:-1])
+            sc.cursor.execute(f'UPDATE Samples SET tag=?, name=?, data=? WHERE id=?', (tag, name, text, sample_id))
             sc.connect.commit()

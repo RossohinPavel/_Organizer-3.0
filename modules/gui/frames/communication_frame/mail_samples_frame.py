@@ -1,60 +1,68 @@
 from gui._source import *
 from ttkbootstrap.scrolled import ScrolledFrame
 from mail_samples import MailSamples
-# from .init_sample_window import InitSampleWindow
-# from .sample_edit_window import SampleEditWindow
+from .init_sample_window import InitSampleWindow
+from .sample_edit_window import SampleEditWindow
 
 
 SAMPLES = MailSamples()
 
 
-class SampleButton(tb.OptionMenu):
+class SampleButton(tb.Menubutton):
     _c_init = 'Использовать'
     _c_change = 'Изменить'
     _c_del = 'Удалить'
     _c_view = 'Содержание'
 
     def __init__(self, root: Any, sample_frame: Any, sample_id: int, sample_name: str, /, **kwargs):
-        self.sample_frame = sample_frame
-        self.sample_id = sample_id
-        self.sample_name = sample_name
-        self.var = tb.StringVar(root)
         super().__init__(root, 
-                        self.var, 
-                        *(sample_name, self._c_init, self._c_change, self._c_del, self._c_view),
-                        **kwargs, style='mini.Outline.TMenubutton', 
-                        command=self.init)
-        self.bind('<ButtonPress-3>', lambda _: self.init_sample())
+                        cursor='hand2',
+                        text=sample_name,
+                        style='mini.Outline.TMenubutton',
+                        **kwargs
+                        )
+        self._sample_frame = sample_frame
+        self._menu = tb.Menu(self)
+        self.sample_id = sample_id
+        self.bind('<ButtonPress-1>', self.init_sample)
+        self.bind('<ButtonPress-3>', self.show_menu)
 
-    def init(self, value: str | tb.StringVar) -> None:
-        """Обработка нажатия в меню"""
-        match value:
-            case self._c_init: self.init_sample()
-            case self._c_change: pass
-            case self._c_del: self.del_sample()
-            case self._c_view: self.see_sample()
-        self.var.set(self.sample_name)
-    
-    def init_sample(self) -> None:
+    def init_sample(self, event: tkinter.Event | None = None) -> None:
         """Инициализация текстового шаблона"""
+        self._menu.destroy()
+        self['menu'] = ''
         tag, sample_name, text = SAMPLES.get(self.sample_id)
         sample_title = f'{tag} - {sample_name}'
         if '?%' not in text:
             self.clipboard_clear()
             self.clipboard_append(text)
-            Messagebox.show_info(parent=self, title=sample_title, message='Шаблон скопирован в буфер обмена')
+            tkmb.showinfo(title=sample_title, message='Шаблон скопирован в буфер обмена.')
         else:
-            InitSampleWindow(master=self.master.master.master, text=text, sample_title=sample_title) #type: ignore
+            InitSampleWindow(self._sample_frame, sample_title, text) #type: ignore
+    
+    def show_menu(self, event: tkinter.Event | None = None) -> None:
+        """Отрисовка меню"""
+        self['menu'] = self._menu = tb.Menu(self)
+        self._menu.add_command(label=self._c_init, command=self.init_sample)
+        self._menu.add_command(label=self._c_change, command=self.edit_sample)
+        self._menu.add_command(label=self._c_del, command=self.del_sample)
+        self._menu.add_command(label=self._c_view, command=self.see_sample)
+        self.event_generate('<<Invoke>>')
+    
+    def edit_sample(self) -> None:
+        """Замыкание для вызова окна редактирования/добавления шаблона"""
+        self.wait_window(SampleEditWindow(self.sample_id))
+        self._sample_frame.update_frame()
     
     def del_sample(self):
         """Удаление шаблона из хранилища"""
         SAMPLES.delete(self.sample_id)
-        self.sample_frame.update_frame()
+        self._sample_frame.update_frame()
 
     def see_sample(self):
         """Просмотр содержимого шаблона"""
         _, name, data = SAMPLES.get(self.sample_id)
-        Messagebox.show_info(parent=self.sample_frame.master, title=name, message=''.join(data))
+        tkmb.showinfo(parent=AppManager.mw, title=name, message=''.join(data))
 
 
 class MailSamplesFrame(ScrolledFrame):
@@ -74,12 +82,8 @@ class MailSamplesFrame(ScrolledFrame):
                 frame = tb.LabelFrame(self, text=tag)
                 frame.pack(fill='x', padx=(0, 18))
             SampleButton(frame, self, sid, name).pack(fill='x', padx=5, pady=(0, 5))
-
-    # def edit_sample(self, mode: str, func: Callable[[], tuple] | None) -> Callable[[], None]:
-    #     """Замыкание для вызова окна редактирования/добавления шаблона"""
-    #     if func is None:
-    #         func = lambda: (None, '#Таг', '#Демонстрационный шаблон', None) #type: ignore
-    #     def closure() -> None:
-    #         SampleEditWindow(master=self.master.master.master, mode=mode, sample_tpl=func(), update_func=self.update_listbox) #type: ignore
-    #     return closure
-
+        tb.Button(master=self, text='Добавить', command=self.add_sample).pack(pady=5)
+    
+    def add_sample(self) -> None:
+        self.wait_window(SampleEditWindow())
+        self.update_frame()
