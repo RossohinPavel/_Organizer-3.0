@@ -1,3 +1,4 @@
+from ttkbootstrap import Bootstyle
 from ._source import *
 from . import frames
 # from . import windows
@@ -28,6 +29,7 @@ class MainWindow(tb.Window):
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
+        self.iconphoto(True, tkinter.PhotoImage(data=AppManager.stg.app_ico))
         self.update_idletasks()
 
     @staticmethod
@@ -44,14 +46,6 @@ class MainWindow(tb.Window):
     #         if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
     #             return
     #     super().destroy()
-    
-    # def set_app_img(self, img_tuple: Sequence[tuple[str, bytes]]) -> None:
-    #     """Устанавливаем изображения, который будут использоваться в программе. Первое значение будет установлено как
-    #     иконка приложения - все последующие станут атрибутами MainWindow"""
-    #     self.iconphoto(True, tkinter.PhotoImage(data=img_tuple[0][1]))
-    #     for attr_name, byte in img_tuple[1:]:
-    #         setattr(self, attr_name, tkinter.PhotoImage(data=byte))
-    #     self.update_idletasks()
 
     def show_header_frames(self) -> None:
         """Отрисовка фрейма - заголовка окна"""
@@ -60,21 +54,43 @@ class MainWindow(tb.Window):
         self.show_log_tracker_widgets(container)
         self.show_theme_switcher(container)
     
-    def show_log_tracker_widgets(self, container: tb.Frame):
+    def show_log_tracker_widgets(self, container: tb.Frame) -> None:
         """Отрисовка статуса процесса выполнения лога"""
-        tb.Checkbutton(master=container, text='Трекер заказов: ', style='success-round-toggle').pack(side='left', padx=(3, 0))
-        # orders_trk = tb.StringVar(master=container, value='Выключен')
-        tb.Label(master=container, text='Выключен').pack(side='left')
-        # # AppManager.txtvars.ot = orders_trk
+        # Обработка нажатия на CheckButton
+        def init(): AppManager.stg.autolog = var.get()
 
-    def show_theme_switcher(self, container: tb.Frame):
+        var = tb.IntVar(self, AppManager.stg.autolog)
+        chbtn = tb.Checkbutton(
+            master=container, 
+            text='Трекер заказов: ', 
+            style='success-round-toggle', 
+            onvalue=1, 
+            offvalue=0,
+            variable=var,
+            command=init
+            )
+        chbtn.pack(side='left', padx=(3, 0))
+        orders_trk = tb.StringVar(master=container, value='Выключен')
+        tb.Label(master=container, textvariable=orders_trk).pack(side='left')
+        AppManager.txtvars.ot = orders_trk
+
+    def show_theme_switcher(self, container: tb.Frame) -> None:
         """Отрисовка свитчера тем"""
+        def switch_theme():
+            """Переключение темы по нажатию"""
+            theme = theme_var.get()
+            style.theme_use(theme)
+            AppManager.stg.theme = theme
+            style_init()
+
         style = tb.Style()
+        theme_var = tb.StringVar(self, value=AppManager.stg.theme)
         menu = tb.Menu(container)
         for name in style.theme_names():
-            menu.add_radiobutton(label=name)
+            menu.add_radiobutton(label=name, variable=theme_var, command=switch_theme)
         btn = tb.Menubutton(container, text='Темы', style='mini.Outline.TMenubutton', menu=menu, cursor='hand2')
         btn.pack(side='right')
+        switch_theme()
     
     def show_processing_column(self) -> None:
         """Отображение заголовка и фреймов файловой обработки"""

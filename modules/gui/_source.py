@@ -78,5 +78,8 @@ def style_init():
     style = tb.Style()
     # Стиль миникнопок - менюшек
     style.configure('mini.Outline.TMenubutton', padding=(5, 1, 0, 1),)
+    # Стиль - выравнивание надписи на кнопке по левому краю
+    style.configure('l_jf.TButton')
+    style.layout('l_jf.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
     # Отладочный стиль для Frame
     style.configure('db.TFrame', background='red')

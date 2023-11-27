@@ -58,8 +58,8 @@ class ControlFrame(tb.Frame):
                 btn.configure(text=path)
         
         tb.Label(master, text=text).pack(anchor='nw', padx=5)
-        btn = tb.Button(master,text=getattr(AppManager.stg, stg_attr), width=24, command=update_dir)
-        btn.pack(fill='x', expand=1, padx=5, pady=(0, 5))
+        btn = tb.Button(master,text=getattr(AppManager.stg, stg_attr), command=update_dir, style='l_jf.TButton')
+        btn.pack(fill='x', padx=5, pady=(0, 5))
     
     def print_geometry(self): print(self.master.master.winfo_geometry())
 
@@ -69,4 +69,3 @@ class ControlFrame(tb.Frame):
         container.pack(fill='both', padx=5, pady=5, expand=1)
         tb.Button(container, text='P_G', width=5, command=self.print_geometry).pack(anchor='s', expand=1, pady=(0, 5))
         tb.Button(container, text='Библиотека', width=13).pack(anchor='s')
-
