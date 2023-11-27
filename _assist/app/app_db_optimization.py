@@ -20,4 +20,4 @@ def main(db_path: str) -> None:
 
 
 if __name__ == '__main__':
-    main(f'{__file__.rsplit('\\', maxsplit=3)[0]}/data/app.db')
+    main('../../data/app.db')
