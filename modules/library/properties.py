@@ -11,13 +11,13 @@ class Properties:
     def __call__(self, property: str) -> list[str] | tuple[str]:
         return eval(f'self._{property}()')
 
-    def _segment(self) -> list[str]:
+    def _segment(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений сегмента для соответствующей категории"""
-        segment = []
+        segment = ()
         if self.__product_type in ('Photobook', 'Layflat', 'Album', 'Canvas'):
-           segment.append('Премиум')
+           segment += ('Премиум', )
         if self.__product_type in ('Photobook', 'Layflat', 'Album', 'Journal', 'Photofolder', 'Subproduct'):
-            segment.append('Тираж')
+            segment += ('Тираж', )
         return segment
 
     def _short_name(self) -> tuple[str, ...]:   # type: ignore

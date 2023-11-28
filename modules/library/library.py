@@ -13,6 +13,8 @@ class Library:
     __slots__ = 'headers'
     __s_con = SafeConnect('library.db')
 
+    products = Product
+
     def __init__(self) -> None:
         self.headers: dict[Type[Product], tuple[str, ...]] = {}
         with self.__s_con:
@@ -56,12 +58,8 @@ class Library:
         with self.__s_con as sc:
             sc.cursor.execute(f'SELECT * FROM {category.__name__} WHERE full_name=?', (name, ))
             return category(*sc.cursor.fetchone()[1:])
-    
-    def get_ptype(self, category: str) -> Type[Product]:
-        """Функция для получения пустого бланка для продукта"""
-        return eval(category)
 
-    def get(self, name: str) -> Product | None:
+    def get(self, name: str) -> Product:    # type: ignore
         """Возвращает объект продукта с которым связан тираж, если этот продукт есть в библиотеке"""
         for category, products in self.headers.items():
             for product in products:

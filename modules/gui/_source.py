@@ -1,11 +1,10 @@
 import tkinter
 import ttkbootstrap as tb
+from ttkbootstrap.scrolled import ScrolledFrame
 from tkinter import messagebox as tkmb
 from tkinter import filedialog as tkfd
-from typing import Callable, NamedTuple, Any, Mapping, Type, Literal
+from typing import Callable, NamedTuple, Any, Mapping, Type, Literal, Self
 from appmanager import AppManager
-
-
 
 
 class Geometry(NamedTuple):
@@ -66,8 +65,10 @@ class ChildWindow(tb.Toplevel):
     def set_window_geometry(self) -> None:
         """Установка размеров окна и центрирование его относительно центрального"""
         width, height = self.get_geometry_by_system()
+
         place_x = ((self.master.winfo_width() - width) // 2) + self.master.winfo_x()
         place_y = ((self.master.winfo_height() - height) // 2) + self.master.winfo_y()
+        
         self.geometry(f"{width}x{height}+{place_x}+{place_y}")
         self.resizable(False, False)
         self.update_idletasks()
@@ -76,10 +77,20 @@ class ChildWindow(tb.Toplevel):
 def style_init():
     """Ф-я для инициализации общих используемых стилей. Вызывается после инициализации основного объекта ttkbootstrap."""
     style = tb.Style()
-    # Стиль миникнопок - менюшек
-    style.configure('mini.Outline.TMenubutton', padding=(5, 1, 0, 1),)
-    # Стиль - выравнивание надписи на кнопке по левому краю
+    # -----Стили различных кнопок-----
+    
+    # Выравнивание надписи на кнопке по левому краю
     style.configure('l_jf.TButton')
     style.layout('l_jf.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
+
+    # Стиль для кнопок текстовых шаблонов 
+    style.configure('ms.info.Outline.TMenubutton', padding=(5, 1, 0, 1),)
+
+    # Стиль для свитчера тем
+    style.configure('ts.Outline.TMenubutton', padding=(5, 1, 0, 1),)
+
+    # Стиль для кнопки + в библиотеке
+    style.configure('miniplus.success.Outline.TButton', padding=(3, -2, 3, -2))
+
     # Отладочный стиль для Frame
     style.configure('db.TFrame', background='red')

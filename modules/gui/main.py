@@ -88,7 +88,7 @@ class MainWindow(tb.Window):
         menu = tb.Menu(container)
         for name in style.theme_names():
             menu.add_radiobutton(label=name, variable=theme_var, command=switch_theme)
-        btn = tb.Menubutton(container, text='Темы', style='mini.Outline.TMenubutton', menu=menu, cursor='hand2')
+        btn = tb.Menubutton(container, text='Темы', style='ts.Outline.TMenubutton', menu=menu, cursor='hand2')
         btn.pack(side='right')
         switch_theme()
     

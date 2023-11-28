@@ -1,5 +1,5 @@
+from ttkbootstrap import Bootstyle
 from gui._source import *
-from ttkbootstrap.scrolled import ScrolledFrame
 from mail_samples import MailSamples
 from .init_sample_window import InitSampleWindow
 from .sample_edit_window import SampleEditWindow
@@ -18,7 +18,7 @@ class SampleButton(tb.Menubutton):
         super().__init__(root, 
                         cursor='hand2',
                         text=sample_name,
-                        style='mini.Outline.TMenubutton',
+                        style='ms.info.Outline.TMenubutton',
                         **kwargs
                         )
         self._sample_frame = sample_frame
