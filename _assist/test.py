@@ -3,14 +3,10 @@ import ttkbootstrap as ttk
 
 root = ttk.Window()
 
-lbl1 = ttk.Label(root, text='test1')
-lbl1.pack()
+btn = ttk.Button(root, text='test')
+btn.place(x=5, y=5)
 
-lbl1.pack_forget()
-
-lbl2 = ttk.Label(root, text='test2')
-lbl2.pack()
-
-lbl1.pack()
+root.bind("<Button-4>", lambda e: print(e))
+root.bind("<Button-5>", lambda e: print(e))
 
 root.mainloop()

@@ -64,7 +64,7 @@ class ControlFrame(tb.Frame):
         def update_dir() -> None:
             """Получение информации из файлового диалога"""
             path = tkfd.askdirectory(
-                parent=self, 
+                parent=AppManager.mw, 
                 initialdir=getattr(AppManager.stg, stg_attr), 
                 title=f'Выберите: {text}'
                 )
