@@ -5,193 +5,209 @@ from library.library import Product
 
 class AssistWindow(ChildWindow):
     """Конструктор вспомогательных окон библиотеки"""
+    WIN_GEOMETRY = Geometry(500, 310)
+    LIN_GEOMETRY = Geometry(500, 310)
 
-    @staticmethod
-    def __get_main_frame(text: str) -> Callable[[Any], tb.LabelFrame]:
-        """Замыкание для получения мастер-фреймов"""
-        def wrapper(master: Any) -> tb.LabelFrame:
-            return tb.LabelFrame(master=master, text=text, padding=(5, 0, 5, 5))
-        return wrapper
-
-
-    MAIN_FRAMES = {
-        'full_name': __get_main_frame('Полное имя продукта'),
-        'options': __get_main_frame('Общие особенности продукта'),
-        'cover_type': __get_main_frame('Тип сборки обложки'),
-        'cover_val': __get_main_frame('Технические размеры обложки'),
-        'print_mat': __get_main_frame('Печатный материал'),
-        'individual': __get_main_frame('Индивидуальные особенности продукта')
+    MARKS = {
+        'main': 'Основное',
+        'cover': 'Обложка',
+        'print_mat': 'Печатный материал',
+        'individual': 'Индивидуальные особенности'
         }
 
-    
-    @staticmethod
-    def __get_checkbutton_widget(instance: Any, key: str, master: tb.Frame, text: str) -> tb.Checkbutton:
+    def __draw_checkbutton_widget(self, master: tb.Frame, key: str, text: str) -> None:
         """Конструктор для отрисовки чек фреймов"""
         # Переменная
-        instance._vars[key] = var = tb.IntVar(master)
-        ch_btn = tb.Checkbutton(master, text=text, variable=var)
-        return ch_btn
+        self._vars[key] = var = tb.IntVar(master)
 
+        # Виджет
+        tb.Checkbutton(
+            master, 
+            text=text, 
+            variable=var,
+            style='success-round-toggle'
+            ).pack(padx=(10, 0), pady=(27, 0))
 
-    @staticmethod
-    def __get_combobox_widget(instance: Any, key: str, master: tb.Frame, text: str) -> tb.Frame:
+    def __draw_combobox_widget(self, master: tb.Frame, key: str, text: str) -> None:
         """Конструктор фрейма для отрисовки Комбобокс виджета"""
-        # Формируем контейнер
-        frame = tb.Frame(master)
         # Рисуем название свойства
-        tb.Label(frame, text=text).pack(anchor='nw')
+        tb.Label(master, text=text).pack(anchor='nw', padx=(5, 0))
+
         # Рисуем Комбобокс
-        instance._vars[key] = combo = tb.Combobox(
-            master=frame, 
+        self._vars[key] = combo = tb.Combobox(
+            master=master, 
             state='readonly', 
-            values=instance._properties(key),
+            values=self._properties(key),
             cursor='hand2'
             )
-        combo.pack(anchor='nw', fill='x')
-        return frame
+        combo.pack(
+            anchor='nw', 
+            fill='x', 
+            padx=5, 
+            pady=(0, 5)
+            )
+    
+    def __draw_cover_type_radio_widgets(self, master: tb.Frame, key: str, text: str) -> None:
+        """Конструктор для отрисовки Радио-баттон-фреймов"""
+        # снимаем отрисовку виджетов мастера
+        for widget in master.master.winfo_children(): widget.pack_forget()
 
+        # Формируем контейнер для правильного размещения Radiobutton'ов
+        container = tb.Frame(master.master)
+        container.pack(anchor='nw', pady=(0, 5))
 
-    @staticmethod
-    def __get_entry_widget(instance: Any, key: str, master: tb.Frame, text: str) -> tb.Frame:
-        """Конструктор фрейма для отрисовки Entry виджета"""
-        # Формируем контейнер
-        frame = tb.Frame(master)
         # Рисуем название свойства
-        tb.Label(master=frame, text=text).pack(anchor='nw')
-        # Текстовая переменная
-        instance._vars[key] = var = tb.StringVar(master)
-        # Энтри виджет
-        entry = tb.Entry(
-            master=frame, 
-            textvariable=var,
-            state='disabled' if key == 'full_name' and instance._mode == 'change' else 'normal')
-        entry.pack(anchor='nw', fill='x')
-        return frame
+        tb.Label(container, text=text).pack(anchor='nw')
+
+        # Получаем свойства и определяем текстовую переменную 
+        values = self._properties(key)
+        self._vars[key] = var = tb.StringVar(master, value=values[0])
+
+        # Рисуем Radiobutton'ы
+        for name in values:
+            tb.Radiobutton(
+                master=container, 
+                text=name, 
+                value=name, 
+                variable=var
+                ).pack(
+                    padx=(3, 5),
+                    pady=5, 
+                    anchor='nw', 
+                    side='left'
+                    )
+        
+        # Отрисовываем мастер виджеты обратно
+        widgets = master.master.winfo_children()
+        widgets[0].pack(anchor='n', side='right')
+        widgets[1].pack(anchor='n', side='left')
 
 
-    @staticmethod
-    def __get_full_name_entry_widget(instance: Any, key: str, master: tb.Frame, _) -> tb.Entry:
+    def __draw_entry_widget(self, master: tb.Frame, key: str, text: str) -> None:
         """Конструктор фрейма для отрисовки Entry виджета"""
+        # Рисуем название свойства
+        tb.Label(master=master, text=text).pack(anchor='nw')
+
         # Текстовая переменная
-        instance._vars[key] = var = tb.StringVar(master)
+        self._vars[key] = var = tb.StringVar(master)
+
         # Энтри виджет
-        entry = tb.Entry(
+        tb.Entry(
             master=master, 
             textvariable=var,
-            state='disabled' if key == 'full_name' and instance._mode == 'change' else 'normal'
-            )
-        return entry
+            ).pack(
+                anchor='nw', 
+                fill='x',
+                padx=5,
+                pady=(0, 5)
+                )
     
+    def __draw_full_name_widgets(self) -> None:
+        """Конструктор фрейма для отрисовки Entry виджета для full_name свойства продукта"""
+        # Текстовая переменная
+        self._vars['full_name'] = var = tb.StringVar(self)
 
-    @staticmethod
-    def __get_radio_widget(instance: Any, key: str, master: tb.Frame, text: str) -> tb.Frame:
+        # Контейнер для виджета
+        lf = tb.LabelFrame(self, text='Полное имя продукта', padding=5)
+        lf.pack(fill='x', padx=5)
+
+        # Энтри виджет
+        tb.Entry(
+            master=lf, 
+            textvariable=var,
+            state='disabled' if self._mode == 'change' else 'normal'
+            ).pack(fill='x')
+
+    def __draw_radio_widgets(self, master: tb.Frame, key: str, text: str) -> None:
         """Конструктор для отрисовки Радио-баттон-фреймов"""
-        # Формируем контейнер
-        frame = tb.Frame(master)
+        # Формируем контейнер для правильного размещения Radiobutton'ов
+        container = tb.Frame(master)
+        container.pack(fill='both', padx=(5, 0), pady=(0, 5))
+
         # Рисуем название свойства
-        tb.Label(frame, text=text).pack(anchor='nw')
+        tb.Label(container, text=text).pack(anchor='nw')
+
         # Получаем свойства и определяем текстовую переменную 
-        values = instance._properties(key)
-        instance._vars[key] = var = tb.StringVar(master, value=values[0])
-        # Рисуем Radiobutton
+        values = self._properties(key)
+        self._vars[key] = var = tb.StringVar(master, value=values[0])
+
+        # Рисуем Radiobutton'ы
         for name in values:
             tb.Radiobutton(
-                master=frame, 
+                master=container, 
                 text=name, 
                 value=name, 
                 variable=var
-                ).pack(side='left', padx=(5, 10))
-        return frame
-
-
-    @staticmethod
-    def __get_cover_type_widget(instance: Any, key: str, master: tb.Frame, text: str) -> tb.Frame:
-        """Конструктор для отрисовки Радио-баттон-фреймов"""
-        # Формируем контейнер
-        frame = tb.Frame(master)
-        # Получаем свойства и определяем текстовую переменную 
-        values = instance._properties(key)
-        instance._vars[key] = var = tb.StringVar(master, value=values[0])
-        # Рисуем Radiobutton
-        for name in values:
-            tb.Radiobutton(
-                master=frame, 
-                text=name, 
-                value=name, 
-                variable=var
-                ).pack(side='left', padx=(5, 5))
-        return frame
-
+                ).pack(
+                    padx=(5, 10),
+                    pady=5, 
+                    anchor='nw', 
+                    side='left'
+                    )
 
     FRAMES = {
-        'full_name': (                      # Название свойства продукта
-            'full_name',                    # Название категории, для отрисовки LabelFrame
-            __get_full_name_entry_widget,   # Cсылка на функцию для отрисовки соответствующий фреймов
-            'left',                         # Позиция в мастер виджете: left или right
-            ''                              # Текст для label 
-            ),
-        'segment': ('options', __get_radio_widget, 'left', 'Сегмент продукции'),
-        'short_name': ('options', __get_combobox_widget, 'left', 'Короткое имя'),
-        'product_format': ('options', __get_combobox_widget, 'left','Формат продукта'),
-        'book_option': ('options', __get_radio_widget, 'right', 'Опция сборки книги'),
-        'lamination': ('options', __get_radio_widget, 'right', 'Ламинация'),
-        'cover_type': ('cover_type', __get_cover_type_widget, 'left',  'Тип сборки обложки'),
-        'carton_length': ('cover_val', __get_entry_widget, 'left', 'ДЛИННА картонки'),
-        'carton_height': ('cover_val',  __get_entry_widget, 'left', 'ВЫСОТА картонки'),
-        'cover_flap': ('cover_val', __get_combobox_widget, 'right','Значение КЛАПАНА обложки'),
-        'cover_joint': ('cover_val', __get_combobox_widget, 'right','Значение ШАРНИРА обложки'),
-        'cover_print_mat': ('print_mat', __get_combobox_widget, 'left', 'Печатный материал обложки'),
-        'page_print_mat': ('print_mat', __get_combobox_widget, 'right', 'Печатный материал разворотов'),
-        'cover_canal': ('individual', __get_combobox_widget, 'left',"'Канал' обложки"),
-        'page_canal': ('individual', __get_combobox_widget, 'right', "'Канал' разворотов"),
-        'dc_top_indent': ('individual', __get_entry_widget, 'left', 'Отступ СВЕРХУ в мм'),
-        'dc_left_indent': ('individual', __get_entry_widget, 'left', 'Отступ СЛЕВА в мм'),
-        'dc_overlap': ('individual', __get_entry_widget, 'right', 'НАХЛЕСТ для переплета в мм'),
-        'dc_break': ('individual', __get_checkbutton_widget, 'right', 'Раскодировка с разрывом')
+        'segment': (                        # Название свойства продукта
+            'main',                         # Название категории, куда будет помещен виджет
+             __draw_radio_widgets,            # Cсылка на функцию для отрисовки соответствующий фреймов
+             'Сегмент продукции',           # Текст для label 
+             'left'                         # Позиция в мастер виджете: left или right
+             ),
+        'short_name': ('main', __draw_combobox_widget, 'Короткое имя', 'left'),
+        'product_format': ('main', __draw_combobox_widget, 'Формат продукта', 'left'),
+        'book_option': ('main', __draw_radio_widgets, 'Опция сборки книги', 'right'),
+        'lamination': ('main', __draw_radio_widgets, 'Ламинация', 'right'),
+        'cover_type': ('cover', __draw_cover_type_radio_widgets, 'Тип сборки обложки', 'left'),
+        'carton_length': ('cover', __draw_entry_widget, 'ДЛИННА картонки', 'left'),
+        'carton_height': ('cover',  __draw_entry_widget, 'ВЫСОТА картонки', 'left'),
+        'cover_flap': ('cover', __draw_combobox_widget, 'Значение КЛАПАНА обложки', 'right'),
+        'cover_joint': ('cover', __draw_combobox_widget, 'Значение ШАРНИРА обложки', 'right'),
+        'cover_print_mat': ('print_mat', __draw_combobox_widget, 'Печатный материал обложки', 'left'),
+        'page_print_mat': ('print_mat', __draw_combobox_widget, 'Печатный материал разворотов', 'right'),
+        'cover_canal': ('individual', __draw_combobox_widget, "'Канал' обложки", 'left'),
+        'page_canal': ('individual', __draw_combobox_widget, "'Канал' разворотов", 'right'),
+        'dc_top_indent': ('individual', __draw_entry_widget, 'Отступ СВЕРХУ в мм', 'left'),
+        'dc_left_indent': ('individual', __draw_entry_widget, 'Отступ СЛЕВА в мм', 'left'),
+        'dc_overlap': ('individual', __draw_entry_widget, 'НАХЛЕСТ для переплета в мм', 'right'),
+        'dc_break': ('individual', __draw_checkbutton_widget, 'Раскодировка с разрывом', 'right')
         }
 
+    def __init__(
+        self, 
+        master: Any, 
+        mode: Literal['add', 'copy', 'change'], 
+        category: Type[Product], 
+        product: str | None = None,
+        update_func: Callable | None = None
+        ) -> None:
 
-    def __init__(self, master: Any, mode: Literal['add', 'copy', 'change'], category: Type[Product], product: Product | None = None) -> None:
         # Сохраняем значения в объекте
         self._mode = mode
         self._category = category
-        self._product = product
         self._properties = Properties(category.__name__)
         self._vars = {}
-        super().__init__(master)
 
-    
-    def get_geometry_by_system(self) -> Geometry:
-        # Переопределенный метод выдаст размер окна относительно обрабатываемого продукта
-        match AppManager.SYSTEM:     
-            case 'win':
-                match self._category.__name__:
-                    case 'Album': y = 528
-                    case 'Canvas': y = 278
-                    case 'Journal': y = 278
-                    case 'Layflat': y = 425
-                    case 'Photobook': y = 488
-                    case 'Photofolder': y = 381
-                    case 'Subproduct' | _: y = 238
-                return Geometry(498, y)
-            case 'lin' | _:
-                match self._category.__name__:
-                    case 'Album': y = 664
-                    case 'Canvas': y = 350
-                    case 'Journal': y = 350
-                    case 'Layflat': y = 530
-                    case 'Photobook': y = 612
-                    case 'Photofolder': y = 484
-                    case 'Subproduct' | _: y = 298
-                return Geometry(498, y)
-        
+        # Создаем замыкание с функцией обновления
+        self.write_to_library = self.write_to_library(update_func)  #type: ignore
+
+        # Вызываем базовый класс
+        super().__init__(master, product=product)
 
     def main(self, **kwargs) -> None:
+        # Отрисовка основных фреймов
         self.set_title()
-        self.show_main_widgets()
-        self.show_buttons()
-    #     if self.module != 'add':
-    #         self.insert_values_from_lib_to_widgets(product)
+        self.__draw_full_name_widgets()
+        self.draw_main_widgets()
+
+        # Кнопка сохранить
+        tb.Button(
+            self, 
+            text='Сохранить', 
+            width=14, 
+            command=self.write_to_library   #type: ignore
+            ).pack(pady=(0, 5))
+        # Наполняем значениями, если продукт изменяется или копируется
+        if self._mode != 'add':
+            self.insert_values_from_lib_to_widgets(kwargs['product'])
 
     def set_title(self) -> None:
         """Установка заголовка окна"""
@@ -201,81 +217,105 @@ class AssistWindow(ChildWindow):
             case 'change' | _ : title = 'Изменение'
         self.title(title + ' продукта: ' + self._category.__doc__)  #type: ignore
 
-
-    def show_main_widgets(self) -> None:
+    def draw_main_widgets(self) -> None:
         """Отображает менюшки на self.product_menus_frame согласно выбранному продукту"""
-        main_frame_name = main_frame = None
-        # Словарь для хранения информации для разделения виджетов по сторонам
-        sides = {'left': [], 'right': []}
+        # Рисуем Notebook
+        nb = tb.Notebook(self)
+        nb.pack(fill='both', expand=1, padx=5, pady=5)
+
+        # Переменная для хранения имени вкладки. 
+        mark_name = None
+
+        # Переменные для хранения фреймов, на которых будут отрисовываться виджеты
+        left = right = None
+
         # Непосредственно, отрисовка виджетов
-        for field in self._category._fields:
-            master_name, child, side, text = self.FRAMES[field]
-            # Инициализируем мастер фрейм, если его еще нет
-            if master_name != main_frame_name:
-                main_frame_name = master_name
-                main_frame = self.MAIN_FRAMES[master_name](self)
-                main_frame.pack(fill='x', padx=5, pady=(0, 5))
-                # Очищаем и заново наполняем стороны размещения виджетов
-                sides['left'].clear() ; sides['right'].clear()
-                sides['left'].extend({'row': i, 'column': 0} for i in range(4))
-                sides['right'].extend({'row': i, 'column': 1} for i in range(4))
-                # Рисуем фреймы для выравнивания виджетов
-                if main_frame_name not in ('full_name', 'cover_type'):
-                    tb.Frame(main_frame, height=1, width=250).grid(sides['left'].pop(0))
-                    tb.Frame(main_frame, height=1, width=250).grid(sides['right'].pop(0))
-            # Получаем сторону для размещения
-            grid_side = sides[side].pop(0)
-            # Настраиваем на полное растяжение к краям
-            main_frame.columnconfigure(grid_side['column'], weight=1)   #type: ignore
-            main_frame.rowconfigure(grid_side['column'], weight=1)      #type: ignore
-            # Формируем выравнивание по х относительно стороны размещения
-            padx = 0
-            if main_frame_name not in ('full_name', 'cover_type'):
-                padx = (0, 3) if side == 'left' else (3, 0)
-            # Отрисовываем дочерние виджеты
-            child(self, field, main_frame, text).grid(**grid_side, padx=padx, sticky='ew')
+        for field in self._category._fields[1:]:
 
+            # Получаем настройки виджета из словаря
+            w_mark_name, draw_func, text, side = self.FRAMES[field] #type: ignore
 
-    def show_buttons(self) -> None:
-        """Функция для отрисовки кнопок"""
-        tb.Button(self, text='Сохранить', width=14, command=lambda: print(self.winfo_geometry())).pack(pady=(0, 5))
+            # Инициализируем закладку, если ее нет.
+            if mark_name != w_mark_name:
+                mark_name = w_mark_name
+                mark = tb.Frame(nb)
+                nb.add(mark, text=self.MARKS[w_mark_name])
+                
+                # Инициализируем и отрисовываем левый и правый фреймы на закладке
+                left = tb.Frame(mark)
+                left.pack(side='left', anchor='n')
+                right = tb.Frame(mark)
+                right.pack(side='right', anchor='n')
 
+                # Виджеты для выравнивания))
+                for _side in (left, right): tb.Frame(_side, width=242).pack(anchor='n')
 
-    # def insert_values_from_lib_to_widgets(self, product_name: str) -> None:
-    #     """Метод для вставки полученных значений из бд в виджеты"""
-    #     product = AppManager.lib.get(product_name)
-    #     for i, attr in enumerate(product._fields):      # type: ignore      # Продукт точно вернется
-    #         if attr == 'full_name' and self.module == 'copy': continue
-    #         self.product_vars[attr].set(product[i])     # type: ignore
+            # Отрисовываем связанные виджеты 
+            draw_func(self, left if side == 'left' else right, field, text)
 
+    def insert_values_from_lib_to_widgets(self, product_name: str) -> None:
+        """Метод для вставки полученных значений из бд в виджеты"""
+        # Получаем продукт из библиотеки
+        product = AppManager.lib.get(product_name)
 
-    # def get_values_from_widgets(self) -> Product:
-    #     """Метод для получения информации из виджетов.\n
-    #     Возвращает Product если все значения были заполнены,\n
-    #     генерирует исключение в противном случае."""
-    #     numbered_var = ('carton_length', 'carton_height', 'dc_top_indent', 'dc_left_indent', 'dc_overlap')
-    #     def handler() -> Iterator[str | int]:
-    #         for key, var in self.product_vars.items():
-    #             value = var.get()
-    #             if value == '': 
-    #                 field = self.__FRAMES[key][-1].get('_text' if key in ('full_name', 'cover_type') else 'text')
-    #                 raise Exception(f'Нет данных в поле: {field}')
-    #             if key in numbered_var:
-    #                 value = int(value) if value.isdigit() else 0
-    #             yield value
-    #     return self.product_type(*handler())    # type: ignore
+        for i, attr in enumerate(product._fields):
+            # Пропускаем full_name если модуль copy
+            if attr == 'full_name' and self._mode == 'copy': continue
 
+            # Размещаем значения
+            self._vars[attr].set(product[i])     
 
-    # def write_to_library(self) -> None:
-    #     """Ф-я для обновления/записи информации библиотеку"""
-    #     try:
-    #         product = self.get_values_from_widgets()
-    #         if self.module == 'change':
-    #             AppManager.lib.change(product)
-    #             title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.full_name}'
-    #         else:
-    #             AppManager.lib.add(product)
-    #             title, message = 'Добавление  продукта', f'Продукт:\n{product.full_name}\nуспешно добавлен в библиотеку'
-    #         tkmb.showinfo(title, message, parent=self)
-    #     except Exception as e:
-    #         tkmb.showwarning('Ошибка', str(e), parent=self)
+    def get_values_from_widgets(self) -> Product:
+        """
+        Метод для получения информации из виджетов.\n
+        Возвращает Product если все значения были заполнены,\n
+        генерирует исключение в противном случае.
+        """
+        # Целочисленные значения для отдельной проверки
+        numbered_var = ('carton_length', 'carton_height', 'dc_top_indent', 'dc_left_indent', 'dc_overlap')
+
+        def _handler() -> Iterator[str | int]:
+            """Обработчик переменных"""
+            for key, var in self._vars.items():
+                # Получаем значение
+                value = var.get()
+
+                # Генерируем исключение, если поле пустое
+                if value == '': 
+                    field = self.FRAMES.get(key, '"__"')[-2] if key != 'full_name' else 'Полное имя'
+                    raise Exception(f'Нет данных в поле: {field}')
+
+                # Переводим в int целочисленные значения
+                if key in numbered_var: value = int(value) if value.isdigit() else 0
+
+                yield value
+
+        # Пакуем и возвращаем кортеж
+        return self._category(*_handler())  #type: ignore
+
+    def write_to_library(self, update_func: Callable | None) -> Callable[[], None]:
+        """Ф-я для обновления/записи информации библиотеку"""
+        def _func() -> None:
+            # Обработчик исключений, чтобы прервать логику выполнения в случае ошибки
+            try:
+                # Получаем продукт
+                product = self.get_values_from_widgets()
+
+                # Обновляем или добавляем продукт в зависимости от типа обработки
+                if self._mode == 'change':
+                    AppManager.lib.change(product)
+                    title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.full_name}'
+                else:
+                    AppManager.lib.add(product)
+                    title, message = 'Добавление  продукта', f'Продукт:\n{product.full_name}\nуспешно добавлен в библиотеку'
+                
+                # Если была передана update_func, то обновляем виджеты
+                if update_func: update_func()
+
+                # Вывод сообщения об успехе операции
+                tkmb.showinfo(title, message, parent=self)
+            
+            # Вывод сообщения об ошибке
+            except Exception as e: tkmb.showwarning('Ошибка', str(e), parent=self)
+        
+        return _func

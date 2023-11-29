@@ -3,7 +3,7 @@ import ttkbootstrap as tb
 from ttkbootstrap.scrolled import ScrolledFrame
 from tkinter import messagebox as tkmb
 from tkinter import filedialog as tkfd
-from typing import Callable, NamedTuple, Any, Mapping, Type, Literal, Self
+from typing import Callable, NamedTuple, Any, Mapping, Type, Literal, Self, Iterator
 from appmanager import AppManager
 
 
@@ -89,8 +89,12 @@ def style_init():
     # Стиль для свитчера тем
     style.configure('ts.Outline.TMenubutton', padding=(5, 1, 0, 1),)
 
+    # Стиль для кнопки категорий в библиотеке
+    style.configure('library.TButton')
+    style.layout('library.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
+
     # Стиль для кнопки + в библиотеке
-    style.configure('miniplus.success.Outline.TButton', padding=(3, -2, 3, -2))
+    style.configure('LibraryPlus.TButton', font=('TkDefaultFont', 20), padding=(5, -5, 5, -5))
 
     # Отладочный стиль для Frame
     style.configure('db.TFrame', background='red')
