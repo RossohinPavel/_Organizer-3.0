@@ -107,7 +107,7 @@ class CollapsingInterface:
             ).grid(
                 row=self._row, 
                 column=1, 
-                sticky='e', 
+                sticky='nsew', 
                 padx=(0, 12)
                 )
         
@@ -172,5 +172,5 @@ class CollapsingInterface:
         # Обновляем контейнер виджетов
         self._update_container()
 
-        # Если циджет был открыт на момент вызова метода, то открываем его снова
+        # Если виджет был открыт на момент вызова метода, то открываем его снова
         if current_state: self._toggle_open_close()

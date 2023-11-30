@@ -34,7 +34,7 @@ class SampleEditWindow(ChildWindow):
         frame = tb.Frame(master=self)
         frame.pack(expand=1, fill='both')
         text = tb.Text(master=frame, width=52, height=15, wrap='word')
-        text.pack(side='left', padx=2, pady=(2, 0))
+        text.pack(side='left', padx=2, pady=(2, 0), expand=1, fill='both')
         text.bind('<Control-space>', self.highlight_event)
         scroll = tb.Scrollbar(master=frame, command=text.yview, style='round')
         text.config(yscrollcommand=scroll.set)
