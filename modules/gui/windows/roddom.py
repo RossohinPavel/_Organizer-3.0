@@ -5,14 +5,16 @@ from appmanager import AppManager
 
 class Roddom(ChildWindow):
     """Окно управления заказами роддома"""
-    width = 253
-    height = 216
-
-    def main(self, *args, **kwargs) -> None:
+    WIN_GEOMETRY = Geometry(315, 282)
+    LIN_GEOMETRY = Geometry(315, 282)
+    win_title='Роддом'
+    
+    def main(self, **kwargs) -> None:
+        # Переменные, необходимые для работы
         self.order_obj = None
-        self.title('Роддом')
-        self.info_var = tk.StringVar(master=self)
-        self.txt_sum = tk.BooleanVar(master=self, value=True)
+        self.info_var = tb.StringVar(master=self, value='l1\nl2\nl3\nl4')
+        self.txt_sum = tb.BooleanVar(master=self, value=True)
+
         self.show_directory_widget()
         self.show_info_widget()
         self.show_buttons()
@@ -26,24 +28,62 @@ class Roddom(ChildWindow):
                 AppManager.stg.roddom_dir = path
                 upd_btn.config(text=path)
 
-        frame = LabeledFrame(master=self, text='Папка, где хранятся заказы Роддом\'а')
-        frame.pack(fill='x')
-        upd_btn = MyButton(master=frame.container, text=AppManager.stg.roddom_dir, command=update_dir)
-        upd_btn.pack(expand=1, fill='x')
+        frame = tb.LabelFrame(master=self, text='Папка, где хранятся заказы Роддом\'а')
+        frame.pack(fill='x', padx=5, pady=(5, 0))
+
+        upd_btn = tb.Button(
+            master=frame, 
+            text=AppManager.stg.roddom_dir, 
+            command=update_dir,
+            style='l_jf.TButton'
+            )
+        upd_btn.pack(
+            expand=1, 
+            fill='x', 
+            padx=5, 
+            pady=(0, 5)
+            )
 
     def show_info_widget(self) -> None:
         """Отрисовка виджета информации о заказе"""
-        frame = LabeledFrame(master=self)
-        frame.config(padding=(3, 0, 3, 3))
-        frame.pack(expand=1, fill='both')
-        ttk.Label(master=frame.container, textvariable=self.info_var, font='12').pack(anchor='w')
+        frame = tb.LabelFrame(master=self, text='Информация', padding=(3, 0, 3, 3))
+        frame.pack(expand=1, fill='both', padx=5, pady=(5, 0))
+        tb.Label(master=frame, textvariable=self.info_var, font='12').pack(anchor='w')
 
     def show_buttons(self):
         """Отрисовка виджетов кнопок"""
-        ttk.Checkbutton(self, text='Сохранять результаты в sum.txt', variable=self.txt_sum).pack(anchor='w', padx=2)
-        MyButton(self, text='Посчитать заказ', width=16, command=self.calc_order).pack(anchor='w', padx=3, pady=3)
-        MyButton(self, text='Скопировать инфо', width=16, command=self.info_to_clipboard).pack(side='left', padx=3, pady=(0, 3))
-        MyButton(self, text='Отправить в печать', width=16, command=self.to_print).pack(side='right', padx=(0, 3), pady=(0, 3))
+        chbtn = tb.Checkbutton(
+            self, 
+            text='Сохранять результаты в sum.txt', 
+            variable=self.txt_sum,
+            style='success-round-toggle'
+            )
+        chbtn.pack(anchor='w', padx=5, pady=(5, 0))
+
+        btn1 = tb.Button(
+            self, 
+            text='Посчитать заказ', 
+            width=18, 
+            command=self.calc_order
+            )
+        btn1.pack(anchor='w', padx=5, pady=5)
+
+        btn2 = tb.Button(
+            self, 
+            text='Скопировать инфо', 
+            width=18, 
+            command=lambda: print(self.winfo_geometry())
+            # command=self.info_to_clipboard
+            )
+        btn2.pack(side='left', padx=5, pady=(0, 5))
+
+        btn3 = tb.Button(
+            self, 
+            text='Отправить в печать', 
+            width=18, 
+            command=self.to_print
+            )
+        btn3.pack(side='right', padx=(0, 5), pady=(0, 5))
 
     def calc_order(self):
         """Инициализация подсчета информации в заказе"""

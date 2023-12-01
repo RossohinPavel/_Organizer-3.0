@@ -4,10 +4,9 @@ from .._source import *
 class ProcessingFrame:
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""  
     def __init__(self, frame: tb.Labelframe):
-        # Отрисовка лейбла очереди
         self.header = tb.StringVar(master=frame)
         self._header_label = tb.Label(master=frame, textvariable=self.header, anchor='w', width=22)
-        self.operation = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name', style='dark')
+        self.operation = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name', bootstyle='info')
         self.file = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name')
         self.__exit__()
 

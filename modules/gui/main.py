@@ -1,7 +1,6 @@
-from ttkbootstrap import Bootstyle
 from ._source import *
 from . import frames
-# from . import windows
+from . import windows
 
 
 class MainWindow(tb.Window):
@@ -99,7 +98,7 @@ class MainWindow(tb.Window):
         btn_container = tb.Labelframe(l_container, text='Обработка', padding=(5, 0, 5, 5))
         btn_container.pack(fill='x')
         self.show_processing_buttons(btn_container)
-        self.show_add_btn_menu(btn_container)
+        self.draw_add_btn_menu(btn_container)
         psg_container = tb.Labelframe(l_container, text='Задач в очереди: ', padding=(5, 0, 3, 3))
         psg_container.pack(side='right', fill='y')
         # queue = ctk.IntVar(master=frame, value=0)
@@ -117,30 +116,21 @@ class MainWindow(tb.Window):
         # self.bind('<F2>', lambda _: btn2.invoke())
         self.bind('<F2>', lambda _: AppManager.pf.__exit__())
 
-    def show_add_btn_menu(self, container: tb.Labelframe) -> None:
-        """Отрисовка меню под кнопкой Дополнительно"""
-        def init(value) -> None:
-            """Обработка выбора в меню"""
-            match value:
-                case 'Обновить БД': pass
-                case 'Направляющие': pass
-                case 'Разместить по каналам': AppManager.pf.__enter__()
-                case 'Холсты': AppManager.pf.__exit__()
-                case 'Замена': pass
-                case 'Восстановление': pass
-                case 'Роддом': pass
-            variable.set('Дополнительно')
-        
-        def event(event=None) -> None:
-            """Ф-я хоткея"""
-            menu.event_generate('<ButtonPress-1>')
-            menu.event_generate('<ButtonRelease-1>')
+    def draw_add_btn_menu(self, container: tb.Labelframe) -> None:
+        """Отрисовка кнопки Дополнительно и меню под ней"""
+        menu = tb.Menu(master=container)
 
-        variable = tb.StringVar(master=self)
-        values = ['Обновить БД', 'Направляющие', 'Разместить по каналам', 'Холсты', 'Замена', 'Восстановление', 'Роддом']
-        menu = tb.OptionMenu(container, variable, 'Дополнительно', *values, command=init)
-        menu.pack(fill='x')
-        self.bind('<F3>', event)
+        menu.add_command(label='Обновить БД')
+        menu.add_command(label='Направляющие')
+        menu.add_command(label='Холсты')
+        menu.add_command(label='Замена')
+        menu.add_command(label='Восстановление')
+        menu.add_command(label='Роддом', command=lambda: windows.Roddom(self))
+
+        btn = tb.Menubutton(master=container, text='Дополнительно', menu=menu)
+        btn.pack(fill='x')
+
+        self.bind('<F3>', lambda _: btn.event_generate('<<Invoke>>'))
     
     def show_processing_frame(self, container: tb.Labelframe) -> None:
         """Отрисовка фрейма отображения прогресса обработки файлов"""

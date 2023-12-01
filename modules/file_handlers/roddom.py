@@ -1,4 +1,4 @@
-from os import walk as os_walk, makedirs as os_makedirs
+import os
 from shutil import copy2 as sh_copy2
 from re import search
 from appmanager import AppManager
@@ -16,7 +16,7 @@ class RoddomHandler:
         """Получение информации о заказе"""
         dct = {'9x15': 0, '15x21': 0, '21x30': 0}
         for path, files in self.__walk_on_order():
-            dct[path.split('\\')[-1]] += len(files)
+            dct[os.path.split(path)[-1]] += len(files)
         if self.__make_txt:
             with open(f'{self.path}/{self.order}/sum.txt', 'w', encoding='utf-8') as file:
                 print(*(f'{k}: {v}' for k, v in dct.items()), sep='\n', file=file)
@@ -25,7 +25,7 @@ class RoddomHandler:
 
     def __walk_on_order(self):
         """Генераторная ф-я для пробега по файлам заказа"""
-        for root in os_walk(f'{self.path}/{self.order}'):
+        for root in os.walk(f'{self.path}/{self.order}'):
             rel_path = root[0].removeprefix(self.path)
             if search(r'\d{1,2}x\d{2}', rel_path):
                 yield rel_path, root[-1]
