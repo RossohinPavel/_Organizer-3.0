@@ -5,14 +5,17 @@ from appmanager import AppManager
 
 class Roddom(ChildWindow):
     """Окно управления заказами роддома"""
-    WIN_GEOMETRY = Geometry(315, 282)
+    WIN_GEOMETRY = Geometry(280, 250)
     LIN_GEOMETRY = Geometry(315, 282)
     win_title='Роддом'
     
     def main(self, **kwargs) -> None:
         # Переменные, необходимые для работы
         self.order_obj = None
-        self.info_var = tb.StringVar(master=self, value='l1\nl2\nl3\nl4')
+
+        default_text = 'Для подсчета количества\nотпечатков в заказе, нажмите на\nкнопку \'Посчитать заказ\' и\nвыберете нужный.'
+
+        self.info_var = tb.StringVar(master=self, value=default_text)
         self.txt_sum = tb.BooleanVar(master=self, value=True)
 
         self.show_directory_widget()
