@@ -15,8 +15,8 @@ class Roddom(ChildWindow):
 
         default_text = 'Для подсчета количества\nотпечатков в заказе, нажмите на\nкнопку \'Посчитать заказ\' и\nвыберете нужный.'
 
-        self.info_var = tb.StringVar(master=self, value=default_text)
-        self.txt_sum = tb.BooleanVar(master=self, value=True)
+        self.info_var = ttk.StringVar(master=self, value=default_text)
+        self.txt_sum = ttk.BooleanVar(master=self, value=True)
 
         self.show_directory_widget()
         self.show_info_widget()
@@ -31,10 +31,10 @@ class Roddom(ChildWindow):
                 AppManager.stg.roddom_dir = path
                 upd_btn.config(text=path)
 
-        frame = tb.LabelFrame(master=self, text='Папка, где хранятся заказы Роддом\'а')
+        frame = ttk.LabelFrame(master=self, text='Папка, где хранятся заказы Роддом\'а')
         frame.pack(fill='x', padx=5, pady=(5, 0))
 
-        upd_btn = tb.Button(
+        upd_btn = ttk.Button(
             master=frame, 
             text=AppManager.stg.roddom_dir, 
             command=update_dir,
@@ -49,13 +49,13 @@ class Roddom(ChildWindow):
 
     def show_info_widget(self) -> None:
         """Отрисовка виджета информации о заказе"""
-        frame = tb.LabelFrame(master=self, text='Информация', padding=(3, 0, 3, 3))
+        frame = ttk.LabelFrame(master=self, text='Информация', padding=(3, 0, 3, 3))
         frame.pack(expand=1, fill='both', padx=5, pady=(5, 0))
-        tb.Label(master=frame, textvariable=self.info_var, font='12').pack(anchor='w')
+        ttk.Label(master=frame, textvariable=self.info_var, font='12').pack(anchor='w')
 
     def show_buttons(self):
         """Отрисовка виджетов кнопок"""
-        chbtn = tb.Checkbutton(
+        chbtn = ttk.Checkbutton(
             self, 
             text='Сохранять результаты в sum.txt', 
             variable=self.txt_sum,
@@ -63,7 +63,7 @@ class Roddom(ChildWindow):
             )
         chbtn.pack(anchor='w', padx=5, pady=(5, 0))
 
-        btn1 = tb.Button(
+        btn1 = ttk.Button(
             self, 
             text='Посчитать заказ', 
             width=18, 
@@ -71,7 +71,7 @@ class Roddom(ChildWindow):
             )
         btn1.pack(anchor='w', padx=5, pady=5)
 
-        btn2 = tb.Button(
+        btn2 = ttk.Button(
             self, 
             text='Скопировать инфо', 
             width=18, 
@@ -80,7 +80,7 @@ class Roddom(ChildWindow):
             )
         btn2.pack(side='left', padx=5, pady=(0, 5))
 
-        btn3 = tb.Button(
+        btn3 = ttk.Button(
             self, 
             text='Отправить в печать', 
             width=18, 
@@ -108,7 +108,11 @@ class Roddom(ChildWindow):
         self.clipboard_clear()
         self.clipboard_append(f'{path}/{self.order_obj.order}\n\n{self.order_obj.order} -- Роддом')
         AppManager.tm.create_task(self.order_obj.to_print, path)
-        tkmb.showinfo(parent=self, title='Отправка в печать', message=f'Заказ {self.order_obj.order} отправлен в печать')
+        tkmb.showinfo(
+            parent=self, 
+            title='Отправка в печать', 
+            message=f'Заказ {self.order_obj.order} отправлен в печать'
+            )
 
     def info_to_clipboard(self):
         self.clipboard_clear()

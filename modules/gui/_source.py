@@ -1,9 +1,17 @@
+# Базовый tkinter и его зависимые модули
 import tkinter
-import ttkbootstrap as tb
-from ttkbootstrap.scrolled import ScrolledFrame
 from tkinter import messagebox as tkmb
 from tkinter import filedialog as tkfd
+
+# Модерновый фреймворк ttkbootstrap и его модули
+import ttkbootstrap as ttk
+import ttkbootstrap.constants as ttkc
+from ttkbootstrap.scrolled import ScrolledFrame
+
+# Типизация для использования в импортируемых виджетах
 from typing import Callable, NamedTuple, Any, Mapping, Type, Literal, Self, Iterator
+
+# AppManager управления приложением
 from appmanager import AppManager
 
 
@@ -13,7 +21,7 @@ class Geometry(NamedTuple):
     height: int
 
 
-class ChildWindow(tb.Toplevel):
+class ChildWindow(ttk.Toplevel):
     """Конструктор для дочерних окон"""
     WIN_GEOMETRY = Geometry(100, 100)
     LIN_GEOMETRY = Geometry(100, 100)
@@ -76,9 +84,10 @@ class ChildWindow(tb.Toplevel):
 
 def style_init():
     """Ф-я для инициализации общих используемых стилей. Вызывается после инициализации основного объекта ttkbootstrap."""
-    style = tb.Style()
+    style = ttk.Style()
     # -----Стили различных кнопок-----
-    
+
+
     # Выравнивание надписи на кнопке по левому краю
     style.configure('l_jf.TButton')
     style.layout('l_jf.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])

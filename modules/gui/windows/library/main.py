@@ -23,7 +23,7 @@ class LibraryWindow(ChildWindow):
             CollapsingInterface(row * 100, scroled_frame, category)
 
 
-class LibMenubutton(tb.Menubutton):
+class LibMenubutton(ttk.Menubutton):
     """Menubutton для представления продукта в библиотеке"""
     def __init__(self, colapsing_int: Any, text:str):
         self._interface = colapsing_int
@@ -48,7 +48,7 @@ class LibMenubutton(tb.Menubutton):
 
     def show_menu(self) -> None:
         """Отрисовка меню"""
-        menu = tb.Menu(self)
+        menu = ttk.Menu(self)
 
         menu.add_command(
             label='Информация', 
@@ -89,7 +89,7 @@ class CollapsingInterface:
         self._category = category
 
         # Основная кнопка С заголовком продукта и функцией свертываня / развертывания
-        self._btn1 = tb.Button(
+        self._btn1 = ttk.Button(
             self._lib_frame,
             text='⌄  ' + self._category.__doc__, #type: ignore
             style='library.TButton', 
@@ -98,7 +98,7 @@ class CollapsingInterface:
         self._btn1.grid(row=self._row, column=0, sticky='ew')
 
         # Вторая кнопка - добавление продукта в библиотеку
-        tb.Button(
+        ttk.Button(
             self._lib_frame, 
             text='+' , 
             style='LibraryPlus.TButton',

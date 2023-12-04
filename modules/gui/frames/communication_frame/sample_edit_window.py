@@ -4,9 +4,9 @@ from mail_samples import MailSamples
 
 class SampleWidgets(NamedTuple):
     sample_id: int | None
-    tag: tb.Combobox
-    name: tb.Entry
-    text: tb.Text
+    tag: ttk.Combobox
+    name: ttk.Entry
+    text: ttk.Text
 
 
 class SampleEditWindow(ChildWindow):
@@ -24,23 +24,23 @@ class SampleEditWindow(ChildWindow):
         self._widgets.tag.focus_set()
 
     def main(self, **kwargs) -> None:
-        tb.Label(master=self, text='Таг шаблона').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
-        tag = tb.Combobox(self, cursor='xterm', values=tuple(x[1] for x in self.SAMPLES.get_headers()))
+        ttk.Label(master=self, text='Таг шаблона').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
+        tag = ttk.Combobox(self, cursor='xterm', values=tuple(x[1] for x in self.SAMPLES.get_headers()))
         tag.pack(padx=2, pady=(2, 0), expand=1, fill='x')
-        tb.Label(master=self, text='Имя шаблона').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
-        name = tb.Entry(master=self, width=50)
+        ttk.Label(master=self, text='Имя шаблона').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
+        name = ttk.Entry(master=self, width=50)
         name.pack(padx=2, pady=(2, 0), expand=1, fill='x')
-        tb.Label(master=self, text='Текст').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
-        frame = tb.Frame(master=self)
+        ttk.Label(master=self, text='Текст').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
+        frame = ttk.Frame(master=self)
         frame.pack(expand=1, fill='both')
-        text = tb.Text(master=frame, width=52, height=15, wrap='word')
+        text = ttk.Text(master=frame, width=52, height=15, wrap='word')
         text.pack(side='left', padx=2, pady=(2, 0), expand=1, fill='both')
         text.bind('<Control-space>', self.highlight_event)
-        scroll = tb.Scrollbar(master=frame, command=text.yview, style='round')
+        scroll = ttk.Scrollbar(master=frame, command=text.yview, style='round')
         text.config(yscrollcommand=scroll.set)
         scroll.pack(side='right', fill='y')
-        tb.Button(master=self, text='Сохранить', width=18, command=self.save).pack(pady=2, padx=(2, 0), side='left')
-        tb.Button(master=self, text='Отмена', width=18, command=self.destroy).pack(pady=2, padx=(0, 2), side='right')
+        ttk.Button(master=self, text='Сохранить', width=18, command=self.save).pack(pady=2, padx=(2, 0), side='left')
+        ttk.Button(master=self, text='Отмена', width=18, command=self.destroy).pack(pady=2, padx=(0, 2), side='right')
         sample_id = kwargs['sample_id']
         self._widgets = SampleWidgets(sample_id, tag, name, text)
         self.insert_values(self.SAMPLES.get(sample_id) if sample_id else self.get_default_text())

@@ -1,4 +1,3 @@
-from ttkbootstrap import Bootstyle
 from gui._source import *
 from mail_samples import MailSamples
 from .init_sample_window import InitSampleWindow
@@ -8,7 +7,7 @@ from .sample_edit_window import SampleEditWindow
 SAMPLES = MailSamples()
 
 
-class SampleButton(tb.Menubutton):
+class SampleButton(ttk.Menubutton):
     _c_init = 'Использовать'
     _c_change = 'Изменить'
     _c_del = 'Удалить'
@@ -22,7 +21,7 @@ class SampleButton(tb.Menubutton):
                         **kwargs
                         )
         self._sample_frame = sample_frame
-        self._menu = tb.Menu(self)
+        self._menu = ttk.Menu(self)
         self.sample_id = sample_id
         self.bind('<ButtonPress-1>', self.init_sample)
         self.bind('<ButtonPress-3>', self.show_menu)
@@ -42,7 +41,7 @@ class SampleButton(tb.Menubutton):
     
     def show_menu(self, event: tkinter.Event | None = None) -> None:
         """Отрисовка меню"""
-        self['menu'] = self._menu = tb.Menu(self)
+        self['menu'] = self._menu = ttk.Menu(self)
         self._menu.add_command(label=self._c_init, command=self.init_sample)
         self._menu.add_command(label=self._c_change, command=self.edit_sample)
         self._menu.add_command(label=self._c_del, command=self.del_sample)
@@ -79,10 +78,10 @@ class MailSamplesFrame(ScrolledFrame):
         for sid, tag, name in SAMPLES.get_headers():
             if current_tag != tag:
                 current_tag = tag
-                frame = tb.LabelFrame(self, text=tag)
+                frame = ttk.LabelFrame(self, text=tag)
                 frame.pack(fill='x', padx=(0, 18))
             SampleButton(frame, self, sid, name).pack(fill='x', padx=5, pady=(0, 5))
-        tb.Button(master=self, text='Добавить', command=self.add_sample).pack(pady=5)
+        ttk.Button(master=self, text='Добавить', command=self.add_sample).pack(pady=5)
     
     def add_sample(self) -> None:
         self.wait_window(SampleEditWindow())

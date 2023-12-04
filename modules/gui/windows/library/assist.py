@@ -15,26 +15,26 @@ class AssistWindow(ChildWindow):
         'individual': 'Индивидуальные особенности'
         }
 
-    def __draw_checkbutton_widget(self, master: tb.Frame, key: str, text: str) -> None:
+    def __draw_checkbutton_widget(self, master: ttk.Frame, key: str, text: str) -> None:
         """Конструктор для отрисовки чек фреймов"""
         # Переменная
-        self._vars[key] = var = tb.IntVar(master)
+        self._vars[key] = var = ttk.IntVar(master)
 
         # Виджет
-        tb.Checkbutton(
+        ttk.Checkbutton(
             master, 
             text=text, 
             variable=var,
             style='success-round-toggle'
             ).pack(padx=(10, 0), pady=(27, 0))
 
-    def __draw_combobox_widget(self, master: tb.Frame, key: str, text: str) -> None:
+    def __draw_combobox_widget(self, master: ttk.Frame, key: str, text: str) -> None:
         """Конструктор фрейма для отрисовки Комбобокс виджета"""
         # Рисуем название свойства
-        tb.Label(master, text=text).pack(anchor='nw', padx=(5, 0))
+        ttk.Label(master, text=text).pack(anchor='nw', padx=(5, 0))
 
         # Рисуем Комбобокс
-        self._vars[key] = combo = tb.Combobox(
+        self._vars[key] = combo = ttk.Combobox(
             master=master, 
             state='readonly', 
             values=self._properties(key),
@@ -47,25 +47,25 @@ class AssistWindow(ChildWindow):
             pady=(0, 5)
             )
     
-    def __draw_cover_type_radio_widgets(self, master: tb.Frame, key: str, text: str) -> None:
+    def __draw_cover_type_radio_widgets(self, master: ttk.Frame, key: str, text: str) -> None:
         """Конструктор для отрисовки Радио-баттон-фреймов"""
         # снимаем отрисовку виджетов мастера
         for widget in master.master.winfo_children(): widget.pack_forget()
 
         # Формируем контейнер для правильного размещения Radiobutton'ов
-        container = tb.Frame(master.master)
+        container = ttk.Frame(master.master)
         container.pack(anchor='nw', pady=(0, 5))
 
         # Рисуем название свойства
-        tb.Label(container, text=text).pack(anchor='nw')
+        ttk.Label(container, text=text).pack(anchor='nw')
 
         # Получаем свойства и определяем текстовую переменную 
         values = self._properties(key)
-        self._vars[key] = var = tb.StringVar(master, value=values[0])
+        self._vars[key] = var = ttk.StringVar(master, value=values[0])
 
         # Рисуем Radiobutton'ы
         for name in values:
-            tb.Radiobutton(
+            ttk.Radiobutton(
                 master=container, 
                 text=name, 
                 value=name, 
@@ -83,16 +83,16 @@ class AssistWindow(ChildWindow):
         widgets[1].pack(anchor='n', side='left')
 
 
-    def __draw_entry_widget(self, master: tb.Frame, key: str, text: str) -> None:
+    def __draw_entry_widget(self, master: ttk.Frame, key: str, text: str) -> None:
         """Конструктор фрейма для отрисовки Entry виджета"""
         # Рисуем название свойства
-        tb.Label(master=master, text=text).pack(anchor='nw')
+        ttk.Label(master=master, text=text).pack(anchor='nw')
 
         # Текстовая переменная
-        self._vars[key] = var = tb.StringVar(master)
+        self._vars[key] = var = ttk.StringVar(master)
 
         # Энтри виджет
-        tb.Entry(
+        ttk.Entry(
             master=master, 
             textvariable=var,
             ).pack(
@@ -105,35 +105,35 @@ class AssistWindow(ChildWindow):
     def __draw_full_name_widgets(self) -> None:
         """Конструктор фрейма для отрисовки Entry виджета для full_name свойства продукта"""
         # Текстовая переменная
-        self._vars['full_name'] = var = tb.StringVar(self)
+        self._vars['full_name'] = var = ttk.StringVar(self)
 
         # Контейнер для виджета
-        lf = tb.LabelFrame(self, text='Полное имя продукта', padding=5)
+        lf = ttk.LabelFrame(self, text='Полное имя продукта', padding=5)
         lf.pack(fill='x', padx=5)
 
         # Энтри виджет
-        tb.Entry(
+        ttk.Entry(
             master=lf, 
             textvariable=var,
             state='disabled' if self._mode == 'change' else 'normal'
             ).pack(fill='x')
 
-    def __draw_radio_widgets(self, master: tb.Frame, key: str, text: str) -> None:
+    def __draw_radio_widgets(self, master: ttk.Frame, key: str, text: str) -> None:
         """Конструктор для отрисовки Радио-баттон-фреймов"""
         # Формируем контейнер для правильного размещения Radiobutton'ов
-        container = tb.Frame(master)
+        container = ttk.Frame(master)
         container.pack(fill='both', padx=(5, 0), pady=(0, 5))
 
         # Рисуем название свойства
-        tb.Label(container, text=text).pack(anchor='nw')
+        ttk.Label(container, text=text).pack(anchor='nw')
 
         # Получаем свойства и определяем текстовую переменную 
         values = self._properties(key)
-        self._vars[key] = var = tb.StringVar(master, value=values[0])
+        self._vars[key] = var = ttk.StringVar(master, value=values[0])
 
         # Рисуем Radiobutton'ы
         for name in values:
-            tb.Radiobutton(
+            ttk.Radiobutton(
                 master=container, 
                 text=name, 
                 value=name, 
@@ -199,7 +199,7 @@ class AssistWindow(ChildWindow):
         self.draw_main_widgets()
 
         # Кнопка сохранить
-        tb.Button(
+        ttk.Button(
             self, 
             text='Сохранить', 
             width=14, 
@@ -220,7 +220,7 @@ class AssistWindow(ChildWindow):
     def draw_main_widgets(self) -> None:
         """Отображает менюшки на self.product_menus_frame согласно выбранному продукту"""
         # Рисуем Notebook
-        nb = tb.Notebook(self)
+        nb = ttk.Notebook(self)
         nb.pack(fill='both', expand=1, padx=5, pady=5)
 
         # Переменная для хранения имени вкладки. 
@@ -238,17 +238,17 @@ class AssistWindow(ChildWindow):
             # Инициализируем закладку, если ее нет.
             if mark_name != w_mark_name:
                 mark_name = w_mark_name
-                mark = tb.Frame(nb)
+                mark = ttk.Frame(nb)
                 nb.add(mark, text=self.MARKS[w_mark_name])
                 
                 # Инициализируем и отрисовываем левый и правый фреймы на закладке
-                left = tb.Frame(mark)
+                left = ttk.Frame(mark)
                 left.pack(side='left', anchor='n')
-                right = tb.Frame(mark)
+                right = ttk.Frame(mark)
                 right.pack(side='right', anchor='n')
 
                 # Виджеты для выравнивания))
-                for _side in (left, right): tb.Frame(_side, width=242).pack(anchor='n')
+                for _side in (left, right): ttk.Frame(_side, width=242).pack(anchor='n')
 
             # Отрисовываем связанные виджеты 
             draw_func(self, left if side == 'left' else right, field, text)

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from library import Library
     from log import Log
     from gui.main import MainWindow
-    from gui.frames import ProcessingFrame
+    from gui.frames import ProcessingInterface
     from ttkbootstrap import StringVar, IntVar
     from task_manager import TaskManager
     from trackers.orders_tracker import OrdersTracker
@@ -26,7 +26,7 @@ class _TxtVars:
 class _AppManager:
     """Класс собирающий в себя критические модули приложения"""
     # Объявляем слоты для ускорения доступа
-    __slots__ = 'SYSTEM', 'lib', 'log', 'mw', 'pf', 'tm', 'txtvars', 'stg', 'ot'
+    __slots__ = 'SYSTEM', 'lib', 'log', 'mw', 'pi', 'tm', 'txtvars', 'stg', 'ot'
     __instance = None
 
     def __new__(cls) -> Self:
@@ -39,7 +39,7 @@ class _AppManager:
         self.lib: Library
         self.log: Log
         self.mw: MainWindow
-        self.pf: ProcessingFrame    # Этот фрейм будет записан в мменеджер при инициализации основного окна
+        self.pi: ProcessingInterface    # Этот фрейм будет записан в мменеджер при инициализации основного окна
         self.txtvars = _TxtVars()
         self.tm: TaskManager
         self.ot: OrdersTracker
@@ -63,8 +63,8 @@ AppManager.lib = Library()
 # from log import Log
 # AppManager.log = Log()
 
-# from task_manager import TaskManager
-# AppManager.tm = TaskManager()
+from task_manager import TaskManager
+AppManager.tm = TaskManager()
 
 # from trackers.orders_tracker import OrdersTracker
 # AppManager.ot = OrdersTracker()

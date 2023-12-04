@@ -24,14 +24,14 @@ class InitSampleWindow(ChildWindow):
         return Geometry(old.width, 59 + len(self._text[1::2]) * old.height)
     
     def main(self, **kwargs) -> None:
-        tb.Label(master=self, text='Заполните поля:').pack(pady=(1, 0))
+        ttk.Label(master=self, text='Заполните поля:').pack(pady=(1, 0))
         for var in self._text[1::2]:
-            tb.Label(master=self, text=var).pack(padx=(5, 0), pady=(1, 0), anchor='nw')
-            entry = tb.Entry(master=self, width=30)
+            ttk.Label(master=self, text=var).pack(padx=(5, 0), pady=(1, 0), anchor='nw')
+            entry = ttk.Entry(master=self, width=30)
             entry.pack(padx=2, pady=(1, 0), expand=1, fill='x')
             self._widgets.append(entry)
-        tb.Button(self, text='Ок', width=8, command=self.create_sample).pack(side='left', padx=2, pady=2)
-        tb.Button(self, text='Отмена', width=8, command=self.destroy).pack(side='right', pady=2, padx=(0, 2))
+        ttk.Button(self, text='Ок', width=8, command=self.create_sample).pack(side='left', padx=2, pady=2)
+        ttk.Button(self, text='Отмена', width=8, command=self.destroy).pack(side='right', pady=2, padx=(0, 2))
 
     def create_sample(self, event: tkinter.Event | None = None):
         """Создание сэмпла и помещение его в буфер обмена"""

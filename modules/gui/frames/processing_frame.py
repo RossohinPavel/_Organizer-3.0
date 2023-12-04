@@ -1,74 +1,104 @@
 from .._source import *
 
 
-class MyMeter(tb.Meter):
-    """Более удобный для меня метр виджет"""
-
-    def __init__(self, master: Any, /, **kwargs):
-        # Определяем основные настройки виджета
-        super().__init__(
-            master,
-            metersize=160,
-            textfont='-size 20 -weight bold',
-            interactive=True,
-            # stripethickness=0,    # 360 градусов максимальное значение, как в обычном круге. Значение должно быть int
-            **kwargs
-            )
-
-    def _setup_widget(self):
-        super()._setup_widget()
-        self.meterframe.configure(height=int(self._metersize * 0.68))
-
-    def _set_show_text(self):
-        """Переопределенная ф-я для отрисовки основного счетчика внутри метер виджета"""
-        super()._set_show_text()
-        self.textframe.pack_forget()
-        if self._showtext:
-            if self._subtext:
-                self.textframe.place(relx=0.5, rely=0.50, anchor='center')
-            else:
-                self.textframe.place(relx=0.5, rely=0.5, anchor='s')
-
-    def _set_subtext(self):
-        if self._subtextfont:
-            if self._showtext:
-                self.subtext.place(relx=0.5, rely=0.71, anchor='center')
-            else:
-                self.subtext.place(relx=0.5, rely=0.5, anchor='center')
-
-
-class OperationMeter(MyMeter):
-    """Метр виджет для отображения операций"""
-    def __init__(self, master: Any, /, **kwargs):
-        super().__init__(
-            master,
-            arcrange=210,
-            arcoffset=165,
-            bootstyle='info',
-            textright='/ 5',
-            # stripethickness=42,
-            **kwargs
-            )
-
-
-class ProcessingFrame:
+class ProcessingInterface:
     """Конструктор для фрейма отображающего статус обработки различных задач. Используется как контекстный менеджер"""  
-    def __init__(self, frame: tb.Labelframe):
-        self.header = tb.StringVar(master=frame)
-        self._header_label = tb.Label(master=frame, textvariable=self.header, anchor='w', width=22)
-        self.operation = OperationMeter(frame, subtext='super_long_file_name')
-        self.file = tb.Meter(frame, metersize=160, interactive=True, textfont='-size 18 -weight bold', subtext='long_file_name')
-        self.__exit__()
+
+    __slots__ = 'header', '__header_lbl', 'operation', 'filebar'
+    
+    def __init__(self, frame: ttk.Labelframe):
+        # Текстовая пременная и лейбл модуля
+        self.header = ttk.StringVar(frame, value='__Module_Name__')
+        self.__header_lbl = ttk.Label(frame, textvariable=self.header)
+
+        # Интерфейс операций
+        self.operation = OperationLabel(frame)
+
+        # Интерфейс фалов
+        self.filebar = FileBar(frame)
 
     def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
-        self._header_label.pack(pady=(0, 2))
-        self.operation.pack()
-        self.file.pack()
+        self.__header_lbl.pack(anchor=ttkc.W, expand=1)
+        self.operation.pack(anchor=ttkc.W, expand=1)
+        self.filebar.pack(anchor=ttkc.W, expand=1, fill=ttkc.BOTH)
 
     def __exit__(self, *args) -> None:
         """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""
-        self.header.set('__Имодуль__')
-        self._header_label.pack_forget()
+        self.__header_lbl.pack_forget()
         self.operation.pack_forget()
-        self.file.pack_forget()
+        self.operation.reset()
+        self.filebar.pack_forget()
+        self.filebar.reset()
+
+
+class OperationLabel(ttk.Label):
+    """Интерфейс для упрощения обработки операций и их названий"""
+
+    def __init__(self, master: ttk.LabelFrame, /, **kwargs) -> None:
+        super().__init__(master, text='__Operation_Name__', **kwargs)
+        self.__value = -1
+        self.maximum = 0
+
+    def set(self, value: str) -> None:
+        """Установка значения в текстовую переменную"""
+        self.__value += 1
+        self.configure(text=f'{self.__value} / {self.maximum} -- {value}')
+    
+    def reset(self) -> None:
+        """Сбрасывает значения виджетов до начальных"""
+        self.__value = -1
+        self.maximum = 0
+
+
+class FileBar(ttk.Frame):
+    """Интерфейс для управления виджетами файлов"""
+
+    def __init__(self, master: ttk.LabelFrame, /, **kwargs) -> None:
+        super().__init__(master, **kwargs)
+
+        # Лейбл отображения имени файла
+        self.__lbl = ttk.Label(self, text='__long_file_name__')
+        self.__lbl.pack(anchor=ttkc.W, expand=1)
+
+        # Переменные для прогрессбара и лейблов
+        self.__value = 1
+        self.__delta = 1.0
+        self.__maximum = 100
+
+        # Прогрессбар
+        self.__pb = ttk.Progressbar(self)
+        self.__pb.pack(
+            anchor=ttkc.W, 
+            expand=1, 
+            fill=ttkc.X, 
+            side=ttkc.LEFT
+            )
+        # Лейбл отображения процента
+        self.__lbl1 = ttk.Label(self, text='100.0%', width=5, justify='left')
+        self.__lbl1.pack(side=ttkc.RIGHT, anchor=ttkc.E)
+    
+    @property
+    def maximum(self) -> int:
+        """Возвращает предельное значение интерфейса"""
+        return self.__maximum
+
+    @maximum.setter
+    def maximum(self, value: int) -> None:
+        """Устанавливает предельное значение"""
+        self.__maximum = value
+        self.__delta = 100 / value
+        self.__pb['value'] -= self.__delta
+
+    def set(self, value: str) -> None:
+        """Устанавливает value в лейблы и продвигает прогрессбар"""
+        self.__pb['value'] += self.__delta
+        self.__value += 1
+        self.__lbl.configure(text=f'{self.__value} / {self.__maximum} -- {value}')
+        self.__lbl1.configure(text=str(round(self.__pb['value'], 1)) + '%')
+    
+    def reset(self) -> None:
+        """Сбрасывает значения виджетов до начальных"""
+        self.__value = 1
+        self.__delta = 1.0
+        self.__maximum = 100

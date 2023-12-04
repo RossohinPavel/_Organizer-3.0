@@ -18,7 +18,7 @@ class TaskManager:
         """Замыкание, возвращающее ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args: Any, **kwargs: Mapping[str, Any]):
             AppManager.txtvars.queue.set(AppManager.txtvars.queue.get() + 1)
-            with self.__lock, AppManager.pf:
+            with self.__lock, AppManager.pi:
                 try:
                     func(*args, **kwargs)
                 except Exception as exc:

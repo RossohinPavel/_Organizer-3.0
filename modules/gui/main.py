@@ -3,9 +3,9 @@ from . import frames
 from . import windows
 
 
-class MainWindow(tb.Window):
+class MainWindow(ttk.Window):
     WIN_GEOMETRY = Geometry(527, 511)
-    LIN_GEOMETRY = Geometry(547, 527)
+    LIN_GEOMETRY = Geometry(370, 520)
 
     # Определяем тип ОС
     match AppManager.SYSTEM:
@@ -18,9 +18,9 @@ class MainWindow(tb.Window):
         style_init()
         # Отрисовываем остальные виджеты
         self.set_main_graph_settings()
-        self.show_header_frames()
-        self.show_processing_column()
-        self.show_common_line()
+        self.draw_header_frames()
+        self.draw_processing_widgets()
+        self.draw_common_notebook()
     
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""
@@ -37,43 +37,45 @@ class MainWindow(tb.Window):
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
 
-    # def destroy(self) -> None:
-    #     """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
-    #     ttl = 'Очередь задач не пуста'
-    #     msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
-    #     if AppManager.txtvars.queue.get() > 0:
-    #         if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
-    #             return
-    #     super().destroy()
+    def destroy(self) -> None:
+        """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
+        ttl = 'Очередь задач не пуста'
+        msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
+        if AppManager.txtvars.queue.get() > 0:
+            if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
+                return
+        super().destroy()
 
-    def show_header_frames(self) -> None:
+    def draw_header_frames(self) -> None:
         """Отрисовка фрейма - заголовка окна"""
-        container = tb.Frame(master=self, padding=(5, 6, 5, 0))
-        container.pack(fill='x')
-        self.show_log_tracker_widgets(container)
-        self.show_theme_switcher(container)
+        container = ttk.Frame(master=self, padding=(5, 5, 5, 0))
+        container.pack(fill=ttkc.X)
+        self.draw_log_tracker_widgets(container)
+        self.draw_theme_switcher(container)
     
-    def show_log_tracker_widgets(self, container: tb.Frame) -> None:
+    def draw_log_tracker_widgets(self, container: ttk.Frame) -> None:
         """Отрисовка статуса процесса выполнения лога"""
         # Обработка нажатия на CheckButton
         def init(): AppManager.stg.autolog = var.get()
 
-        var = tb.IntVar(self, AppManager.stg.autolog)
-        chbtn = tb.Checkbutton(
+        # Checkbutton виджет управления теркером
+        var = ttk.IntVar(self, AppManager.stg.autolog)
+        chbtn = ttk.Checkbutton(
             master=container, 
-            text='Трекер заказов: ', 
+            text='Трекер: ', 
             style='success-round-toggle', 
             onvalue=1, 
             offvalue=0,
             variable=var,
             command=init
             )
-        chbtn.pack(side='left', padx=(3, 0))
-        orders_trk = tb.StringVar(master=container, value='Выключен')
-        tb.Label(master=container, textvariable=orders_trk).pack(side='left')
-        AppManager.txtvars.ot = orders_trk
+        chbtn.pack(side=ttkc.LEFT, padx=(3, 0))
 
-    def show_theme_switcher(self, container: tb.Frame) -> None:
+        # Лейбл отрисовки статуса логгера
+        AppManager.txtvars.ot = orders_trk = ttk.StringVar(master=container, value='Выключен')
+        ttk.Label(master=container, textvariable=orders_trk).pack(side=ttkc.LEFT)
+
+    def draw_theme_switcher(self, container: ttk.Frame) -> None:
         """Отрисовка свитчера тем"""
         def switch_theme():
             """Переключение темы по нажатию"""
@@ -82,43 +84,85 @@ class MainWindow(tb.Window):
             AppManager.stg.theme = theme
             style_init()
 
-        style = tb.Style()
-        theme_var = tb.StringVar(self, value=AppManager.stg.theme)
-        menu = tb.Menu(container)
+        # Объект Style
+        style = ttk.Style()
+
+        # Переменная для хранения названия темы
+        theme_var = ttk.StringVar(self, value=AppManager.stg.theme)
+
+        # Выподающее меню
+        menu = ttk.Menu(container)
         for name in style.theme_names():
             menu.add_radiobutton(label=name, variable=theme_var, command=switch_theme)
-        btn = tb.Menubutton(container, text='Темы', style='ts.Outline.TMenubutton', menu=menu, cursor='hand2')
-        btn.pack(side='right')
+
+        # Кнопка для меню
+        btn = ttk.Menubutton(
+            container, 
+            text='Темы', 
+            style='ts.Outline.TMenubutton', 
+            menu=menu, 
+            cursor='hand2'
+            )
+        btn.pack(side=ttkc.RIGHT)
+
+        # Вызываем ф-ю для того, чтобы применилась сохраненная тема
         switch_theme()
     
-    def show_processing_column(self) -> None:
-        """Отображение заголовка и фреймов файловой обработки"""
-        l_container = tb.Frame(master=self, padding=(5, 0, 5, 5))
-        l_container.pack(side='left', fill='y')
-        btn_container = tb.Labelframe(l_container, text='Обработка', padding=(5, 0, 5, 5))
-        btn_container.pack(fill='x')
-        self.show_processing_buttons(btn_container)
+    def draw_processing_widgets(self) -> None:
+        """Отображение виджетов файловой обработки"""
+        master = ttk.Frame(self, padding=(0, 2, 0 , 0))
+        master.pack(fill=ttkc.X)
+
+        # Контейнер для кнопок
+        btn_container = ttk.Labelframe(
+            master, 
+            text='Обработка', 
+            padding=(5, 0, 5, 5)
+            )
+        btn_container.pack(side=ttkc.LEFT, padx=5)
+
+        # Отрисовка кнопок
+        self.draw_processing_buttons(btn_container)
         self.draw_add_btn_menu(btn_container)
-        psg_container = tb.Labelframe(l_container, text='Задач в очереди: ', padding=(5, 0, 3, 3))
-        psg_container.pack(side='right', fill='y')
-        # queue = ctk.IntVar(master=frame, value=0)
-        # AppManager.txtvars.queue = queue
-        self.show_processing_frame(psg_container)
 
-    def show_processing_buttons(self, container: tb.Labelframe) -> None:
+        pf_container = ttk.Labelframe(
+            master, 
+            text='Задач в очереди: ', 
+            padding=(5, 0, 5, 5)
+            )
+        pf_container.pack(
+            side=ttkc.LEFT, 
+            padx=(0, 5),
+            fill=ttkc.BOTH,
+            expand=1
+            )
+        self.draw_processing_frame(pf_container)
+
+    def draw_processing_buttons(self, container: ttk.Labelframe) -> None:
         """Отрисовка фрейма кнопок запуска обработчика файлов"""
-        btn1 = tb.Button(container, text='Разметка обложек', command=lambda: CoverMarkerWindow(self), width=16)
-        btn1.pack(fill='x')
-        # self.bind('<F1>', lambda _: btn1.invoke())
-        self.bind('<F1>', lambda _: AppManager.pf.__enter__())
-        btn2 = tb.Button(container, text='Раскодировка', command=lambda: PageDecoderWindow(master=self), width=16)
-        btn2.pack(fill='x', pady=5)
-        # self.bind('<F2>', lambda _: btn2.invoke())
-        self.bind('<F2>', lambda _: AppManager.pf.__exit__())
+        btn1 = ttk.Button(
+            container, 
+            text='Разметка обложек', 
+            command=lambda: print(self.winfo_geometry())
+            # command=lambda: CoverMarkerWindow(self), 
+            )
+        btn1.pack(fill=ttkc.X)
+        
+        btn2 = ttk.Button(
+            container, 
+            text='Раскодировка', 
+            command=lambda: PageDecoderWindow(master=self), 
+            )
+        btn2.pack(fill=ttkc.X, pady=5)
 
-    def draw_add_btn_menu(self, container: tb.Labelframe) -> None:
+        self.bind('<F1>', lambda _: AppManager.pi.__enter__())
+         # # self.bind('<F1>', lambda _: btn1.invoke())
+        # # self.bind('<F2>', lambda _: btn2.invoke())
+        self.bind('<F2>', lambda _: AppManager.pi.__exit__())
+
+    def draw_add_btn_menu(self, container: ttk.Labelframe) -> None:
         """Отрисовка кнопки Дополнительно и меню под ней"""
-        menu = tb.Menu(master=container)
+        menu = ttk.Menu(master=container)
 
         menu.add_command(label='Обновить БД')
         menu.add_command(label='Направляющие')
@@ -127,24 +171,37 @@ class MainWindow(tb.Window):
         menu.add_command(label='Восстановление')
         menu.add_command(label='Роддом', command=lambda: windows.Roddom(self))
 
-        btn = tb.Menubutton(master=container, text='Дополнительно', menu=menu)
-        btn.pack(fill='x')
+        btn = ttk.Menubutton(
+            master=container, 
+            text='Дополнительно', 
+            menu=menu
+            )
+        btn.pack(fill=ttkc.X)
 
         self.bind('<F3>', lambda _: btn.event_generate('<<Invoke>>'))
     
-    def show_processing_frame(self, container: tb.Labelframe) -> None:
+    def draw_processing_frame(self, container: ttk.Labelframe) -> None:
         """Отрисовка фрейма отображения прогресса обработки файлов"""
-        tb.Frame(container, width=160).pack()
-        AppManager.pf = frames.ProcessingFrame(container)
-    
-    def show_common_line(self) -> None:
-        """Отображение остальных фреймов для работы с заказами, клиентами и др"""
-        tab = tb.Notebook(master=self)
-        tab.pack(padx=(0, 5), pady=(8, 5), side='right', anchor='n', fill='y')
-        tab1 = tb.Frame(tab)
-        tab2 = tb.Label(tab, text='test', background='red')
+        # Переменная для хранения значения очереди
+        AppManager.txtvars.queue = queue = ttk.IntVar(container, value=0)
+        ttk.Label(container, textvariable=queue).place(x=105, y=-20)
 
-        tab.add(tab1, text='Информация')
-        tab.add(tab2, text='Планировщик', padding=5)
+        # Отрисовка ProcessingFrame
+        AppManager.pi = frames.ProcessingInterface(container)
+    
+    def draw_common_notebook(self) -> None:
+        """Отображение остальных фреймов для работы с заказами, клиентами и др"""
+        tab = ttk.Notebook(master=self)
+        tab.pack(
+            padx=5, 
+            pady=5,
+            fill=ttkc.BOTH,
+            expand=1
+            )
+
+        # Закладки
+        tab.add(ttk.Frame(tab), text='Информация')
+        tab.add(ttk.Label(tab, text='test', background='red'), text='Планировщик', padding=5)
         tab.add(frames.MailSamplesFrame(tab).container, text='Общение', padding=5)
-        tab.add(frames.ControlFrame(tab), text='Управление')
+        tab.add(frames.ControlFrame(tab), text='Управление')    
+
