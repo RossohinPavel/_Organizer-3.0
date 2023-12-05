@@ -5,13 +5,13 @@ import os
 # Импорты для типизации менеджера
 if TYPE_CHECKING:   
     from library import Library
-    from log import Log
+    from db_connect.log import Log
     from gui.main import MainWindow
     from gui.frames import ProcessingInterface
     from ttkbootstrap import StringVar, IntVar
     from task_manager import TaskManager
     from trackers.orders_tracker import OrdersTracker
-    from settings import Settings
+    from db_connect.settings import Settings
 
 
 class _TxtVars:
