@@ -12,7 +12,7 @@ from ttkbootstrap.scrolled import ScrolledFrame
 from typing import Callable, NamedTuple, Any, Mapping, Type, Literal, Self, Iterator
 
 # AppManager управления приложением
-from appmanager import AppManager
+from ..app_manager import AppManager
 
 
 class Geometry(NamedTuple):

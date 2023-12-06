@@ -1,6 +1,6 @@
 from typing import Any
-from safe_connect import SafeConnect
-from appmanager import AppManager
+from .safe_connect import SafeConnect
+from ..app_manager import AppManager
 
 
 class Settings:

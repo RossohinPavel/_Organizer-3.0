@@ -1,4 +1,4 @@
-from gui._source import *
+from ..._source import *
 
 
 class InitSampleWindow(ChildWindow):

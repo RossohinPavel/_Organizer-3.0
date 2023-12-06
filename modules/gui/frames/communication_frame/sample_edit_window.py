@@ -1,5 +1,5 @@
-from gui._source import *
-from mail_samples import MailSamples
+from ..._source import *
+from ....data_base import MailSamples
 
 
 class SampleWidgets(NamedTuple):

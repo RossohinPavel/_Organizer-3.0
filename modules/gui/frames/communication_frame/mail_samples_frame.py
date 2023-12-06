@@ -1,5 +1,5 @@
-from gui._source import *
-from mail_samples import MailSamples
+from ..._source import *
+from ....data_base import MailSamples
 from .init_sample_window import InitSampleWindow
 from .sample_edit_window import SampleEditWindow
 

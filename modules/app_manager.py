@@ -4,14 +4,14 @@ import os
 
 # Импорты для типизации менеджера
 if TYPE_CHECKING:   
-    from library import Library
-    from db_connect.log import Log
+    from .data_base import Library
+    from .data_base import Log
     from gui.main import MainWindow
     from gui.frames import ProcessingInterface
     from ttkbootstrap import StringVar, IntVar
     from task_manager import TaskManager
     from trackers.orders_tracker import OrdersTracker
-    from db_connect.settings import Settings
+    from .data_base import Settings
 
 
 class _TxtVars:
@@ -57,22 +57,22 @@ match os.name:
 
 
 # Наполняем менеджер реальными объектами
-from library import Library
+from .data_base import Library
 AppManager.lib = Library()
 
 # from log import Log
 # AppManager.log = Log()
 
-from task_manager import TaskManager
+from .task_manager import TaskManager
 AppManager.tm = TaskManager()
 
 # from trackers.orders_tracker import OrdersTracker
 # AppManager.ot = OrdersTracker()
 
-from settings import Settings
+from .data_base import Settings
 AppManager.stg = Settings()
 
-from gui.main import MainWindow
+from .gui.main import MainWindow
 AppManager.mw = MainWindow()    # Самый последний инициализируемый модуль
 
 

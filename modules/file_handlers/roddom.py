@@ -1,7 +1,7 @@
 import os
 from shutil import copy2 as sh_copy2
 from re import search
-from appmanager import AppManager
+from ..app_manager import AppManager
 
 
 class RoddomHandler:

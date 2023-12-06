@@ -82,7 +82,7 @@ class CollapsingInterface:
     """Интерфейс для управления отрисовкой дочерних виджетов"""
     __slots__ = '_row', '_lib_frame', '_category', '_container', '_state', '_btn1'
 
-    def __init__(self, row: int, lib_frame: ScrolledFrame, category: Type[AppManager.lib.products]) -> None:
+    def __init__(self, row: int, lib_frame: ScrolledFrame, category: Type[AppManager.lib.Product]) -> None:
         # Сохраняем атрибуты
         self._row = row
         self._lib_frame = lib_frame

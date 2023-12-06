@@ -1,6 +1,4 @@
-from gui._source import *
-from library.properties import Properties
-from library.library import Product
+from ..._source import *
 
 
 class AssistWindow(ChildWindow):
@@ -175,7 +173,7 @@ class AssistWindow(ChildWindow):
         self, 
         master: Any, 
         mode: Literal['add', 'copy', 'change'], 
-        category: Type[Product], 
+        category: Type[AppManager.lib.Product], 
         product: str | None = None,
         update_func: Callable | None = None
         ) -> None:
@@ -265,7 +263,7 @@ class AssistWindow(ChildWindow):
             # Размещаем значения
             self._vars[attr].set(product[i])     
 
-    def get_values_from_widgets(self) -> Product:
+    def get_values_from_widgets(self) -> AppManager.lib.Product:
         """
         Метод для получения информации из виджетов.\n
         Возвращает Product если все значения были заполнены,\n

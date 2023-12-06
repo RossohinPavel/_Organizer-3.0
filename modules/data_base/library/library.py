@@ -1,11 +1,12 @@
 from functools import lru_cache
 from typing import Type, NoReturn
-from safe_connect import SafeConnect
+from ..safe_connect import SafeConnect
 from .products import *
+from .properties import Properties
 
 
 # Переменные для аннотации
-type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
+# type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
 
 
 class Library:
@@ -13,7 +14,8 @@ class Library:
     __slots__ = 'headers'
     __s_con = SafeConnect('library.db')
 
-    products = Product
+    Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
+    Properties = Properties
 
     def __init__(self) -> None:
         self.headers: dict[Type[Product], tuple[str, ...]] = {}

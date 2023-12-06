@@ -1,6 +1,5 @@
-from gui._source import *
-from file_handlers import RoddomHandler
-from appmanager import AppManager
+from .._source import *
+from ...file_handlers import RoddomHandler
 
 
 class Roddom(ChildWindow):
