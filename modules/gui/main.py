@@ -4,7 +4,7 @@ from . import windows
 
 
 class MainWindow(ttk.Window):
-    WIN_GEOMETRY = Geometry(360, 500)
+    WIN_GEOMETRY = Geometry(370, 500)
     LIN_GEOMETRY = Geometry(370, 520)
 
     # Определяем тип ОС

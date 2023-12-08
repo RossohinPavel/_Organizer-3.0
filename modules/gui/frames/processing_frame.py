@@ -72,10 +72,11 @@ class FileBar(ttk.Frame):
             anchor=ttkc.W, 
             expand=1, 
             fill=ttkc.X, 
-            side=ttkc.LEFT
+            side=ttkc.LEFT,
+            padx=(0, 10)
             )
         # Лейбл отображения процента
-        self.__lbl1 = ttk.Label(self, text='100.0%', width=5, justify='left')
+        self.__lbl1 = ttk.Label(self, text='100.0%', width=6, justify='left')
         self.__lbl1.pack(side=ttkc.RIGHT, anchor=ttkc.E)
     
     @property
@@ -99,6 +100,7 @@ class FileBar(ttk.Frame):
     
     def reset(self) -> None:
         """Сбрасывает значения виджетов до начальных"""
+        self.__pb['value'] = 0
         self.__value = 1
         self.__delta = 1.0
         self.__maximum = 100
