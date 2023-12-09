@@ -28,7 +28,7 @@ class MainWindow(ttk.Window):
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
-        self.iconphoto(True, tkinter.PhotoImage(data=AppManager.stg.app_ico))
+        self.iconphoto(True, tkinter.PhotoImage(master=self, data=AppManager.stg.app_ico))
         self.update_idletasks()
 
     @staticmethod
@@ -41,7 +41,7 @@ class MainWindow(ttk.Window):
         """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
         ttl = 'Очередь задач не пуста'
         msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
-        if AppManager.txtvars.queue.get() > 0:
+        if AppManager.pf.queue > 0:
             if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
                 return
         super().destroy()
@@ -72,7 +72,7 @@ class MainWindow(ttk.Window):
         chbtn.pack(side=ttkc.LEFT, padx=(3, 0))
 
         # Лейбл отрисовки статуса логгера
-        AppManager.txtvars.ot = orders_trk = ttk.StringVar(master=container, value='Выключен')
+        AppManager.ot_var = orders_trk = ttk.StringVar(master=container, value='Выключен')
         ttk.Label(master=container, textvariable=orders_trk).pack(side=ttkc.LEFT)
 
     def draw_theme_switcher(self, container: ttk.Frame) -> None:
@@ -125,18 +125,14 @@ class MainWindow(ttk.Window):
         self.draw_processing_buttons(btn_container)
         self.draw_add_btn_menu(btn_container)
 
-        pf_container = ttk.Labelframe(
-            master, 
-            text='Задач в очереди: ', 
-            padding=(5, 0, 5, 5)
-            )
-        pf_container.pack(
+        # Отрисовка фрейма статуса выполнения процессов
+        pf = AppManager.pf = frames.ProcessingFrame(master)
+        pf.pack(
             side=ttkc.LEFT, 
             padx=(0, 5),
             fill=ttkc.BOTH,
             expand=1
             )
-        self.draw_processing_frame(pf_container)
 
     def draw_processing_buttons(self, container: ttk.Labelframe) -> None:
         """Отрисовка фрейма кнопок запуска обработчика файлов"""
@@ -155,10 +151,10 @@ class MainWindow(ttk.Window):
             )
         btn2.pack(fill=ttkc.X, pady=5)
 
-        self.bind('<F1>', lambda _: AppManager.pi.__enter__())
+        self.bind('<F1>', lambda _: AppManager.pf.__enter__())
          # # self.bind('<F1>', lambda _: btn1.invoke())
         # # self.bind('<F2>', lambda _: btn2.invoke())
-        self.bind('<F2>', lambda _: AppManager.pi.__exit__())
+        self.bind('<F2>', lambda _: AppManager.pf.__exit__())
 
     def draw_add_btn_menu(self, container: ttk.Labelframe) -> None:
         """Отрисовка кнопки Дополнительно и меню под ней"""
@@ -178,16 +174,7 @@ class MainWindow(ttk.Window):
             )
         btn.pack(fill=ttkc.X)
 
-        self.bind('<F3>', lambda _: btn.event_generate('<<Invoke>>'))
-    
-    def draw_processing_frame(self, container: ttk.Labelframe) -> None:
-        """Отрисовка фрейма отображения прогресса обработки файлов"""
-        # Переменная для хранения значения очереди
-        AppManager.txtvars.queue = queue = ttk.IntVar(container, value=0)
-        ttk.Label(container, textvariable=queue).place(x=105, y=-20)
-
-        # Отрисовка ProcessingFrame
-        AppManager.pi = frames.ProcessingInterface(container)
+        self.bind('<F3>', lambda _: btn.event_generate('<<Invoke>>'))       
     
     def draw_common_notebook(self) -> None:
         """Отображение остальных фреймов для работы с заказами, клиентами и др"""
@@ -204,4 +191,3 @@ class MainWindow(ttk.Window):
         tab.add(ttk.Label(tab, text='test', background='red'), text='Планировщик', padding=5)
         tab.add(frames.MailSamplesFrame(tab).container, text='Общение', padding=5)
         tab.add(frames.ControlFrame(tab), text='Управление')    
-

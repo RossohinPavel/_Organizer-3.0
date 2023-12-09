@@ -31,16 +31,17 @@ class RoddomHandler:
                 yield rel_path, root[-1]
 
     def to_print(self, path):
-        AppManager.pi.header.set(f'Роддом: {self.order}')
+        """Отправка в печать (копирование файлов в указанную папку)"""
+        AppManager.pf.header.set(f'Роддом: {self.order}')
 
-        AppManager.pi.operation.maximum = 1
-        AppManager.pi.operation.set('Копирование на печать')
+        AppManager.pf.operation.maximum = 1
+        AppManager.pf.operation.set('Копирование на печать')
 
-        AppManager.pi.filebar.maximum = self.__img_len
+        AppManager.pf.filebar.maximum = self.__img_len
 
         for rel_path, files in self.__walk_on_order():
             new_path = f'{path}/{rel_path}'
             os.makedirs(new_path, exist_ok=True)
             for file in files:
-                AppManager.pi.filebar.set(file)
+                AppManager.pf.filebar.set(file)
                 sh_copy2(f'{self.path}/{rel_path}/{file}', f'{new_path}/{file}')

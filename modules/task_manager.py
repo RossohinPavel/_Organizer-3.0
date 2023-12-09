@@ -17,14 +17,13 @@ class TaskManager:
     def __get_task(self, func: Callable[[Any], None]) -> Type[Callable[[Any], None]]:
         """Замыкание, возвращающее ф-ю обернутую в контекстный менеджер для последовательного выполнения задач"""
         def wrapper(*args: Any, **kwargs: Mapping[str, Any]):
-            AppManager.txtvars.queue.set(AppManager.txtvars.queue.get() + 1)
-            with self.__lock, AppManager.pi:
+            AppManager.pf.queue = AppManager.pf.queue + 1
+            with self.__lock, AppManager.pf:
                 try:
                     func(*args, **kwargs)
                 except Exception as exc:
                     tkmb.showerror('Ошибка', message=f'{repr(exc)}')
-                    raise exc
-            AppManager.txtvars.queue.set(AppManager.txtvars.queue.get() - 1)
+            AppManager.pf.queue = AppManager.pf.queue - 1
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 

@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, Any, Self, Literal, Type
-import os
+from typing import TYPE_CHECKING, Self, Literal
+from os import name as osname
 
 
 # Импорты для типизации менеджера
@@ -7,28 +7,19 @@ if TYPE_CHECKING:
     from .data_base import Library
     from .data_base import Log
     from gui.main import MainWindow
-    from gui.frames import ProcessingInterface
-    from ttkbootstrap import StringVar, IntVar
+    from gui.frames import ProcessingFrame
+    from ttkbootstrap import StringVar
     from task_manager import TaskManager
     from trackers.orders_tracker import OrdersTracker
     from .data_base import Settings
 
 
-class _TxtVars:
-    """Класс для хранения переменных для виджетов"""
-    __slots__ = 'ot', 'queue'
-    
-    def __init__(self) -> None:
-        self.ot: StringVar
-        self.queue: IntVar
-
-
 class _AppManager:
     """Класс собирающий в себя критические модули приложения"""
-    # Объявляем слоты для ускорения доступа
-    __slots__ = 'SYSTEM', 'lib', 'log', 'mw', 'pi', 'tm', 'txtvars', 'stg', 'ot'
     __instance = None
-
+    # Объявляем слоты для ускорения доступа
+    __slots__ = ('SYSTEM', 'lib', 'log', 'mw', 'ot', 'ot_var', 'pf',  'tm', 'stg')
+    
     def __new__(cls) -> Self:
         if cls.__instance is None:
             cls.__instance = super().__new__(cls)
@@ -39,10 +30,10 @@ class _AppManager:
         self.lib: Library
         self.log: Log
         self.mw: MainWindow
-        self.pi: ProcessingInterface    # Этот фрейм будет записан в мменеджер при инициализации основного окна
-        self.txtvars = _TxtVars()
-        self.tm: TaskManager
         self.ot: OrdersTracker
+        self.ot_var: StringVar
+        self.pf: ProcessingFrame    # Этот фрейм будет записан в мменеджер при инициализации основного окна
+        self.tm: TaskManager
         self.stg: Settings
 
 
@@ -50,7 +41,7 @@ AppManager = _AppManager()
 
 
 # Определяем тип ос
-match os.name:
+match osname:
     case 'nt': AppManager.SYSTEM = 'win'
     case 'posix': AppManager.SYSTEM = 'lin'
     case _: AppManager.SYSTEM = 'other'
@@ -74,5 +65,3 @@ AppManager.stg = Settings()
 
 from .gui.main import MainWindow
 AppManager.mw = MainWindow()    # Самый последний инициализируемый модуль
-
-
