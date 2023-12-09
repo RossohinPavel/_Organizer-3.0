@@ -1,4 +1,4 @@
-from os import listdir
+import os
 from re import fullmatch
 from typing import Iterator
 
@@ -8,14 +8,24 @@ DAY_PATTERN = r'\d{4}(-\d{2}){2}'
 ORDER_PATTERN = r'\d{6}'
 
 
-def orders_grabber_iterator(path: str) -> Iterator[tuple[str, str]]:
-    """Итератор по номерам заказов и датам их создания. Возвращает значения в виде кортежа:\t
-    (<дата создания>, <имя заказа>)\nЗначения возвращаются в обратном порядке. От новых к старым."""
-    for day in reversed(listdir(path)):
+def ot_grabber(path: str) -> Iterator[tuple[str, str, Iterator[str]]]:
+    """
+    Итератор по номерам заказов, дате их создания и содержимому заказов. 
+    
+    Возвращает значения в виде кортежа: (<дата создания>, <имя заказа>, (<Генератор по содержимому>)).
+
+    Генератор по содержимому возвращает имена папок и completed.htm, если он есть.
+    
+    Значения возвращаются в обратном порядке. От новых к старым.
+    """
+
+    for day in reversed(os.listdir(path)):
         if fullmatch(DAY_PATTERN, day):
-            for order in reversed(listdir(f'{path}/{day}')):
+            for order in reversed(os.listdir(f'{path}/{day}')):
                 if fullmatch(ORDER_PATTERN, order):
-                    yield day, order
+                    order_path = f'{path}/{day}/{order}'
+                    it = (x for x in os.listdir(order_path) if x == 'completed.htm' or os.path.isdir(f'{order_path}/{x}'))
+                    yield day, order, it
 
 
 # class EditionGrabberIterator:

@@ -1,7 +1,7 @@
 from threading import Thread
 from time import sleep as tsleep, time as ttime
-from typing import Any, Callable, Type, NoReturn
-from appmanager import AppManager
+from typing import Any, Callable, Type
+from ..app_manager import AppManager
 
 
 class Tracker:
@@ -10,7 +10,7 @@ class Tracker:
 
     class TrackerThread(Thread):
         """Параллельный поток, который запускает выполнение трекера в автоматическом режиме"""
-        def __init__(self, tracker):
+        def __init__(self, tracker) -> None:
             self.tracker: Tracker = tracker
             self.is_repeating = True
             super().__init__(daemon=True)
@@ -43,7 +43,7 @@ class Tracker:
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 
-    def _run(self) -> NoReturn:
+    def _run(self) -> None:
         """Абстрактная ф-я. В дочернем классе реализует общую логику работы трекера"""
         raise Exception('Функция _run не переопределена в дочерном классе')
 
@@ -52,7 +52,7 @@ class Tracker:
         """Запускает трекер в ручном режиме."""
         self._manual()
 
-    def _manual(self) -> NoReturn:
+    def _manual(self) -> None:
         """Абстрактная ф-я. Реализует логику работы трекера в ручном режиме. Должна запускать ф-ю _run"""
         raise Exception('Функция manual не переопределена в дочерном классе')
 
@@ -61,6 +61,6 @@ class Tracker:
         """Запускает трекер в автоматическом режиме."""
         raise Exception('Функция auto не переопределена в дочерном классе')
 
-    def _auto(self) -> NoReturn:
+    def _auto(self) -> None:
         """Абстрактная ф-я. Реализует логику работы трекера в автоматическом режиме. Должна запускать ф-ю _run"""
         raise Exception('Функция auto не переопределена в дочерном классе')

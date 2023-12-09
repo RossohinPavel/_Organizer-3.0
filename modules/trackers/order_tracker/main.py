@@ -1,32 +1,32 @@
 from datetime import datetime, timedelta
-from ._tracker import Tracker
-from grabbers import orders_grabber_iterator
-from proxies.orders_tracker import *
+from ..tracker import Tracker
+from ...grabbers import ot_grabber
+from .proxy import *
 
 
 class OrdersTracker(Tracker):
     """Основной объект слежения за файлами заказов"""
-    __slots__ = '_orders', '_border_name', '_z_disc', '_limit'
+    __slots__ = 'proxies', 'border_name', 'z_disc', 'limit'
 
     def __init__(self):
         super().__init__()
-        self._orders = {}
-        self._z_disc: str
-        self._limit: int
-        self._border_name = self.appm.log.get_newest_order_name()
+        self.proxies = set()
+        self.z_disc: str
+        self.limit: int
+        self.border_name = self.appm.log.get_newest_order_name()
 
     def _run(self) -> None:
         # Получение значений атрибутов из настроек
-        self._z_disc = self.appm.stg.z_disc
-        self._limit = self.appm.stg.log_check_depth
+        self.z_disc = self.appm.stg.z_disc
+        self.limit = self.appm.stg.log_check_depth
+
         # Обновление инофрмации на Прогрессбаре
         self.appm.pf.header.set('Трекер заказов')
-        self.appm.pf.filebar.maximum = 5
+        self.appm.pf.operation.maximum = 5
+
         # Проверяем наличие новых заказов
-        self.appm.pf.operation.set('Обновление списка отслеживаемых заказов')
-        self.appm.pf.filebar.set()
-        self.__update_orders_dct()
-        self.appm.pf.filebar += 1
+        self.__update_proxies()
+
         # self.storage.pf.status.set('2/5: Обновление списка отслеживаемых тиражей')
         # self.__update_edition_list()
         # self.storage.pf.pb['value'] += 1
@@ -42,49 +42,49 @@ class OrdersTracker(Tracker):
     
     def init_auto(self, value) -> None:
         if not value: 
-            self.appm.txtvars.ot.set('Выключен')
+            self.appm.ot_var.set('Выключен')
         super().init_auto(value)
 
     def _manual(self):
-        for proxy_lst in self._orders.values():
-            for proxy in proxy_lst:
-                proxy.update_flag = True
+        # for proxy_lst in self._orders.values():
+        #     for proxy in proxy_lst:
+        #         proxy.update_flag = True
         self._run()
 
     def _auto(self):
-        self.appm.txtvars.ot.set('Ожидание выполнения')
+        self.appm.ot_var.set('Ожидание выполнения')
         current_time = datetime.now() + timedelta(seconds=self.delay)
         self._run()
-        self.appm.txtvars.ot.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
+        self.appm.ot_var.set(f'Следующий скан: {current_time.strftime("%H:%M")}')
 
-    def __update_orders_dct(self):
+    def __update_proxies(self):
         """Обновление списка отслеживаемых заказов"""
-        limit = self._limit
-        for day, order in orders_grabber_iterator(self._z_disc):
-            if limit == 0:
-                break
-            if order not in self._orders:
-                self._orders[OrderDC(order, day)] = set()
-            print(self._orders)
-            if order <= self._border_name:
+        self.appm.pf.operation.set('Обновление списка отслеживаемых заказов')
+
+        # Получаем лимит
+        limit = self.limit
+
+        # Итерируемся по заказам и их тиражам
+        for day, order, contents in ot_grabber(self.z_disc):
+            # прерываем цикл, когда лимит 0.
+            if limit == 0: break
+
+            # Итерируемся по именам содержимого
+            for name in contents:
+                # Если в отслеживаемых объектах есть это имя, то пропускаем их добавление
+                if f'{order}_{name}' in self.proxies: continue
+
+                # Создаем объекты, согласно их типу
+                match name:
+                    case 'PHOTO': pass
+                    case 'completed.htm': pass
+                    case _: pass
+            
+            # Уменьшаем лимит, если имя заказа меньше рубежного
+            if order <= self.border_name:
                 limit -= 1
-
-
-    # def __update_edition_list(self):
-    #     """Обновление списка отслеживаемых прокси объектов тиражей и информации о заказе"""
-    #     z_disc = self.storage.stg.z_disc                  # Получаем необходимые настройки
-    #     for order_obj, proxies_lst in self.__orders.items():
-    #         path = f'{z_disc}/{order_obj.creation_date}/{order_obj.name}'
-    #         for name in listdir(path):
-    #             if name not in proxies_lst:
-    #                 if name == 'PHOTO':
-    #                     proxies_lst.append(PhotoProxy(order_obj, path, name))
-    #                     continue
-    #                 if name == 'completed.htm':
-    #                     proxies_lst.append(OrderInfoProxy(order_obj, path, name))
-    #                     continue
-    #                 if osp_isdir(f'{path}/{name}'):
-    #                     proxies_lst.append(EditionProxy(order_obj, path, name))
+        
+        print(self.proxies)
 
     # def __update_proxies(self):
     #     """Обновление информации в прокси объектах слежения"""

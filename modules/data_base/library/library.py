@@ -18,7 +18,7 @@ class Library:
     Properties = Properties
 
     def __init__(self) -> None:
-        self.headers: dict[Type[Product], tuple[str, ...]] = {}
+        self.headers: dict[Type[Library.Product], tuple[str, ...]] = {}
         with self.__s_con:
             self.__update_product_headers()
 

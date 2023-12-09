@@ -5,27 +5,31 @@ from typing import Any
 # from collections import Counter
 
 
-__all__ = ('OrderDC', )
-
-
 @dataclass
-class OrderDC:
+class OrderInfo:
     """"""
     name: str
     creation_date: str
     customer_name: str = 'Unknown'
     customer_address: str = 'Unknown'
-    price: float = 0
-    photo: list = field(default_factory=list)
-    content: set = field(default_factory=set)
+    price: float = 0.0
 
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, str):
-            return self.name == other
-        return self.__dict__ == other.__dict__
 
-    def __hash__(self) -> int:
-        return hash(self.name)
+@dataclass
+class Edition:
+    """"""
+    name: str
+    covers: int = 0
+    pages: int | None = None
+    ccount: str | None = None
+    comp: str | None = None
+
+
+@dataclass
+class Photo:
+    """"""
+    name: str
+    count: int = 0
 
 
 # class ProxyObserver:
@@ -206,23 +210,3 @@ class OrderDC:
 
 # from typing import Any
 
-
-
-
-
-
-# @dataclass
-# class EditionDC:
-#     """"""
-#     name: str
-#     covers: int = 0
-#     pages: int = 0
-#     ccount: str | None = None
-#     comp: str | None = None
-
-
-# @dataclass
-# class PhotoDC:
-#     """"""
-#     name: str
-#     count: int = 0

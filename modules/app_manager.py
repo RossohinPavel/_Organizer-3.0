@@ -6,11 +6,11 @@ from os import name as osname
 if TYPE_CHECKING:   
     from .data_base import Library
     from .data_base import Log
-    from gui.main import MainWindow
-    from gui.frames import ProcessingFrame
+    from .gui.main import MainWindow
+    from .gui.frames import ProcessingFrame
     from ttkbootstrap import StringVar
-    from task_manager import TaskManager
-    from trackers.orders_tracker import OrdersTracker
+    from .task_manager import TaskManager
+    from .trackers import OrdersTracker
     from .data_base import Settings
 
 
@@ -51,14 +51,14 @@ match osname:
 from .data_base import Library
 AppManager.lib = Library()
 
-# from log import Log
-# AppManager.log = Log()
+from .data_base import Log
+AppManager.log = Log()
 
 from .task_manager import TaskManager
 AppManager.tm = TaskManager()
 
-# from trackers.orders_tracker import OrdersTracker
-# AppManager.ot = OrdersTracker()
+from .trackers import OrdersTracker
+AppManager.ot = OrdersTracker()
 
 from .data_base import Settings
 AppManager.stg = Settings()

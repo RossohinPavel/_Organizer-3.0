@@ -146,7 +146,7 @@ class AssistWindow(ChildWindow):
     FRAMES = {
         'segment': (                        # Название свойства продукта
             'main',                         # Название категории, куда будет помещен виджет
-             __draw_radio_widgets,            # Cсылка на функцию для отрисовки соответствующий фреймов
+             __draw_radio_widgets,          # Cсылка на функцию для отрисовки соответствующий фреймов
              'Сегмент продукции',           # Текст для label 
              'left'                         # Позиция в мастер виджете: left или right
              ),
@@ -181,7 +181,7 @@ class AssistWindow(ChildWindow):
         # Сохраняем значения в объекте
         self._mode = mode
         self._category = category
-        self._properties = Properties(category.__name__)
+        self._properties = AppManager.lib.Properties(category.__name__)
         self._vars = {}
 
         # Создаем замыкание с функцией обновления

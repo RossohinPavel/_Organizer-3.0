@@ -160,7 +160,7 @@ class MainWindow(ttk.Window):
         """Отрисовка кнопки Дополнительно и меню под ней"""
         menu = ttk.Menu(master=container)
 
-        menu.add_command(label='Обновить БД')
+        menu.add_command(label='Обновить БД', command=AppManager.ot.manual)
         menu.add_command(label='Направляющие')
         menu.add_command(label='Холсты')
         menu.add_command(label='Замена')
