@@ -28,7 +28,7 @@ class MainWindow(ttk.Window):
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
-        self.iconphoto(True, tkinter.PhotoImage(master=self, data=AppManager.stg.app_ico))
+        # self.iconphoto(True, tkinter.PhotoImage(master=self, data=AppManager.stg.app_ico))
         self.update_idletasks()
 
     @staticmethod
@@ -56,7 +56,10 @@ class MainWindow(ttk.Window):
     def draw_log_tracker_widgets(self, container: ttk.Frame) -> None:
         """Отрисовка статуса процесса выполнения лога"""
         # Обработка нажатия на CheckButton
-        def init(): AppManager.stg.autolog = var.get()
+        def init(): 
+            res = var.get()
+            AppManager.stg.autolog = AppManager.ot.auto = res
+            if not res: orders_trk.set('Выключен')
 
         # Checkbutton виджет управления теркером
         var = ttk.IntVar(self, AppManager.stg.autolog)
@@ -160,7 +163,7 @@ class MainWindow(ttk.Window):
         """Отрисовка кнопки Дополнительно и меню под ней"""
         menu = ttk.Menu(master=container)
 
-        menu.add_command(label='Обновить БД', command=AppManager.ot.manual)
+        menu.add_command(label='Обновить БД', command=lambda: AppManager.ot.manual_init())
         menu.add_command(label='Направляющие')
         menu.add_command(label='Холсты')
         menu.add_command(label='Замена')
@@ -185,9 +188,12 @@ class MainWindow(ttk.Window):
             fill=ttkc.BOTH,
             expand=1
             )
-
         # Закладки
-        tab.add(ttk.Frame(tab), text='Информация')
-        tab.add(ttk.Label(tab, text='test', background='red'), text='Планировщик', padding=5)
-        tab.add(frames.MailSamplesFrame(tab).container, text='Общение', padding=5)
+        tab.add(frames.InfoFrame(tab), text='Информация')
+        tab.add(
+            ttk.Label(tab, text='test', background='red'), 
+            text='Планировщик', 
+            padding=5
+            )
+        tab.add(frames.MailSamplesFrame(tab).container, text='Общение')
         tab.add(frames.ControlFrame(tab), text='Управление')    

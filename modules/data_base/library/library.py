@@ -14,7 +14,7 @@ class Library:
     __slots__ = 'headers'
     __s_con = SafeConnect('library.db')
 
-    Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
+    type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
     Properties = Properties
 
     def __init__(self) -> None:

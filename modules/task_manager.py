@@ -24,9 +24,15 @@ class TaskManager:
                 except Exception as exc:
                     tkmb.showerror('Ошибка', message=f'{repr(exc)}')
             AppManager.pf.queue = AppManager.pf.queue - 1
+
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper
 
-    def create_task(self, func: Type[Callable[[Any], None]], *args: Iterable[Any], **kwargs: Mapping[str, Any]) -> None:
+    def create_task(self, func: Type[Callable[[Any], None]], *args: Any, **kwargs: Mapping[str, Any]) -> None:
         """Создание задачи. Задача будет поставлена в очередь вызовов. Если очередь пуста, задача запустится немедленно."""
-        Thread(target=self.__get_task(func), args=args, kwargs=kwargs, daemon=True).start()
+        Thread(
+            target=self.__get_task(func), 
+            args=args, 
+            kwargs=kwargs, 
+            daemon=True
+            ).start()

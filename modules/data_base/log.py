@@ -35,12 +35,13 @@ class Log:
     def __init__(self) -> None:
         self.__s_con = SafeConnect('log.db')
 
-    # def update_records(self, lst: list):
-    #     """Сборная ф-я для обновления библиотеки"""
-    #     lst.reverse()
-    #     with self.__s_con:
-    #         self.__update_orders_table(lst)
-    #         self.__s_con.connect.commit()
+    def update_records(self, proxies: set) -> None:
+        """Сборная ф-я для обновления библиотеки"""
+        with self.__s_con:
+            for obj in sorted(proxies, key=lambda x: (x.info_proxy.order, x.name)):
+                print(obj.info_proxy.order, obj.name)
+        #     self.__update_orders_table(lst)
+        #     self.__s_con.connect.commit()
 
     # def __update_orders_table(self, lst):
     #     """Обновление данных в основной таблице информации о заказе"""

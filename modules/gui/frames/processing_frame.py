@@ -55,7 +55,7 @@ class ProcessingFrame(ttk.LabelFrame):
 class HeaderLabel(ttk.Label):
     """Интерфейс для текста заголовка"""
 
-    def set(self, value: str):
+    def step(self, value: str):
         """Установка текста лейбла"""
         self.configure(text=value)
     
@@ -72,7 +72,7 @@ class OperationLabel(ttk.Label):
         self.__value = 0
         self.maximum = 1
 
-    def set(self, value: str) -> None:
+    def step(self, value: str) -> None:
         """Установка значения в текстовую переменную"""
         self.__value += 1
         prefix = f'{self.__value} / {self.maximum} -- ' if self.maximum > 1 else ''
@@ -111,26 +111,27 @@ class FileBar(ttk.Frame):
         # Лейбл отображения процента
         self.__lbl1 = ttk.Label(self, text='100.0%', width=6, justify='left')
         self.__lbl1.pack(side=ttkc.RIGHT, anchor=ttkc.E)
-    
-    @property
-    def maximum(self) -> int:
-        """Возвращает предельное значение интерфейса"""
-        return self.__maximum
 
-    @maximum.setter
-    def maximum(self, value: int) -> None:
-        """Устанавливает предельное значение"""
+    def maximum(self, value: int, percentage: int = 100) -> None:
+        """
+        Устанавливает предельное значение
+        value: общее количество шагов (файлов, объектов и т.д)
+        percentage: Сколько в процентном соотношении от 100, займет прогрессия 
+        """
         self.__maximum = value
-        self.__delta = 100 / value
-        self.__pb['value'] -= self.__delta
-
-    def set(self, value: str) -> None:
-        """Устанавливает value в лейблы и продвигает прогрессбар"""
-        self.__pb['value'] += self.__delta
-        self.__value += 1
-        self.__lbl.configure(text=f'{self.__value} / {self.__maximum} -- {value}')
-        self.__lbl1.configure(text=str(round(self.__pb['value'], 1)) + '%')
+        self.__delta = percentage / value
     
+    def step(self, value: str) -> None:
+        """Начало шага. Устанавливает значение в текстовую переменную"""
+        self.__value += 1
+        prefix = f'{self.__value} / {self.__maximum} -- ' if self.__maximum > 1 else ''
+        self.__lbl.configure(text=f'{prefix}{value}')
+        
+    def step_end(self) -> None:
+        """Конец шага. Продвигает прогрессбар"""
+        self.__pb['value'] += self.__delta
+        self.__lbl1.configure(text=str(round(self.__pb['value'], 1)) + '%')
+
     def reset(self) -> None:
         """Сбрасывает значения виджетов до начальных"""
         self.__pb['value'] = 0

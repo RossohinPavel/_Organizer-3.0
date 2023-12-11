@@ -1,14 +1,25 @@
-import ttkbootstrap as ttk
+def print_decorator(func):
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        print(res)
+        return res
+    return wrapper
 
 
-root = ttk.Window('test')
 
-lf = ttk.LabelFrame(root, text='test')
-lf.pack(padx=5, pady=5)
+class Test: 
+    def __init__(self) -> None:
+        print(self.__class__.__dict__)
+        self.__class__._some_method = print_decorator(self.__class__._some_method)
+        print(self.__class__.__dict__)
 
-text = ttk.Label(lf, text='test')
-text.pack()
+    def _some_method(self) -> int:
+        return 1
 
-lf.configure(text='test1')
+class Test1(Test):
+    def _some_method(self) -> int:
+        return 2
 
-root.mainloop()
+
+t = Test1()
+t._some_method()
