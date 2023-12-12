@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from .safe_connect import SafeConnect
+from .data_base import DataBase
 
 
 class Photo(NamedTuple):
@@ -28,12 +28,11 @@ class Order(NamedTuple):
     content: tuple[Edition, ...] | None     # Кортеж объектов тиражей заказа
 
 
-class Log:
+class Log(DataBase):
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
-    __slots__ = '__s_con'
+    __slots__ = ()
 
-    def __init__(self) -> None:
-        self.__s_con = SafeConnect('log.db')
+    data_base = 'log.db'
 
     def update_records(self, proxies: set) -> None:
         """Сборная ф-я для обновления библиотеки"""

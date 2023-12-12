@@ -1,74 +1,80 @@
 from functools import lru_cache
 from typing import Type, NoReturn
-from ..safe_connect import SafeConnect
+from ..data_base import DataBase
 from .products import *
 from .properties import Properties
 
 
-# Переменные для аннотации
-# type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
-
-
-class Library:
+class Library(DataBase):
     """Класс для работы с библиотекой продуктов"""
     __slots__ = 'headers'
-    __s_con = SafeConnect('library.db')
+
+    data_base = 'library.db'
 
     type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
+
     Properties = Properties
 
     def __init__(self) -> None:
+        super().__init__()
+        print(self._lock)
         self.headers: dict[Type[Library.Product], tuple[str, ...]] = {}
-        with self.__s_con:
-            self.__update_product_headers()
+        self.safe_connect(Library.__update_product_headers)(self)
 
+    @DataBase.safe_connect
     def add(self, product: Product) -> None:
         """Метод добавления продукта в библиотеку"""
-        with self.__s_con as con:
-            self.__check_unique(product)
-            req = ', '.join('?' * len(product))
-            con.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
-            con.connect.commit()
-            self.__update_product_headers()
+        self.__check_unique(product)
+        req = ', '.join('?' * len(product))
+        self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
+        self.connect.commit()
+        self.__update_product_headers()
         self.__get.cache_clear()
 
+    @DataBase.safe_connect
     def change(self, product: Product) -> None:
         """Внесение изменений в ячейку"""
-        with self.__s_con as sc:
-            req = ', '.join(f'{s}=?' for s in product._fields)
-            sc.cursor.execute(f'UPDATE {product.category} SET {req} WHERE full_name=\'{product.full_name}\'', product)
-            sc.connect.commit()
+        req = ', '.join(f'{s}=?' for s in product._fields)
+        self.cursor.execute(f'UPDATE {product.category} SET {req} WHERE full_name=\'{product.full_name}\'', product)
+        self.connect.commit()
         self.__get.cache_clear()
 
-    @classmethod
-    def __check_unique(cls, product: Product) -> NoReturn | None:
+    def __check_unique(self, product: Product) -> NoReturn | None:
         """Вспомогательная функция для библиотеки. Проверка на уникальность продукта"""
-        cls.__s_con.cursor.execute(f'SELECT full_name FROM {product.category} WHERE full_name=?', (product.full_name, ))
-        if cls.__s_con.cursor.fetchone(): raise Exception(f'{product.full_name}\nУже есть в библиотеке')
+        for name in (y for x in self.headers.values() for y in x):
+            if name == product.full_name:
+                raise Exception(f'{product.full_name}\nУже есть в библиотеке')
 
+        # cls.__s_con.cursor.execute(f'SELECT full_name FROM {product.category} WHERE full_name=?', (product.full_name, ))
+        # if cls.__s_con.cursor.fetchone(): raise Exception(f'{product.full_name}\nУже есть в библиотеке')
+
+    @DataBase.safe_connect
     def delete(self, category: str, full_name: str) -> None:
         """Удаление продукта из библиотеки."""
-        with self.__s_con as sc:
-            sc.cursor.execute(f'DELETE FROM {category} WHERE full_name=?', (full_name, ))
-            sc.connect.commit()
-            self.__update_product_headers()
+        self.cursor.execute(f'DELETE FROM {category} WHERE full_name=?', (full_name, ))
+        self.connect.commit()
+        self.__update_product_headers()
         self.__get.cache_clear()
 
-    @lru_cache
+    @DataBase.safe_connect    
     def __get(self, category: Type[Product], name: str) -> Product: # type: ignore
         """Метод для получения объекта продукта по передоваемому имени. Возрващает объект или None."""
-        with self.__s_con as sc:
-            sc.cursor.execute(f'SELECT * FROM {category.__name__} WHERE full_name=?', (name, ))
-            return category(*sc.cursor.fetchone()[1:])
+        self.cursor.execute(f'SELECT * FROM {category.__name__} WHERE full_name=?', (name, ))
+        return category(*self.cursor.fetchone()[1:])
 
+    @lru_cache
     def get(self, name: str) -> Product:    # type: ignore
         """Возвращает объект продукта с которым связан тираж, если этот продукт есть в библиотеке"""
         for category, products in self.headers.items():
             for product in products:
-                if name.endswith(product): return self.__get(category, product)
+                if name.endswith(product): 
+                    return self.__get(category, product)
 
     def __update_product_headers(self) -> None:
-        """Обновляет словрь имен продуктов в виде {имя продукта: категория}. Использовать только внутри менеджера"""
+        """
+            Обновляет словрь имен продуктов в виде {имя продукта: категория}. 
+            Использовать только внутри менеджера
+        """
         for category in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
-            self.__s_con.cursor.execute(f'SELECT full_name FROM {category.__name__}')
-            self.headers[category] = tuple(n[0] for n in self.__s_con.cursor.fetchall())
+            self.cursor.execute(f'SELECT full_name FROM {category.__name__}')
+            self.headers[category] = tuple(n[0] for n in self.cursor.fetchall())
