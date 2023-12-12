@@ -20,6 +20,7 @@ class DataBase:
         """Декоратор для безопасного подключения к бд"""
 
         def wrapper(self, *args, **kwargs):
+            print(self, func)
             with self._lock:
                 self.connect = connect(f'data/{self.data_base}')
                 self.cursor = self.connect.cursor()

@@ -17,6 +17,7 @@ class Settings(DataBase):
     data_base = 'app.db'
 
     def __init__(self) -> None:
+        super().__init__()
         # Типы данных настроек
         self.autolog: int
         self.log_check_depth: int
@@ -26,19 +27,19 @@ class Settings(DataBase):
         self.roddom_dir: str
         self.theme: str
 
-    @DataBase.safe_connect
+    # @DataBase.safe_connect
     def __get_saving_values(self):
         """Получаем настройки из бд при открытии программы"""
         self.cursor.execute('SELECT name, data FROM Settings')
         for name, value in self.cursor.fetchall():
-            super().__setattr__(name, value)
+            self.__setattr__(name, value)
 
     def __setattr__(self, name: str, value: int | str) -> None:
         """Обновляет атрибуты на объекте, запускает связанные с ними функции и обновляет базу данных"""
         super().__setattr__(name, value)
         self.__update_db(name, value)
 
-    @DataBase.safe_connect
+    # @DataBase.safe_connect
     def __update_db(self, name: str, value: int | str) -> None:
         """Обновление базы данных"""
         self.cursor.execute('UPDATE Settings SET data=? WHERE name=?', (value, name))
