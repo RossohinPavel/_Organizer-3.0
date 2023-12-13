@@ -13,13 +13,13 @@ class MailSamples(DataBase):
         self.connect.commit()
 
     @DataBase.safe_connect
-    def get_headers(self) -> list[tuple[int, str, str]]: #type: ignore
+    def get_headers(self) -> list[tuple[int, str, str]]:
         """Получение заголовков текстовых шаблонов"""
         self.cursor.execute('SELECT id, tag, name FROM Samples')
         return sorted(self.cursor.fetchall(), key=lambda x: (x[1], x[2]))
 
     @DataBase.safe_connect
-    def get(self, sample_id: int) -> tuple[str, str, str]: #type: ignore
+    def get(self, sample_id: int) -> tuple[str, str, str]:
         """Получение тага, названия и текста шаблона"""
         self.cursor.execute('SELECT tag, name, data FROM Samples WHERE id=?', (sample_id, ))
         return self.cursor.fetchone()

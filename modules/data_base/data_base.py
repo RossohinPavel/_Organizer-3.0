@@ -5,28 +5,35 @@ from typing import Self
 
 class DataBase:
     """Реализует общую логику работы с базами данных sqlite3"""
-    __slots__ = '_lock', 'connect', 'cursor'
 
     # Имя базы данных, к которой будет совершено подключение
     data_base: str = 'None'
 
-    def __init__(self):
-        self._lock = Lock()
-        self.connect: Connection
-        self.cursor: Cursor
+    # Ссылка на объект подключения к базе данных
+    connect: Connection = None      #type: ignore
+
+    # Ссылка на объект cursor
+    cursor: Cursor = None           #type: ignore
+
+    # Ссылка на Замок, для предотвращения единовременного доступа к бд
+    __lock = None
+
+    def __new__(cls) -> Self:
+        # Определяем атрибуты для классов наследников
+        if cls.__lock is None:
+            cls.connect = connect(f'data/{cls.data_base}', check_same_thread=False)
+            cls.cursor = cls.connect.cursor()
+            cls.__lock = Lock()
+
+        return super().__new__(cls)
 
     @staticmethod
     def safe_connect(func):
         """Декоратор для безопасного подключения к бд"""
 
         def wrapper(self, *args, **kwargs):
-            print(self, func)
-            with self._lock:
-                self.connect = connect(f'data/{self.data_base}')
-                self.cursor = self.connect.cursor()
-                res = func(self, *args, **kwargs)
-                self.connect.close()
-                return res
+            with self.__lock:
+                return func(self, *args, **kwargs)
 
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper

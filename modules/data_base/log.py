@@ -85,8 +85,8 @@ class Log(DataBase):
         res = self.__s_con.cursor.fetchall()
         if res: return tuple(Edition(*r) for r in res)
 
-    def get_newest_order_name(self) -> str:     #type: ignore
+    @DataBase.safe_connect
+    def get_newest_order_name(self) -> str:
         """Получение последнего сканированного номера заказа"""
-        with self.__s_con as con:
-            con.cursor.execute('SELECT MAX(name) FROM Orders')
-            return con.cursor.fetchone()[0]
+        self.cursor.execute('SELECT MAX(name) FROM Orders')
+        return self.cursor.fetchone()[0]

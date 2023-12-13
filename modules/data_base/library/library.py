@@ -17,7 +17,6 @@ class Library(DataBase):
 
     def __init__(self) -> None:
         super().__init__()
-        print(self._lock)
         self.headers: dict[Type[Library.Product], tuple[str, ...]] = {}
         self.safe_connect(Library.__update_product_headers)(self)
 
@@ -29,7 +28,7 @@ class Library(DataBase):
         self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
         self.connect.commit()
         self.__update_product_headers()
-        self.__get.cache_clear()
+        self.get.cache_clear()
 
     @DataBase.safe_connect
     def change(self, product: Product) -> None:
@@ -37,7 +36,7 @@ class Library(DataBase):
         req = ', '.join(f'{s}=?' for s in product._fields)
         self.cursor.execute(f'UPDATE {product.category} SET {req} WHERE full_name=\'{product.full_name}\'', product)
         self.connect.commit()
-        self.__get.cache_clear()
+        self.get.cache_clear()
 
     def __check_unique(self, product: Product) -> NoReturn | None:
         """Вспомогательная функция для библиотеки. Проверка на уникальность продукта"""
@@ -54,7 +53,7 @@ class Library(DataBase):
         self.cursor.execute(f'DELETE FROM {category} WHERE full_name=?', (full_name, ))
         self.connect.commit()
         self.__update_product_headers()
-        self.__get.cache_clear()
+        self.get.cache_clear()
 
     @DataBase.safe_connect    
     def __get(self, category: Type[Product], name: str) -> Product: # type: ignore
