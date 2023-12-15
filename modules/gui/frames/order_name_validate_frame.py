@@ -2,21 +2,19 @@ from .._source import *
 from re import match as re_match
 
 
-class ONVFrame(ttk.Frame):
+class ONVFrame(ttk.Entry):
     """Класс для отрисовки фреймов проверки заказа и осуществления логики первичной валидации номера"""
-    def __init__(self, *args, func=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._func = func
-        self._entry = ttk.Entry(master=self, width=22, validate='key')
-        self._entry.pack(anchor='n', pady=(0, 3))
-        self._entry.focus_set()
+    def __init__(self, master: Any, /, **kwargs):
+        self._func = kwargs.pop('func')
+        super().__init__(master, validate='key', **kwargs)
+        self.focus_set()
         self.__insert_def_val()
-        self._entry.bind('<KeyPress>', self.__enter_event)
-        self._entry.config(validatecommand=(self.register(self.__validate), "%P"))
+        self.bind('<KeyPress>', self.__enter_event)
+        self.config(validatecommand=(self.register(self.__validate), "%P"))
 
     def __enter_event(self, event):
-        if self._entry.get().startswith('#') and event.char.isdigit():
-            self._entry.delete(0, 'end')
+        if self.get().startswith('#') and event.char.isdigit():
+            self.delete(0, 'end')
 
     def __validate(self, value: str) -> bool:
         """Валидация введеных значений, вызов функции при полной валидации и очистка _entry"""
@@ -27,8 +25,8 @@ class ONVFrame(ttk.Frame):
             self.__insert_def_val()
         return res
 
-    def __insert_def_val(self, text='#Введите номер заказа', cursor=0):
+    def __insert_def_val(self, text='#Введите номер заказа', cursor=0) -> None:
         """Очитска _entry и вставка значения по умолчанию"""
-        self._entry.delete(0, 'end')
-        self._entry.insert(0, text)
-        self._entry.icursor(cursor)
+        self.delete(0, 'end')
+        self.insert(0, text)
+        self.icursor(cursor)

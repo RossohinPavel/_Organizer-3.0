@@ -17,17 +17,45 @@ class InfoFrame(ttk.Frame):
 
 
 class StickerGenFrame(ttk.LabelFrame):
+    """Фрейм генерации стикера"""
+
     def __init__(self, master: Any, /, **kwargs):
         super().__init__(master, text='Генератор наклеек')
-        ONVFrame(master=self, func=self.main).pack(pady=(3, 5), fill='both')
+        # Верхнаяя чать. Поле ввода и кнопка
+        container = ttk.Frame(self, padding=(5, 3, 5, 5))
+        container.pack(fill=ttkc.X)
+
+        onvf = ONVFrame(container, func=self.main)
+        onvf.pack(
+            padx=(0, 3), 
+            fill=ttkc.X,
+            side=ttkc.LEFT,
+            expand=1
+            )
+        btn = ttk.Button(
+            master=container, 
+            text='Скопировать инфо', 
+            command=self.to_clipboard,
+            style='info-outline'
+            )
+        btn.pack(
+            padx=(2, 0), 
+            fill=ttkc.X,
+            side=ttkc.RIGHT,
+            expand=1
+            )
+        # Разделитель
         ttk.Frame(master=self, borderwidth=1, relief='solid').pack(fill='x')
+
+        # Переменные и лейблы под них
         self.header_var = ttk.StringVar(master=self)
         ttk.Label(master=self, textvariable=self.header_var).pack(anchor='nw', fill='x')
+
         self.info_var = ttk.StringVar(master=self)
         ttk.Label(master=self, textvariable=self.info_var).pack(anchor='nw', fill='both')
-        ttk.Button(master=self, text='Скопировать инфо', command=self.to_clipboard).pack(anchor='s', expand=1)
-
-    def main(self, order_name):
+        
+    def main(self, order_name: str) -> None:
+        """После валидации введенного номера, обновляет лейбл"""
         proxy = StickerGenProxy(order_name)
         if proxy is None:
             self.header_var.set(f'Не могу найти заказ {order_name}')
@@ -38,5 +66,6 @@ class StickerGenFrame(ttk.LabelFrame):
         self.to_clipboard()
 
     def to_clipboard(self):
+        """Копирования информации в буфер обмена"""
         self.clipboard_clear()
         self.clipboard_append(self.info_var.get())
