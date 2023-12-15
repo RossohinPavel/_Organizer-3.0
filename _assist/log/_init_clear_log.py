@@ -24,7 +24,7 @@ def create_clear_log():
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 order_name TEXT,
                                 name TEXT,
-                                count INT
+                                value INT
                                 )""")
         log.cursor().execute("""INSERT INTO Orders (name, creation_date, customer_name, customer_address, price)
                                 VALUES (?, ?, ?, ?, ?)""", ('000000', '2020-01-01', 'Admin', 'Home', 66.6))

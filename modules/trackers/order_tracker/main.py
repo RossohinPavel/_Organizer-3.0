@@ -6,13 +6,13 @@ from .tracker_proxies import *
 
 class OrdersTracker(Tracker):
     """Основной объект слежения за файлами заказов"""
-    __slots__ = 'orders', 'proxies', 'border_name'
+    __slots__ = '_orders', '_proxies','_border_name'
 
     def __init__(self) -> None:
         super().__init__()
-        self.orders: dict[str, OrderInfoProxy] = {}
-        self.proxies: set[EditionProxy | PhotoProxy] = set()
-        self.border_name = self.appm.log.get_newest_order_name()
+        self._orders: dict[str, OrderInfoProxy] = {}
+        self._proxies: set[EditionProxy | PhotoProxy] = set()
+        self._border_name = self.appm.log.get_newest_order_name()
 
         # Получаем значения из настроек и запускаем автолог
         self.auto = self.appm.stg.autolog
@@ -31,7 +31,8 @@ class OrdersTracker(Tracker):
 
     def manual_init(self) -> None:
         # Принудительно переводим прокси объект в состояние ожидающих сканирования
-        for proxy in self.proxies: proxy.trackable = True
+        for proxy in self._proxies:
+            proxy._count = 0
         self.run()
 
     def auto_init(self) -> None:
@@ -56,44 +57,43 @@ class OrdersTracker(Tracker):
             # Прерываем цикл, когда лимит 0.
             if limit == 0: break
 
-            # Вспомогательная переменная order_path
-            order_path = f'{z_disc}/{day}/{order}'
-
-            # Создаем прокси объект для заказа, которого нет в словаре self.orders
-            if order not in self.orders:
-                self.orders[order] = OrderInfoProxy(order_path, day, order)
+            # Создаем прокси объект для заказа, которого нет в словаре self._orders
+            if order not in self._orders:
+                self._orders[order] = OrderInfoProxy(z_disc, day, order)
+            
+            # Получаем ссылки на Объект информации и на кортеж с прокси объектами тиражей
+            info_proxy = self._orders[order]
 
             # Итерируемся по именам содержимого
             for name in contents:
-                obj_name = order + name
-
-                # Перед добавлением проверяем, есть ли эти объекты во множествах
-                if obj_name not in self.proxies:
+                # Перед добавлением проверяем, есть ли эти объекты во множесте прокси объектоа
+                proxy_name = order + name
+                if proxy_name not in self._proxies:
                     obj = PhotoProxy if name == 'PHOTO' else EditionProxy
-                    self.proxies.add(obj(self.orders[order], order_path, name))
+                    self._proxies.add(obj(info_proxy, proxy_name, name))
             
             # Уменьшаем лимит, если имя заказа меньше рубежного
-            if order <= self.border_name:
+            if order <= self._border_name:
                 limit -= 1
         
         self.appm.pf.filebar.step_end()
 
     def __update_proxies(self):
         """Обновление информации в прокси объектах слежения"""
-        self.appm.pf.filebar.maximum(len(self.proxies) + len(self.orders), 85)
-        
-        # Обновляем информацию в прокси объектах информации о заказе
-        self.appm.pf.operation.step('Обновление объектов заказов')
-        for order_proxy in self.orders.values():
-            self.appm.pf.filebar.step(order_proxy.order)
-            order_proxy.update_info()
-            self.appm.pf.filebar.step_end()
+        self.appm.pf.filebar.maximum(len(self._proxies) + len(self._orders), 85)
 
         # Обновляем информацию в прокси объектах тиражей
-        self.appm.pf.operation.step('Обновление объектов тиражей')
-        for proxy in self.proxies:
+        self.appm.pf.operation.step('Обновление тиражей')
+        for proxy in self._proxies:
             self.appm.pf.filebar.step(proxy.name)
-            proxy.update_info()
+            proxy.update_proxy()
+            self.appm.pf.filebar.step_end()
+        
+        # Обновляем информацию в прокси объектах информации о заказе
+        self.appm.pf.operation.step('Обновление заказов')
+        for order_proxy in self._orders.values():
+            self.appm.pf.filebar.step(order_proxy.name)
+            order_proxy.update_proxy()
             self.appm.pf.filebar.step_end()
 
     def __update_log(self):
@@ -103,25 +103,28 @@ class OrdersTracker(Tracker):
 
         # Вызываем обновление лога.  
         self.appm.pf.filebar.step('Запись в лог файл')
-        self.appm.log.update_records(self.proxies)
+        self.appm.log.update_records(self._proxies)
         self.appm.pf.filebar.step_end()
 
     def __clearing_orders(self):
         """
             Очистка self.orders и self.proxies от старых объектов, которые вышли за границу глубины проверки.
-            Удалит только те заказы, прокси объекты которых не находятся в статусе отслеживаемых
         """
         self.appm.pf.operation.step('Очитска списка')
         self.appm.pf.filebar.maximum(1, 5)
         self.appm.pf.filebar.step('Удаляем старые объекты')
 
         # Устананвливаем границу на последний сканированный заказ
-        self.border_name = max(self.orders)
+        self._border_name = max(self._orders)
 
         # Очищаем словарь self.orders и формируем вспомогательную переменную для очитски
-        orders_to_del = set(self.orders.pop(x) for x in sorted(self.orders)[:-self.appm.stg.log_check_depth])
+        orders_to_del = set()
+
+        for order in sorted(self._orders)[:-self.appm.stg.log_check_depth]:
+            del self._orders[order]
+            orders_to_del.add(order)
         
-        # Получаем неотслеживаемы прокси объекты и вычитаем их из исходного множества
-        self.proxies -= set(x for x in self.proxies if x.info_proxy in orders_to_del and not x.trackable)
+        # Получаем неотслеживаемые прокси объекты и вычитаем их из исходного множества
+        self._proxies -= set(x for x in self._proxies if x._order_proxy.name in orders_to_del)
 
         self.appm.pf.filebar.step_end()

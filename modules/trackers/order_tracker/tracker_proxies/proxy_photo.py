@@ -2,37 +2,41 @@ from ._proxy import *
 from ....file_iterators import photo_iterator
 
 
-class Photo(dict):
-    """Словарь для хранения информации о фотопечати"""
-    __slots__ = ('order_name', )
-
-    def __init__(self, order_name: str):
-        # Имя заказа сохраняем как атрибут объекта
-        self.order_name = order_name
-
-
-class PhotoProxy(ProxyObserver):
+class PhotoProxy(FileObserver):
     """Объект слежения за фотопечатью"""
-    __slots__ = ()
 
-    def get_default_dataclass(self) -> DATA:
-        return Photo(self.info_proxy.order)
-    
-    def get_info(self) -> DATA:
+    # Указание названи таблицы
+    table = 'Photos'
+
+
+    def __init__(self, order_proxy, proxy_name, name: str) -> None:
+        super().__init__(order_proxy, proxy_name, name)
+
+    def _update_info(self):
         """Ф-я подсчета фотопечати в заказе."""
-        # Создем новый объект
-        data = Photo(self.info_proxy.order)
+        # Промежуточный словарь для сравнения значений
+        dct = {}
 
         # Итерируемся по фотопечати в заказе
-        for paper, format, pages_it in photo_iterator(self._path):
+        for paper, size, pages_it in photo_iterator(self._path):
             # Отсекаем слово Фото из имени
-            format = format.split()[1]
+            size = size.split()[1]
 
             # Получаем строку формата и мультипликатор изображений
-            format, multiplier = format.split('--')
+            size, multiplier = size.split('--')
 
             # Обновляем значения словаря
             multiplier = int(multiplier)
-            data[f'{paper} {format}'] = sum(multiplier for _ in pages_it)
+            dct[f'{paper} {size}'] = sum(multiplier for _ in pages_it)
 
-        return data
+        # помещаем атрибуты на объект
+        for k, v in dct.items(): self[k] = v
+    
+    def check_request(self, name: str) -> str:                              #type: ignore
+        return f'SELECT EXISTS (SELECT name FROM Photos WHERE name=\'{name}\' LIMIT 1)'
+    
+    def insert_request(self, name: str) -> tuple[str, tuple[Any, ...]]:    #type: ignore
+        return f'INSERT INTO Photos (order_name, name, value) VALUES (?, ?, ?)', (self._order_proxy.name, name, getattr(self, name))
+    
+    def update_request(self, name: str) -> tuple[str, tuple[Any, ...]]:         #type: ignore
+        return f'UPDATE Photos SET value=? WHERE order_name=\'{self._order_proxy.name}\' AND name=\'{name}\'', (getattr(self, name), )

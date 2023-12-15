@@ -120,6 +120,7 @@ class FileBar(ttk.Frame):
         """
         self.__maximum = value
         self.__delta = percentage / value
+        self.__value = 0
     
     def step(self, value: str) -> None:
         """Начало шага. Устанавливает значение в текстовую переменную"""

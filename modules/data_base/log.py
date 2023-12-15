@@ -1,11 +1,12 @@
 from typing import NamedTuple
 from .data_base import DataBase
+from ..trackers.order_tracker.tracker_proxies import *
 
 
 class Photo(NamedTuple):
     """Инофрмация о фотопечати."""
     name: str                               # Имя тиража
-    count: int                              # Счетчик отпечатков
+    value: int                              # Счетчик отпечатков
 
 
 class Edition(NamedTuple):
@@ -34,37 +35,41 @@ class Log(DataBase):
 
     data_base = 'log.db'
 
-    def update_records(self, proxies: set) -> None:
+    @DataBase.safe_connect
+    def update_records(self, proxies: set[EditionProxy | PhotoProxy]) -> None:
         """Сборная ф-я для обновления библиотеки"""
-        with self.__s_con:
-            for obj in sorted(proxies, key=lambda x: (x.info_proxy.order, x.name)):
-                print(obj.info_proxy.order, obj.name)
-        #     self.__update_orders_table(lst)
-        #     self.__s_con.connect.commit()
+        for proxy in sorted(proxies, key=lambda x: (x._order_proxy.name, x.name)):
+            # Записываем информацию по заказу в лог, если к нам пришел непустой тираж
+            if proxy._order_proxy._updated:
+                proxy._order_proxy._updated = False
+                self.__update_table(proxy._order_proxy)
+            
+            # Пропускаем не обновившиеся прокси объекты
+            if not proxy._updated: continue
 
-    # def __update_orders_table(self, lst):
-    #     """Обновление данных в основной таблице информации о заказе"""
-    #     for order_dc in lst:
-    #         keys, values = zip(*((k, v) for k, v in order_dc.__dict__.items() if k not in ('photo', 'content')))
-    #         self.__s_con.cursor.execute(f'SELECT EXISTS (SELECT name FROM Orders WHERE name={order_dc.name} LIMIT 1)')
-    #         if self.__s_con.cursor.fetchone()[0]:
-    #             req = ', '.join(f'{keys[x]} = \'{values[x]}\'' for x in range(2, 5))
-    #             self.__s_con.cursor.execute(f'UPDATE Orders SET {req} WHERE name={values[0]}')
-    #         else:
-    #             self.__s_con.cursor.execute(f'INSERT INTO Orders {keys} VALUES {values}')
-    #         self.__update_editions_tables(*order_dc.content, *order_dc.photo)
+            # Обновляем лог
+            if isinstance(proxy, PhotoProxy):
+                self.__update_photos(proxy)
+            else:
+                self.__update_table(proxy)
+        self.connect.commit()
 
-    # def __update_editions_tables(self, *edt_tuple):
-    #     """Обновление данных в таблице тиражей"""
-    #     for edt in edt_tuple:
-    #         table = 'Editions' if edt.__class__.__name__ == 'Edition' else 'Photos'
-    #         keys, values = zip(*((k, v) for k, v in edt.__dict__.items() if v is not None))
-    #         self.__s_con.cursor.execute(f'SELECT EXISTS(SELECT name FROM {table} WHERE order_name={values[0]} AND name=\'{values[1]}\' LIMIT 1)')
-    #         if self.__s_con.cursor.fetchone()[0]:
-    #             req = ', '.join(f'{keys[x]} = \'{values[x]}\'' for x in range(2, len(keys)))
-    #             self.__s_con.cursor.execute(f'UPDATE {table} SET {req} WHERE order_name={values[0]} AND name=\'{values[1]}\'')
-    #         else:
-    #             self.__s_con.cursor.execute(f'INSERT INTO {table} {keys} VALUES {values}')
+    def __update_table(self, proxy: OrderInfoProxy | EditionProxy) -> None:
+        """Обновление данных в основной таблице информации о заказе"""
+        self.cursor.execute(proxy.check_request)
+        if self.cursor.fetchone()[0]:
+            self.cursor.execute(*proxy.update_request)
+        else:
+            self.cursor.execute(*proxy.insert_request)
+    
+    def __update_photos(self, proxy: PhotoProxy) -> None:
+        """Для записи фотопечати пришлось использовать отдельный метод"""
+        for name in proxy.__dict__:
+            self.cursor.execute(proxy.check_request(name))
+            if self.cursor.fetchone()[0]:
+                self.cursor.execute(*proxy.update_request(name))
+            else:
+                self.cursor.execute(*proxy.insert_request(name))
 
     def get(self, order_name: str) -> Order | None:
         """Получение объекта заказа из лога."""

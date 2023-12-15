@@ -1,75 +1,90 @@
-from collections import namedtuple
-from typing import Iterator, TYPE_CHECKING, Any
+from abc import ABC, abstractmethod
+from typing import Any
 
 
-if TYPE_CHECKING:
-    from .proxy_edition import Edition
-    from .proxy_info import OrderInfoProxy
-    from .proxy_photo import Photo
+class BaseObserver(ABC):
+    """Реализует базовую логику наблюдения за объектом"""
+    __slots__ = '_count', '_updated', 'name'
 
-
-type DATA = Photo | Edition
-
-
-class ProxyObserver:
-    """Реализует общую логику наблюдения за объектом"""
-    __slots__ = '_count', 'trackable', 'info_proxy', '_path', 'name', 'data', '_hash'
-
-    def __init__(self, info_proxy: Any, order_path: str, name: str) -> None:
+    @abstractmethod
+    def __init__(self, name: str) -> None:
         # Атрибуты управления прокси-объектом
-        self._count = 0                     # Счетчик итераций обновления объекта
-        self.trackable = True               # Метка для обновления
-
-        # Информационные атрибуты
-        self.info_proxy: OrderInfoProxy = info_proxy        # ссылка на прокси объект информации о заказе
-        self._path = f'{order_path}/{name}' # Абсолютный путь до заказа
         self.name = name
+        self._count = 0                     # Счетчик итераций обновления объекта
+        self._updated = False               # Метка для обновления
+    
+    @abstractmethod
+    def _update_info(self) -> None:
+        """Абстракнтый метод установки на объект информации. Этот метод должен вызываться методм update_proxy"""
+        pass
 
-        # Создаем пустой датакласс для объекта. 
-        # Он будет использован для сравнения с 1 сканированным результатом.
-        # Необходим для отсеивания пустых тиражей.
-        self.data = self.get_default_dataclass()
+    @abstractmethod
+    def update_proxy(self):
+        """Логика работы прокси объекта. Его следует вызывать в трекере"""
+        pass
 
-        # На основе номера заказа и имени тиража высчитываем хэш сумму. 
-        # Она будет использоваться для записи во множество.
-        self._hash = hash(order_path.rsplit('/', 1)[-1] + name)
+    @property
+    def check_request(self) -> str:
+        """Запрос SQL на проверку дубликата"""
+        raise Exception(f'Не переопределен метод check_request')
+    
+    @property
+    def insert_request(self) -> tuple[str, tuple[Any, ...]]:
+        """Запрос SQL на добавление в базу данных"""
+        raise Exception(f'Не переопределен метод insert_request')
 
-    def __eq__(self, __value: object) -> bool:
-        if isinstance(__value, ProxyObserver):
-            return self._hash == __value._hash
+    @property
+    def update_request(self) -> tuple[str, tuple[Any, ...]]:
+        """Запрос SQL для обновления базы данных"""
+        raise Exception(f'Не переопределен метод update_request')
+
+    def __setitem__(self, key: str, value: str | int | float | None):
+        """
+            Установка значения атрибута на объект. 
+            Дополнительно проверяет на совпадение значений.
+            Управляет _updated атрибутом объекта.
+        """
+        if value != getattr(self, key, None):
+            self._updated = True
+        super().__setattr__(key, value)
+
+
+class FileObserver(BaseObserver):
+    """Реализует логику слежения за файлами: тиражами и фотопечатью"""
+    __slots__ = '_order_proxy', '_proxy_name', '_hash', 'name'              
+
+    @abstractmethod
+    def __init__(self, order_proxy, proxy_name, name: str) -> None:
+        super().__init__(name)
+        self._order_proxy = order_proxy         # Ссылка на прокси объект хранения информации о заказе
+        self._proxy_name = proxy_name           # Имя прокси объекта
+        self._hash = hash(proxy_name)           # переменная для хранения хеш-значения
+        self.name = name                        # Имя тиража
+    
+    @property
+    def _path(self) -> str:
+        return self._order_proxy._path + '/' + self.name
+
+    def update_proxy(self) -> None:
+        # Когда сетчик равен 0, вызываем сканирование объекта
+        if self._count == 0:
+            self._updated = False
+            self._update_info()
         
-        return self._hash == hash(__value)
-    
-    def __hash__(self) -> int:
-        return self._hash
-    
-    def get_default_dataclass(self) -> DATA:     #type: ignore
-        """
-        Возвращает Объект со значениями по умолчанию. 
-        Этот объект в дальнейшем используется для сравнения и выявления пустых тиражей
-        """
-        raise Exception(f'Ф-я <__get_default_dataclass> должна быть переопределна в классе {self.__class__.__name__}')
-
-    def update_info(self):
-        """Обновление информации в датаклассе."""
+        # Если после обновления атрибут _updated остался False, это значит, что новая информация равна старой.
+        # В таком случае, можно увелчить счетчик и пропускать сканирование объекта.
+        if not self._updated:
+            self._count += 1
+        
         # Каждые 20 минут (Цикл трекера - 150 секунд, 8 итераций -> 20 минут)
         # Устанавливаем метки на начальное положение для инициализации повтороного сканирования.
         if self._count == 8:
             self._count = 0
-            self.trackable = True
-        
-        # Если объект не нуждается в обновлении, увеличиваем счетчик на 1 и пропускаем скан
-        if not self.trackable:
-            self._count += 1
-            return
 
-        # Получаем объект и сравниваем его с предыдущим сканированием
-        res = self.get_info()
-        if self.data == res:
-            self.trackable = False  # Если объекты равны, переводим флаг в False
-        else:
-            self.data = res         # Иначе обновляем data
+    def __hash__(self) -> int:
+        return self._hash
 
-    def get_info(self) -> DATA:
-        """Возвращает полученную информацию"""
-        raise Exception(f'В классе <{self.__class__.__name__}> должен быть переопределен метод <get_info>')
+    def __eq__(self, _value: object) -> bool:
+        if isinstance(_value, str):
+            return self._proxy_name == _value
+        return _value._hash == self._hash       #type: ignore

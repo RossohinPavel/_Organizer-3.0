@@ -1,79 +1,78 @@
 from re import findall
-from collections import namedtuple
+from ._proxy import BaseObserver, Any
 
 
-_oi = namedtuple(
-    typename='OrderInfo',
-    field_names=(
-        'order_name',               # Номер заказа
-        'creation_date',            # Дата создания заказа
-        'customer_name',            # Имя заказчика
-        'customer_address',         # Адрес заказчика
-        'price',                    # Общая стоимость заказа
-    ),
-    # Значения по умолчанию для customer_name, customer_address и price
-    defaults=('_unknown_', '_unknown_', 0.0)
-)
-
-
-class OrderInfo(_oi):
-    __slots__ = ()
-    pass
-
-
-class OrderInfoProxy:
+class OrderInfoProxy(BaseObserver):
     """
         Объект слежения за файлом completed.htm содержащий в себе информацию о заказе.
         Повторяет некоторые эдементы ProxyObserver для получения общего интерфейса.
     """
-    __slots__ = 'trackable', 'in_log', 'order_path', 'day', 'order', 'data'
 
+    # Паттерны для re для распознавания информации
     _patterns = {
         'customer_name': r'Уважаемый \(ая\), (.+) !</p>',
         'customer_address': r'выдачи.+\n?.+\n?.+<strong>(.+)</strong>',
         'price': r'руб\..+<strong>(\d+\.?\d*)'
     }
 
-    def __init__(self, order_path: str, day: str, order: str) -> None:
-        # Атрибуты управления объектом
-        self.trackable = True       # Флаг отслеживание изменений
-        self.in_log = False         # Флаг присутствия в логе
+    __slots__ = 'name', 'creation_date', 'customer_name', 'customer_address', 'price', '_path'                      
 
+    def __init__(self, z_disc: str, day: str, order: str) -> None:
+        super().__init__(order)
         # Информационные атрибуты
-        self.order_path = order_path
-        self.day = day
-        self.order = order
+        self.creation_date = day                        # Дата создания заказа
+        self.customer_name = '_unknown_'                # Имя заказчика
+        self.customer_address = '_unknown_'             # Адрес заказчика
+        self.price = 0.0                                # Общая стоимость заказа
 
-        # Датакласс
-        self.data = OrderInfo(order, day)
+        # Атрибуты управления объектом
+        self._path = f'{z_disc}/{day}/{order}'          # Полный путь до объекта
 
-    def update_info(self):
-        """Обновление информации в датаклассе. Логика будет отличаться от тиражных прокси."""
+        # Флаг _updated и счетчик _count будет работать в этом прокси слегка по-другому.
+        # Помимо обновления, _updated будет служить флагом присутствия заказа в библиотеке.
+        # Объект, в отличие от раодительского, создаем с True значением. Заказ должен попасть
+        # в бибилотеку в любом случае, есть в нем информация, или там значения по-умолчанию.
+        self._updated = True
+
+    def update_proxy(self) -> None:
         # self._count будет служить меткой от повторного записи в библиотеку
-        if self.trackable:
-            # Пытаемся обновить информацию.
+        # Если его значение равно 0 - пытаемся получить информацию из completed.htm
+        if not self._count:
             try:
-                self.data = self.get_info()
+                self._update_info()
                 # Повторно сканировать существующий completed нет необходимости.
-                self.trackable = False
-                # А флаг присутствиия в логе меняем на False, так как инфомрация обновилась
-                self.in_log = False
+                # Поэтому, при успехе меняем _count на 1, и _updated снова на True, чтобы объект прошел проверку на запись.
+                self._count = 1
+                self._updated = True
             except:
-                # В случае ошибки (не найден файл completed продолжаем искать его раз за разом)
+                # В случае ошибки (не найден файл completed), то продолжаем искать его раз за разом.
                 # Для большинства заказов он будет найден, остальные остануться со значением по умолчанию
                 pass
 
-    def get_info(self):
+    def _update_info(self) -> None:
         """Парсим completed.htm с целью нахождения нужной нам информации"""
-        with open(f'{self.order_path}/completed.htm', encoding='utf-8') as file:
-            # создаем и возвращаем новый объект
-            return eval(f'OrderInfo(self.order, self.day, {', '.join(self._arg_generator(file.read()))})')
+        with open(f'{self._path}/completed.htm', encoding='utf-8') as file:
+            string = file.read()
 
-    def _arg_generator(self, string):
-        """Генератор именованных аргументов для создания кортежа OrderInfo"""
-        for arg, pattern in self._patterns.items():
             # По паттерну находим нужную строку
-            res = findall(pattern, string)
-            if res:
-                if arg == 'price': res[0] = float(res[0])
-                yield f'{arg}={repr(res[0])}'
+            for arg, pattern in self._patterns.items():
+                res = findall(pattern, string)
+                if res:
+                    res = res[0]
+                    if arg == 'price': 
+                        res = float(res)
+                    self[arg] = res
+    
+    @property
+    def check_request(self) -> str:
+        return f'SELECT EXISTS (SELECT name FROM Orders WHERE name=\'{self.name}\' LIMIT 1)'
+    
+    @property
+    def insert_request(self) -> tuple[str, tuple[Any, ...]]:
+        fields = ', '.join(self.__slots__[:-1])
+        return f'INSERT INTO Orders ({fields}) VALUES (?, ?, ?, ?, ?)', tuple(getattr(self, x) for x in self.__slots__[:-1])
+    
+    @property
+    def update_request(self) -> tuple[str, tuple[Any, ...]]:
+        fields = 'customer_name=?, customer_address=?, price=?'
+        return f'UPDATE Orders SET {fields} WHERE name={self.name}', (self.customer_name, self.customer_address, self.price)
