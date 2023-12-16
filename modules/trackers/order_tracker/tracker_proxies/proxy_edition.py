@@ -43,12 +43,13 @@ class EditionProxy(FileObserver):
 
         # Устанавливаем атрибуты на объект после сканирования
         self['covers'] = covers
-        self['pages'] = pages = sum(page_lst) if page_lst else None
+        pages = sum(page_lst)
+        self['pages'] = pages if pages > 0 else None
         self['ccount'] = self.get_ccount(pages, page_lst)
         self['comp'] = self.get_comparison(covers, pages, const)
 
     @staticmethod
-    def get_ccount(page_count: int | None, ex_list: list) -> str | None:
+    def get_ccount(page_count: int, ex_list: list) -> str | None:
         """Метод для формирования комплексного счетчика в формате <30/3 2/4>"""
         if not page_count: return
         return ' '.join(f'{v}/{k}' for k, v in sorted(Counter(ex_list).items(), key=lambda x: (x[1], x[0])))
@@ -62,7 +63,7 @@ class EditionProxy(FileObserver):
 
         # Возвращаем None, если это одна книжка в тираже или счетчик разворотов = 0.
         # Совмещать штучную продукцию нет смысла))
-        if page_count is None or cover_count == 1: return
+        if not page_count or cover_count == 1: return
 
         # Вспомогательные переменные для подсчета
         cover_exist = False

@@ -29,7 +29,7 @@ def create_clear_log():
         log.cursor().execute("""INSERT INTO Orders (name, creation_date, customer_name, customer_address, price)
                                 VALUES (?, ?, ?, ?, ?)""", ('000000', '2020-01-01', 'Admin', 'Home', 66.6))
         log.cursor().execute("""INSERT INTO Editions (order_name, name, covers, pages, ccount, comp)
-                                VALUES (?, ?, ?, ?, ?, ?)""", ('000000', 'Test-Фотопечать SRA3 170гр горизонт 40', 1, 0, None, None))
+                                VALUES (?, ?, ?, ?, ?, ?)""", ('000000', 'Test-Фотопечать SRA3 170гр горизонт 40', 1, None, None, None))
 
 
 if __name__ == '__main__':

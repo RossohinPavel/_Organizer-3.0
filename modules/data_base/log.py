@@ -40,7 +40,7 @@ class Log(DataBase):
         """Сборная ф-я для обновления библиотеки"""
         for proxy in sorted(proxies, key=lambda x: (x._order_proxy.name, x.name)):
             # Записываем информацию по заказу в лог, если к нам пришел непустой тираж
-            if proxy._order_proxy._updated:
+            if proxy._updated and proxy._order_proxy._updated:
                 proxy._order_proxy._updated = False
                 self.__update_table(proxy._order_proxy)
             
