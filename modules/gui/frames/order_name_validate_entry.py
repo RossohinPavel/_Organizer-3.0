@@ -2,7 +2,7 @@ from .._source import *
 from re import match as re_match
 
 
-class ONVFrame(ttk.Entry):
+class ONVEntry(ttk.Entry):
     """Класс для отрисовки фреймов проверки заказа и осуществления логики первичной валидации номера"""
     def __init__(self, master: Any, /, **kwargs):
         self._func = kwargs.pop('func')

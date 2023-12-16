@@ -71,23 +71,24 @@ class Log(DataBase):
             else:
                 self.cursor.execute(*proxy.insert_request(name))
 
+    @DataBase.safe_connect
     def get(self, order_name: str) -> Order | None:
         """Получение объекта заказа из лога."""
-        with self.__s_con:
-            self.__s_con.cursor.execute('SELECT * FROM Orders WHERE name=?', (order_name, ))
-            res = self.__s_con.cursor.fetchone()
-            if res: return Order(*res[1:], self.__get_photos(order_name), self.__get_editions(order_name))  #type: ignore
+        self.cursor.execute('SELECT * FROM Orders WHERE name=?', (order_name, ))
+        res = self.cursor.fetchone()
+        if res: 
+            return Order(*res[1:], self.__get_photos(order_name), self.__get_editions(order_name))  #type: ignore
     
     def __get_photos(self, order_name: str) -> tuple[Photo, ...] | None:
         """Вспомогательная ф-я для получения информации о фотопечати в заказе"""
-        self.__s_con.cursor.execute('SELECT name, count FROM Photos WHERE order_name=?', (order_name, ))
-        res = self.__s_con.cursor.fetchall()
+        self.cursor.execute('SELECT name, value FROM Photos WHERE order_name=?', (order_name, ))
+        res = self.cursor.fetchall()
         if res: return tuple(Photo(*r) for r in res)
 
     def __get_editions(self, order_name: str) -> tuple[Edition, ...] | None:
         """Вспомогательная ф-я для получения информации о тиражах в заказе"""
-        self.__s_con.cursor.execute('SELECT name, covers, pages, ccount, comp FROM Editions WHERE order_name=?', (order_name, ))
-        res = self.__s_con.cursor.fetchall()
+        self.cursor.execute('SELECT name, covers, pages, ccount, comp FROM Editions WHERE order_name=?', (order_name, ))
+        res = self.cursor.fetchall()
         if res: return tuple(Edition(*r) for r in res)
 
     @DataBase.safe_connect

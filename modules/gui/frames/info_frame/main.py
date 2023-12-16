@@ -1,5 +1,5 @@
 from ..._source import *
-from ..order_name_validate_frame import ONVFrame
+from ..order_name_validate_entry import ONVEntry
 from .proxy import StickerGenProxy
 
 
@@ -25,7 +25,7 @@ class StickerGenFrame(ttk.LabelFrame):
         container = ttk.Frame(self, padding=(5, 3, 5, 5))
         container.pack(fill=ttkc.X)
 
-        onvf = ONVFrame(container, func=self.main)
+        onvf = ONVEntry(container, func=self.main)
         onvf.pack(
             padx=(0, 3), 
             fill=ttkc.X,
