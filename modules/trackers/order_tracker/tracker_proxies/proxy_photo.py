@@ -27,7 +27,10 @@ class PhotoProxy(FileObserver):
 
             # Обновляем значения словаря
             multiplier = int(multiplier)
-            dct[f'{paper} {size}'] = sum(multiplier for _ in pages_it)
+            name = f'{paper} {size}'
+            if name not in dct:
+                dct[name] = 0
+            dct[name] += sum(multiplier for _ in pages_it)
 
         # помещаем атрибуты на объект
         for k, v in dct.items(): self[k] = v
