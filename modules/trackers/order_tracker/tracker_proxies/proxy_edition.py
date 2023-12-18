@@ -84,7 +84,14 @@ class EditionProxy(FileObserver):
 
     @property
     def check_request(self) -> str:
-        return f'SELECT EXISTS(SELECT name FROM Editions WHERE order_name=\'{self._order_proxy.name}\' AND name=\'{self.name}\' LIMIT 1)'
+        return f"""
+        SELECT EXISTS(
+            SELECT name
+            FROM Editions 
+            WHERE order_name=\'{self._order_proxy.name}\'
+            AND name=\'{self.name}\'
+            LIMIT 1
+        )"""
 
     @property
     def insert_request(self) -> tuple[str, tuple[Any, ...]]:

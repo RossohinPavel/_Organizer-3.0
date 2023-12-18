@@ -1,8 +1,8 @@
+"""
+    Осуществляет миграцию записей из старой базы данных в новую.
+    Принудительно сортирует записи по имени заказа
+"""
 import sqlite3
-
-
-# Осуществляет миграцию записей из старой базы данных в новую.
-# Принудительно сортирует записи по имени заказа
 
 
 def main():
@@ -11,19 +11,38 @@ def main():
         old_cursor = old_con.cursor()
 
         # Переливаем информацию по заказам
-        old_cursor.execute('SELECT name, creation_date, customer_name, customer_address, price FROM Orders')
+        old_cursor.execute(
+            """
+            SELECT name, creation_date, customer_name, customer_address, price 
+            FROM Orders
+            """
+        )
         current_cursor.executemany(
-            """INSERT INTO Orders (name, creation_date, customer_name, customer_address, price) VALUES (?, ?, ?, ?, ?)""", 
+            """
+            INSERT INTO 
+            Orders (name, creation_date, customer_name, customer_address, price) 
+            VALUES (?, ?, ?, ?, ?)
+            """, 
             sorted(old_cursor.fetchall(), key=lambda x: x[0])
         )
         
         # Переливаем информацию по тиражам
-        old_cursor.execute('SELECT order_name, name, covers, pages, ccount, comp FROM Editions')
+        old_cursor.execute(
+            """
+            SELECT order_name, name, covers, pages, ccount, comp 
+            FROM Editions
+            """
+        )
         for on, name, cov, pages, cc, comp in sorted(old_cursor.fetchall(), key=lambda x: x[0]):
             if pages == 0: 
                 pages = None
+
             current_cursor.execute(
-                """INSERT INTO Editions (order_name, name, covers, pages, ccount, comp) VALUES (?, ?, ?, ?, ?, ?)""",
+                """
+                INSERT INTO 
+                Editions (order_name, name, covers, pages, ccount, comp) 
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
                 (on, name, cov, pages, cc, comp)
             )
         

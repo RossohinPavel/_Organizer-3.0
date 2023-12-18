@@ -8,7 +8,6 @@ class PhotoProxy(FileObserver):
     # Указание названи таблицы
     table = 'Photos'
 
-
     def __init__(self, order_proxy, proxy_name, name: str) -> None:
         super().__init__(order_proxy, proxy_name, name)
 
@@ -28,18 +27,39 @@ class PhotoProxy(FileObserver):
             # Обновляем значения словаря
             multiplier = int(multiplier)
             name = f'{paper} {size}'
+
             if name not in dct:
                 dct[name] = 0
             dct[name] += sum(multiplier for _ in pages_it)
 
         # помещаем атрибуты на объект
-        for k, v in dct.items(): self[k] = v
+        for k, v in dct.items(): 
+            self[k] = v
     
     def check_request(self, name: str) -> str:                              #type: ignore
-        return f'SELECT EXISTS (SELECT name FROM Photos WHERE name=\'{name}\' LIMIT 1)'
+        req = f"""
+        SELECT EXISTS (
+            SELECT name 
+            FROM Photos 
+            WHERE order_name=\'{self._order_proxy.name}\'
+            AND name=\'{name}\' 
+            LIMIT 1
+        )"""
+        return req
     
     def insert_request(self, name: str) -> tuple[str, tuple[Any, ...]]:    #type: ignore
-        return f'INSERT INTO Photos (order_name, name, value) VALUES (?, ?, ?)', (self._order_proxy.name, name, getattr(self, name))
+        req = f"""
+        INSERT INTO 
+        Photos (order_name, name, value) 
+        VALUES (?, ?, ?)
+        """
+        return req, (self._order_proxy.name, name, getattr(self, name))
     
     def update_request(self, name: str) -> tuple[str, tuple[Any, ...]]:         #type: ignore
-        return f'UPDATE Photos SET value=? WHERE order_name=\'{self._order_proxy.name}\' AND name=\'{name}\'', (getattr(self, name), )
+        req = f"""
+        UPDATE Photos 
+        SET value=? 
+        WHERE order_name=\'{self._order_proxy.name}\' 
+        AND name=\'{name}\'
+        """
+        return req, (getattr(self, name), )
