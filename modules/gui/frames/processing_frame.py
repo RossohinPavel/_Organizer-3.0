@@ -139,3 +139,4 @@ class FileBar(ttk.Frame):
         self.__value = 1
         self.__delta = 1.0
         self.__maximum = 100
+        self.__lbl.configure(text='0.0%')

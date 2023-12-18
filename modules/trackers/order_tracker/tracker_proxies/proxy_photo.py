@@ -20,7 +20,7 @@ class PhotoProxy(FileObserver):
         # Итерируемся по фотопечати в заказе
         for paper, size, pages_it in photo_iterator(self._path):
             # Отсекаем слово Фото из имени
-            size = size.split()[1]
+            size = size.split(maxsplit=1)[1]
 
             # Получаем строку формата и мультипликатор изображений
             size, multiplier = size.split('--')
