@@ -109,7 +109,7 @@ class FileBar(ttk.Frame):
             padx=(0, 5)
             )
         # Лейбл отображения процента
-        self.__lbl1 = ttk.Label(self, text='100.0%', width=6, justify='left')
+        self.__lbl1 = ttk.Label(self, text='0.0%', width=6, justify='left')
         self.__lbl1.pack(side=ttkc.RIGHT, anchor=ttkc.E)
 
     def maximum(self, value: int, percentage: int = 100) -> None:
