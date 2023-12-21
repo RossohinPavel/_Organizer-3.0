@@ -1,5 +1,5 @@
 from .._source import *
-from ..windows.library import LibraryWindow
+# from ..windows.library import LibraryWindow
 
 
 class ControlFrame(ttk.Frame):

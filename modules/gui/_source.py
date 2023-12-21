@@ -1,6 +1,6 @@
 # Базовый tkinter и его зависимые модули
 import tkinter
-from tkinter import Radiobutton, messagebox as tkmb
+from tkinter import messagebox as tkmb
 from tkinter import filedialog as tkfd
 
 # Модерновый фреймворк ttkbootstrap и его модули
@@ -9,10 +9,21 @@ import ttkbootstrap.constants as ttkc
 from ttkbootstrap.scrolled import ScrolledFrame
 
 # Типизация для использования в импортируемых виджетах
-from typing import Callable, NamedTuple, Any, Mapping, Type, Literal, Self, Iterator
+from ..typing import NamedTuple, Any
 
 # AppManager управления приложением
 from ..app_manager import AppManager
+
+
+# Иконки, используемые в приложении
+IMAGES = {
+    'todo_d': 'data/assets/todo_d.png',
+    'todo_l': 'data/assets/todo_l.png',
+    'todo_p': 'data/assets/todo_p.png',
+    'settings_d': 'data/assets/settings_d.png',
+    'settings_l': 'data/assets/settings_l.png',
+    'settings_p': 'data/assets/settings_p.png'
+}
 
 
 class Geometry(NamedTuple):

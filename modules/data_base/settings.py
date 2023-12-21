@@ -12,7 +12,7 @@ class Settings(DataBase):
         - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
         - theme - Название темы, которая используется в приложении
     """
-    __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir', 'theme'
+    __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir', 'theme', 'color'
 
     data_base = 'app.db'
 
@@ -25,6 +25,7 @@ class Settings(DataBase):
         self.t_disc: str
         self.roddom_dir: str
         self.theme: str
+        self.color: str
         self.__get_saving_values()
 
     @DataBase.safe_connect

@@ -60,8 +60,8 @@ AppManager.log = Log()
 from .gui.main import MainWindow
 AppManager.mw = MainWindow()   
 
-from .task_manager import TaskManager
-AppManager.tm = TaskManager()
+# from .task_manager import TaskManager
+# AppManager.tm = TaskManager()
 
-from .trackers import OrdersTracker
-AppManager.ot = OrdersTracker()
+# from .trackers import OrdersTracker
+# AppManager.ot = OrdersTracker()

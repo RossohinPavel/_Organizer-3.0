@@ -1,22 +1,36 @@
+from enum import verify
 import ttkbootstrap as ttk
-from ttkbootstrap import PhotoImage
 
 
-root = ttk.Window('test')
+class Main(ttk.Frame):
+    def __init__(self, master, /, **kwargs):
+        super().__init__(master, **kwargs)
+        self.lbl = ttk.Label(self, image=t)
+        self.lbl.pack(side='left')
+        self.support = ttk.Label(self)
+        self.support.pack(side='left', fill='y')
 
-t = PhotoImage(file='../data/assets/home.png')
+        self.lbl.bind('<Button-1>', self.event)
 
-lst = ['t1', 't2']
+        self.bind('<<ThemeChanged>>', self.event)
 
-val = ttk.StringVar(root)
-
-r1 = ttk.Radiobutton(root, bootstyle='light-outline-toolbutton', image=t, variable=val, value='t1')
-
-r2 = ttk.Radiobutton(root, bootstyle='outline-toolbutton', image=t, variable=val, value='t2')
+    def event(self, e):
+        style.theme_use('darkly')
+        print(e)
 
 
-r1.place(x=20, y=20)
-r2.place(x=20, y=80)
+root = ttk.Window('test', themename='litera')
+
+t = ttk.PhotoImage(master=root, file='../data/assets/settings_l.png')
+
+m = Main(root)
+m.pack(side='left')
+
+ttk.Separator(root, orient='vertical').pack(side='left')
+# root.winfo_children()[0].destroy()
+
+style = ttk.Style()
+
 
 
 root.mainloop()
