@@ -1,6 +1,6 @@
 # Базовый tkinter и его зависимые модули
 import tkinter
-from tkinter import messagebox as tkmb
+from tkinter import Radiobutton, messagebox as tkmb
 from tkinter import filedialog as tkfd
 
 # Модерновый фреймворк ttkbootstrap и его модули
