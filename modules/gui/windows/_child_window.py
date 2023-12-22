@@ -1,31 +1,3 @@
-# Базовый tkinter и его зависимые модули
-import tkinter
-from tkinter import messagebox as tkmb
-from tkinter import filedialog as tkfd
-
-# Модерновый фреймворк ttkbootstrap и его модули
-import ttkbootstrap as ttk
-import ttkbootstrap.constants as ttkc
-from ttkbootstrap.scrolled import ScrolledFrame
-
-# Типизация для использования в импортируемых виджетах
-from ..typing import NamedTuple, Any
-
-# AppManager управления приложением
-from ..app_manager import AppManager
-
-
-# Иконки, используемые в приложении
-IMAGES = {
-    'todo_d': 'data/assets/todo_d.png',
-    'todo_l': 'data/assets/todo_l.png',
-    'todo_p': 'data/assets/todo_p.png',
-    'settings_d': 'data/assets/settings_d.png',
-    'settings_l': 'data/assets/settings_l.png',
-    'settings_p': 'data/assets/settings_p.png'
-}
-
-
 class Geometry(NamedTuple):
     """Для описании геометрии окон, фреймов и т.д."""
     width: int
@@ -91,30 +63,3 @@ class ChildWindow(ttk.Toplevel):
         self.geometry(f"{width}x{height}+{place_x}+{place_y}")
         self.resizable(False, False)
         self.update_idletasks()
-
-
-def style_init():
-    """Ф-я для инициализации общих используемых стилей. Вызывается после инициализации основного объекта ttkbootstrap."""
-    style = ttk.Style()
-    # -----Стили различных кнопок-----
-
-
-    # Выравнивание надписи на кнопке по левому краю
-    style.configure('l_jf.TButton')
-    style.layout('l_jf.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
-
-    # Стиль для кнопок текстовых шаблонов 
-    style.configure('ms.info.Outline.TMenubutton', padding=(5, 1, 0, 1),)
-
-    # Стиль для свитчера тем
-    style.configure('ts.Outline.TMenubutton', padding=(5, 1, 0, 1),)
-
-    # Стиль для кнопки категорий в библиотеке
-    style.configure('library.TButton')
-    style.layout('library.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
-
-    # Стиль для кнопки + в библиотеке
-    style.configure('LibraryPlus.TButton', font=('TkDefaultFont', 20), padding=(5, -5, 5, -5))
-
-    # Отладочный стиль для Frame
-    style.configure('db.TFrame', background='red')

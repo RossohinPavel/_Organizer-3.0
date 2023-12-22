@@ -1,4 +1,6 @@
 from .data_base import DataBase
+from ..descriptors import *
+from ..mytyping import Callable
 
 
 class Settings(DataBase):
@@ -11,37 +13,38 @@ class Settings(DataBase):
         - t_disc - Ссылка на серверный диск цифрового отдела и операторов фотопечати
         - roddom_dir - Ссылка на папку, где хранятся заказы Роддома
         - theme - Название темы, которая используется в приложении
+        - color - Цветовая палитра, которая используется в приложении
     """
-    __slots__ = 'autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir', 'theme', 'color'
-
+    __slots__ = ()
     data_base = 'app.db'
 
+    # Дескрипторы атрибутов
+    autolog = Autolog
+    log_check_depth = Log_check_depth
+    z_disc = Z_disc
+    o_disc = O_disc
+    t_disc = T_disc
+    roddom_dir = Roddom_dir
+    theme = Theme
+    color = Color
+
     def __init__(self) -> None:
-        # Типы данных настроек
-        self.autolog: int
-        self.log_check_depth: int
-        self.z_disc: str
-        self.o_disc: str
-        self.t_disc: str
-        self.roddom_dir: str
-        self.theme: str
-        self.color: str
-        self.__get_saving_values()
+        for name, value in self.__get_saving_values():
+            setattr(self, name, value)
+            eval(f'{name.capitalize()}.add_call(self.closure(name))')
 
     @DataBase.safe_connect
-    def __get_saving_values(self) -> None:
+    def __get_saving_values(self) -> list[tuple[str, str | int]]:
         """Получаем настройки из бд при открытии программы"""
         self.cursor.execute('SELECT name, data FROM Settings')
-        for name, value in self.cursor.fetchall():
-            super().__setattr__(name, value)
+        return self.cursor.fetchall()
 
-    def __setattr__(self, name: str, value: int | str) -> None:
-        """Обновляет атрибуты на объекте, запускает связанные с ними функции и обновляет базу данных"""
-        super().__setattr__(name, value)
-        self.__update_db(name, value)
-
+    def closure(self, name: str) -> Callable[[str | int], None]:
+        """Замыкание, для получения функции записи в базу данных"""
+        return lambda v: self.__update_data_bese(name, v)
+    
     @DataBase.safe_connect
-    def __update_db(self, name: str, value: int | str) -> None:
+    def __update_data_bese(self, name: str, value: str | int) -> None:
         """Обновление базы данных"""
         self.cursor.execute('UPDATE Settings SET data=? WHERE name=?', (value, name))
         self.connect.commit()

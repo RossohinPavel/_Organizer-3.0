@@ -30,10 +30,11 @@ class DataBase:
     @staticmethod
     def safe_connect(func):
         """Декоратор для безопасного подключения к бд"""
-
+        
         def wrapper(self, *args, **kwargs):
             with self.__lock:
-                return func(self, *args, **kwargs)
+                res = func(self, *args, **kwargs)
+            return res
 
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper

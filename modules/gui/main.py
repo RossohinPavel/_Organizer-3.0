@@ -1,4 +1,6 @@
-from ._source import *
+from .source import *
+
+
 from . import frames
 # from . import windows
 
@@ -7,11 +9,7 @@ class MainWindow(ttk.Window):
     """Основное окно приложения"""
 
     def __init__(self) -> None:
-        super().__init__(
-            title='Органайзер 3.2.0 BETA',
-            themename=AppManager.stg.color,
-            iconphoto='data/assets/ico.png'
-        )
+        super().__init__(title='Органайзер 3.2.0 BETA', iconphoto='data/assets/ico.png')
         # Запускаем определение стилей и получения изображений после __init__
         style_init()
         for k, v in IMAGES.items():
@@ -32,16 +30,7 @@ class MainWindow(ttk.Window):
 
         # Разделитель
         separator = ttk.Separator(self, orient='vertical')
-        separator.pack(
-            side=ttkc.LEFT, 
-            fill=ttkc.Y,
-            pady=5
-        )
-        # Отрисовываем остальные виджеты
-        # self.set_main_graph_settings()
-    #     self.draw_header_frames()
-    #     self.draw_processing_widgets()
-    #     self.draw_common_notebook()
+        separator.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""

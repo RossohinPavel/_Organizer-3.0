@@ -1,6 +1,6 @@
 from threading import Thread, Lock
 from typing import Callable, Any, Iterable, Mapping, Type
-from .gui._source import tkmb
+from .gui.source import tkmb
 from .app_manager import AppManager
 
 

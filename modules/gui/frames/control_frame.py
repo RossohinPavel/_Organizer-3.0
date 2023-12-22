@@ -1,4 +1,7 @@
-from .._source import *
+from ..source import *
+from .header_label import HeaderLabel
+
+from ...descriptors import Z_disc
 # from ..windows.library import LibraryWindow
 
 
@@ -6,10 +9,10 @@ class ControlFrame(ttk.Frame):
     """Фрейм основных настроек приложения"""
 
     def __init__(self, master: Any):
-        super().__init__(master, padding=5)
-        self.show_log_check_depth_widgets()
+        super().__init__(master, padding=(5, 3, 5, 5))
+
         self.show_directory_widgets()
-        self.show_buttons()
+        # self.show_buttons()
 
     def show_log_check_depth_widgets(self) -> None:
         """Отрисовка виджетов для настройки глубины проверки лога"""
@@ -64,11 +67,31 @@ class ControlFrame(ttk.Frame):
 
     def show_directory_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
-        dir_frm = ttk.LabelFrame(self, text='Рабочие директории')
-        dir_frm.pack(fill=ttkc.BOTH, pady=(5, 0))
-        self.show_directory_frame(dir_frm, 'Диск операторов фотопечати \'Т\'', 't_disc')
-        self.show_directory_frame(dir_frm, 'Диск загрузки заказов \'Z\'', 'z_disc')
-        self.show_directory_frame(dir_frm, 'Диск печати заказов \'О\'', 'o_disc')
+        z_disc = HeaderLabel(self, 'Диск загрузки заказов \'Z\'')
+        z_disc.pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 3))
+
+        def update_dir() -> None:
+            """Получение информации из файлового диалога"""
+            path = tkfd.askdirectory(
+                parent=AppManager.mw, 
+                initialdir=AppManager.stg.z_disc, 
+                title=f'Выберите:'
+                )
+
+            if path:
+                AppManager.stg.z_disc = path
+
+        btn = ttk.Button(master=self, command=update_dir, style='l_jf.TButton')
+        btn.pack(fill=ttkc.X)
+        Z_disc.add_call(lambda e: btn.configure(text=e))
+        # HeaderLabel(self, 'Диск операторов фотопечати \'Т\'')
+
+
+        # dir_frm = ttk.LabelFrame(self, text='Рабочие директории')
+        # dir_frm.pack(fill=ttkc.BOTH, pady=(5, 0))
+        # self.show_directory_frame(dir_frm, 'Диск операторов фотопечати \'Т\'', 't_disc')
+        # self.show_directory_frame(dir_frm, 'Диск загрузки заказов \'Z\'', 'z_disc')
+        # self.show_directory_frame(dir_frm, 'Диск печати заказов \'О\'', 'o_disc')
 
 
     def show_directory_frame(self, master: ttk.LabelFrame, text: str, stg_attr: str) -> None:
@@ -90,7 +113,7 @@ class ControlFrame(ttk.Frame):
 
         btn = ttk.Button(
             master=master,
-            text=getattr(AppManager.stg, stg_attr), 
+            # text=getattr(AppManager.stg, stg_attr), 
             command=update_dir, 
             style='l_jf.TButton'
             )

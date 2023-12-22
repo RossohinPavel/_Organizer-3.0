@@ -1,4 +1,4 @@
-from .._source import *
+from ..source import *
 
 
 class PlanerFrame(ttk.LabelFrame):

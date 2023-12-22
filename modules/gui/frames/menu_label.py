@@ -1,5 +1,5 @@
-from .._source import *
-from ...typing import Any, Type
+from ..source import *
+from ...mytyping import Any, Type
 
 
 class MenuLabel(ttk.Frame):
@@ -16,7 +16,6 @@ class MenuLabel(ttk.Frame):
 
         # Основное изображение кнопки
         self._img = ttk.Label(self)
-        self.on_theme_icon_change(None)
         self._img.pack()
         self._img.bind('<Button-1>', self.click)
         self._img.bind('<<ThemeChanged>>', self.on_theme_icon_change)

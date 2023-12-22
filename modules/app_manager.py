@@ -48,8 +48,6 @@ match osname:
 
 
 # Наполняем менеджер реальными объектами
-from .data_base import Settings
-AppManager.stg = Settings()
 
 from .data_base import Library
 AppManager.lib = Library()
@@ -57,11 +55,14 @@ AppManager.lib = Library()
 from .data_base import Log
 AppManager.log = Log()
 
+from .task_manager import TaskManager
+AppManager.tm = TaskManager()
+
 from .gui.main import MainWindow
 AppManager.mw = MainWindow()   
 
-# from .task_manager import TaskManager
-# AppManager.tm = TaskManager()
-
 # from .trackers import OrdersTracker
 # AppManager.ot = OrdersTracker()
+
+from .data_base import Settings
+AppManager.stg = Settings()
