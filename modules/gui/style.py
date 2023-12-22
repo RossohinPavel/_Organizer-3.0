@@ -7,8 +7,8 @@ def style_init():
     # --------------Стили кнопок--------------
 
     # Стиль для кнопок выбора папок в меню. выравнивает текст по левому краю
-    style.configure('l_jf.TButton')
-    style.layout('l_jf.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
+    style.configure('l_jf.Outline.TButton', padding=(5, 2, 0, 2))
+    style.layout('l_jf.Outline.TButton', [('Button.border', {'sticky': 'nswe', 'border': '1', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'side': 'left'})]})]})]})])
 
 
     # --------------Стили текстовых лейблов--------------
