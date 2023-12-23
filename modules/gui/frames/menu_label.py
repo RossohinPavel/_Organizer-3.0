@@ -1,5 +1,6 @@
 from ..source import *
 from ...mytyping import Any, Type
+from ...descriptors import Theme
 
 
 class MenuLabel(ttk.Frame):
@@ -19,7 +20,7 @@ class MenuLabel(ttk.Frame):
         self._img = ttk.Label(self)
         self._img.pack()
         self._img.bind('<Button-1>', self.click)
-        self._img.bind('<<ThemeChanged>>', self.on_theme_icon_change)
+        Theme.add_call(self.on_theme_icon_change)
     
     def click(self, _) -> None:
         """"Срабатывание по клику мышкой на фрейм"""
@@ -28,8 +29,8 @@ class MenuLabel(ttk.Frame):
             MenuLabel.current_frame = self
             self._frame.pack(side=ttkc.LEFT, expand=1, fill=ttkc.BOTH)
     
-    def on_theme_icon_change(self, _):
+    def on_theme_icon_change(self, theme: str) -> None:
         """Меняет иконку в след за изменением темы."""
         if not self._frame.winfo_viewable():
-            suf = '_l' if AppManager.stg.theme == 'light' else '_d'
+            suf = '_l' if theme == 'light' else '_d'
             self._img.configure(image=IMAGES[f'{self._name}{suf}'])
