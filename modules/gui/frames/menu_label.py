@@ -3,9 +3,10 @@ from ...mytyping import Any, Type
 
 
 class MenuLabel(ttk.Frame):
-    current = None
+    """'Кнопка', для переключения страничек приложения"""
+    current_frame = None
 
-    def __init__(self, name: str, master: Any, frame: Type[ttk.Frame]):
+    def __init__(self, name: str, master: Any, frame: Type[ttk.Frame | ttk.LabelFrame]):
         super().__init__(master)
 
         # Имя виджета
@@ -22,7 +23,10 @@ class MenuLabel(ttk.Frame):
     
     def click(self, _) -> None:
         """"Срабатывание по клику мышкой на фрейм"""
-        self._frame.pack(side=ttkc.LEFT, expand=1, fill=ttkc.BOTH)
+        if self.current_frame != self:
+            self.current_frame._frame.pack_forget()
+            MenuLabel.current_frame = self
+            self._frame.pack(side=ttkc.LEFT, expand=1, fill=ttkc.BOTH)
     
     def on_theme_icon_change(self, _):
         """Меняет иконку в след за изменением темы."""

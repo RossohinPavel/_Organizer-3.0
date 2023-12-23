@@ -32,6 +32,10 @@ class MainWindow(ttk.Window):
         separator = ttk.Separator(self, orient='vertical')
         separator.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
+        # Запускаем 1 фрейм - Лист задач
+        frames.MenuLabel.current_frame = self.stg
+        self.todo.click(None)
+
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""
         width, height = 550, 350
