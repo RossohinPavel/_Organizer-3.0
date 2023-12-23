@@ -1,4 +1,6 @@
-from ..._source import *
+from ...source import *
+from .._child_window import *
+from ....mytyping import Iterator, Type
 from .assist import AssistWindow
 
 

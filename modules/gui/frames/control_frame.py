@@ -2,8 +2,7 @@ from ..source import *
 from .header_label import HeaderLabel
 from ...descriptors import Z_disc, O_disc, T_disc, Theme, Color
 from ...mytyping import Callable
-
-# from ..windows.library import LibraryWindow
+from ..windows.library import LibraryWindow
 
 
 class ControlFrame(ttk.Frame):
@@ -14,6 +13,7 @@ class ControlFrame(ttk.Frame):
         self.dark_menu = self.light_menu = None
         self.init_color_menus()
         self.draw_theme_widgets()
+        self.draw_library_widgets()
         self.draw_directory_widgets()
 
     def theme_closure(self, name: str) -> Callable:
@@ -81,6 +81,18 @@ class ControlFrame(ttk.Frame):
         Color.add_call(lambda v: color_btn.configure(text=v))   #type: ignore
         Color.add_call(lambda v: style_init(v))
 
+    def draw_library_widgets(self) -> None:
+        """Отрисовка виджетов библиотеки"""
+        HeaderLabel(self, 'Настройка библиотеки').pack(anchor=ttkc.W, fill=ttkc.X)
+        btn = ttk.Button(
+            self, 
+            style='minibtn.Outline.TButton', 
+            text='Библиотека', 
+            width=19,
+            command=lambda: LibraryWindow()
+        )
+        btn.pack(pady=(2, 15), padx=5, anchor=ttkc.W)
+
     def draw_directory_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
         self.draw_directory_frame('Диск загрузки заказов \'Z\'', 'z_disc')
@@ -91,7 +103,7 @@ class ControlFrame(ttk.Frame):
         """Отрисовка виджетов управления рабочими папками"""
         HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
         btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
-        btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
+        btn.pack(fill=ttkc.X, pady=(2, 15), padx=5)
 
         # Добавление вызова дескриптору
         add_call_func = eval(f'{attr.capitalize()}.add_call')
@@ -106,18 +118,6 @@ class ControlFrame(ttk.Frame):
         )
         if path:
             setattr(AppManager.stg, attr, path)
-
-
-    # def show_buttons(self):
-        # """Отрисовка кнопок управления"""
-        # lib_btn = ttk.Button(
-        #     master=self, 
-        #     text='Библиотека', 
-        #     width=13, 
-        #     command=lambda: LibraryWindow()
-        #     )
-        # lib_btn.pack(expand=1, anchor='s')
-
 
     # def show_log_check_depth_widgets(self) -> None:
     #     """Отрисовка виджетов для настройки глубины проверки лога"""
