@@ -16,19 +16,14 @@ def style_init(name: str = '') -> None:
     # Стиль для свитчера тем
     style.configure('ts.Outline.TMenubutton', padding=(5, 2, 0, 2), width=15)
 
+    # Стиль для кнопок текстовых шаблонов 
+    style.configure('ms.info.Outline.TMenubutton', padding=(5, 2, 0, 2),)
+
     # --------------Стили текстовых лейблов--------------
 
     # 'Жирный' стиль для текстовой метки
     style.configure('Bold.TLabel', font='TkDefaultFont 10 bold')
 
-    # -----Стили кнопок-----
-    # -----Стили кнопок-----
-
-    # # Выравнивание надписи на кнопке по левому краю
-    
-
-    # # Стиль для кнопок текстовых шаблонов 
-    # style.configure('ms.info.Outline.TMenubutton', padding=(5, 1, 0, 1),)
 
 
 

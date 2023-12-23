@@ -1,4 +1,5 @@
-from ..._source import *
+from ...source import *
+from ...windows import ChildWindow, Geometry
 
 
 class InitSampleWindow(ChildWindow):

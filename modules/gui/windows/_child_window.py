@@ -1,3 +1,10 @@
+from ..source import ttk, tkinter, AppManager
+from ...mytyping import NamedTuple
+
+
+__all__ = ('Geometry', 'ChildWindow')
+
+
 class Geometry(NamedTuple):
     """Для описании геометрии окон, фреймов и т.д."""
     width: int

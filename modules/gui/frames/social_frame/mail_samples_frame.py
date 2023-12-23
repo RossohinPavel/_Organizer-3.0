@@ -1,4 +1,4 @@
-from ..._source import *
+from ...source import *
 from ....data_base import MailSamples
 from .init_sample_window import InitSampleWindow
 from .sample_edit_window import SampleEditWindow
@@ -22,7 +22,7 @@ class SampleButton(ttk.Menubutton):
             text=sample_name, 
             style='ms.info.Outline.TMenubutton', 
             **kwargs
-            )
+        )
         self._sample_frame = sample_frame
         self._menu = ttk.Menu(self)
         self.sample_id = sample_id

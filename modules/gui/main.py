@@ -1,6 +1,4 @@
 from .source import *
-
-
 from . import frames
 # from . import windows
 
@@ -23,7 +21,7 @@ class MainWindow(ttk.Window):
         self.todo = frames.MenuLabel('todo', menu_column, frames.PlanerFrame)
         self.todo.pack(anchor=ttkc.N)
 
-        self.social = frames.MenuLabel('social', menu_column, ttk.Frame)
+        self.social = frames.MenuLabel('social', menu_column, frames.MailSamplesFrame)
         self.social.pack(anchor=ttkc.N)
 
         self.info = frames.MenuLabel('info', menu_column, ttk.Frame)

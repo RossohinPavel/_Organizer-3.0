@@ -1,5 +1,10 @@
-from ..._source import *
+from ...source import *
+from ...windows import ChildWindow, Geometry
+from ....mytyping import NamedTuple
 from ....data_base import MailSamples
+
+
+SAMPLES = MailSamples()
 
 
 class SampleWidgets(NamedTuple):
@@ -11,7 +16,6 @@ class SampleWidgets(NamedTuple):
 
 class SampleEditWindow(ChildWindow):
     """Окно редактирования/добавление текстового шаблона"""
-    SAMPLES = MailSamples()
     WIN_GEOMETRY = Geometry(394, 441)
     LIN_GEOMETRY = Geometry(394, 441)
 
@@ -25,7 +29,7 @@ class SampleEditWindow(ChildWindow):
 
     def main(self, **kwargs) -> None:
         ttk.Label(master=self, text='Таг шаблона').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
-        tag = ttk.Combobox(self, cursor='xterm', values=tuple(x[1] for x in self.SAMPLES.get_headers()))
+        tag = ttk.Combobox(self, cursor='xterm', values=tuple(x[1] for x in SAMPLES.get_headers()))
         tag.pack(padx=2, pady=(2, 0), expand=1, fill='x')
         ttk.Label(master=self, text='Имя шаблона').pack(padx=(3, 0), pady=(2, 0), anchor='nw')
         name = ttk.Entry(master=self, width=50)
@@ -43,7 +47,7 @@ class SampleEditWindow(ChildWindow):
         ttk.Button(master=self, text='Отмена', width=18, command=self.destroy).pack(pady=2, padx=(0, 2), side='right')
         sample_id = kwargs['sample_id']
         self._widgets = SampleWidgets(sample_id, tag, name, text)
-        self.insert_values(self.SAMPLES.get(sample_id) if sample_id else self.get_default_text())
+        self.insert_values(SAMPLES.get(sample_id) if sample_id else self.get_default_text())
 
     def insert_values(self, sample_tpl: tuple[str, str, str]) -> None:
         """Размещает полученную информацию по виджетам"""
@@ -86,8 +90,8 @@ class SampleEditWindow(ChildWindow):
             return
         # В зависимости от наличия тэга (существования шаблона) обновляем его или создаем новый
         if sid:   
-            self.SAMPLES.update(sid, tag, name, text)
+            SAMPLES.update(sid, tag, name, text)
         else:
-            self.SAMPLES.create(tag, name, text)
+            SAMPLES.create(tag, name, text)
         self.destroy()
         tkmb.showinfo(parent=self.master, title='Сохранение шаблона', message=f'Шаблон <{name}> сохранен')

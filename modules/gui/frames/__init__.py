@@ -1,9 +1,6 @@
-from .menu_label import MenuLabel
-
-# from .social_frame import *
 from .control_frame import ControlFrame
+# from .info_frame import InfoFrame
+from .menu_label import MenuLabel
 from .planer_frame import PlanerFrame
 # from .processing_frame import ProcessingFrame
-# from .info_frame import InfoFrame
-
-
+from .social_frame import *
