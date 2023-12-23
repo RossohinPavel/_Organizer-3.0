@@ -5,8 +5,8 @@ from ....mytyping import Literal, Type, Callable, Iterator
 
 class AssistWindow(ChildWindow):
     """Конструктор вспомогательных окон библиотеки"""
-    WIN_GEOMETRY = Geometry(500, 310)
-    LIN_GEOMETRY = Geometry(500, 310)
+    width = 500
+    height = 310
 
     MARKS = {
         'main': 'Основное',

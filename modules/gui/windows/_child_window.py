@@ -1,20 +1,14 @@
 from ..source import ttk, tkinter, AppManager
-from ...mytyping import NamedTuple
+from ...mytyping import Any
 
 
-__all__ = ('Geometry', 'ChildWindow')
-
-
-class Geometry(NamedTuple):
-    """Для описании геометрии окон, фреймов и т.д."""
-    width: int
-    height: int
+__all__ = ('ChildWindow', )
 
 
 class ChildWindow(ttk.Toplevel):
     """Конструктор для дочерних окон"""
-    WIN_GEOMETRY = Geometry(100, 100)
-    LIN_GEOMETRY = Geometry(100, 100)
+    width = 100
+    height = 100
 
     # Переменная для хранения имени окна
     win_title = None
@@ -38,7 +32,9 @@ class ChildWindow(ttk.Toplevel):
         'border'
         )
     
-    def __init__(self, master: tkinter.Misc, /, **kwargs) -> None:
+    def __init__(self, master: Any = None, /, **kwargs) -> None:
+        if master is None:
+            master = AppManager.mw
         kwargs.setdefault('title', self.win_title if self.win_title else self.__class__.__name__)
         # Фильтруем атрибуты, чтобы лишние не были переданы в инициализатор окна
         super().__init__(master=master, **{x: y for x, y in kwargs.items() if x in self.__TK_KWARGS})   #type: ignore
@@ -54,15 +50,9 @@ class ChildWindow(ttk.Toplevel):
         В основном, служит для сборки ф-й отрисовки дочерних виджетов."""
         pass
 
-    def get_geometry_by_system(self) -> Geometry:
-        """Определяем тип ос и возвращаем соответствующую геометрию"""
-        match AppManager.SYSTEM:     
-            case 'win': return self.WIN_GEOMETRY
-            case 'lin' | _: return self.LIN_GEOMETRY
-
     def set_window_geometry(self) -> None:
         """Установка размеров окна и центрирование его относительно центрального"""
-        width, height = self.get_geometry_by_system()
+        width, height = self.width, self.height
 
         place_x = ((self.master.winfo_width() - width) // 2) + self.master.winfo_x()
         place_y = ((self.master.winfo_height() - height) // 2) + self.master.winfo_y()

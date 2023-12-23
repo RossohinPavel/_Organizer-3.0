@@ -40,7 +40,7 @@ class SampleButton(ttk.Menubutton):
             self.clipboard_append(text)
             tkmb.showinfo(title=sample_title, message='Шаблон скопирован в буфер обмена.')
         else:
-            InitSampleWindow(self._sample_frame, sample_title, text) #type: ignore
+            InitSampleWindow(sample_title, text)
     
     def show_menu(self, event: tkinter.Event | None = None) -> None:
         """Отрисовка меню"""

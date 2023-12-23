@@ -6,8 +6,8 @@ from .assist import AssistWindow
 
 class LibraryWindow(ChildWindow):
     """Окно управления библиотекой"""
-    WIN_GEOMETRY = Geometry(430, 500)
-    LIN_GEOMETRY = Geometry(450, 500)
+    width = 450
+    height = 500
     win_title = 'Библиотека'
 
     def __init__(self, /, **kwargs) -> None:

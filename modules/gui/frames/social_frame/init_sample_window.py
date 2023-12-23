@@ -1,28 +1,21 @@
 from ...source import *
-from ...windows import ChildWindow, Geometry
+from ...windows import ChildWindow
 
 
 class InitSampleWindow(ChildWindow):
     """Вспомогательное окно для заполнения переменных в текстовом шаблоне"""
     # Параметр height используется как множитель для растягивания окна
-    WIN_GEOMETRY = Geometry(230, 54)
-    LIN_GEOMETRY = Geometry(230, 54)
+    width = 230
+    height = 54
 
-    def __init__(self, master: Any, title: str, text: str) -> None:
+    def __init__(self, title: str, text: str) -> None:
         self._title = title
         self._text = text.split('?%')
         self._widgets = []
-        super().__init__(AppManager.mw, 
-                        relief='solid',
-                        overrideredirect=True,
-                        border=1
-                        )
+        self.height = 59 + len(self._text[1::2]) * self.height
+        super().__init__(relief='solid',overrideredirect=True, border=1)
         self._widgets[0].focus_set()
         self.bind('<Return>', self.create_sample)
-
-    def get_geometry_by_system(self) -> Geometry:
-        old = super().get_geometry_by_system()
-        return Geometry(old.width, 59 + len(self._text[1::2]) * old.height)
     
     def main(self, **kwargs) -> None:
         ttk.Label(master=self, text='Заполните поля:').pack(pady=(1, 0))

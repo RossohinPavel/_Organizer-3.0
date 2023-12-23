@@ -1,5 +1,5 @@
 from ...source import *
-from ...windows import ChildWindow, Geometry
+from ...windows import ChildWindow
 from ....mytyping import NamedTuple
 from ....data_base import MailSamples
 
@@ -16,8 +16,8 @@ class SampleWidgets(NamedTuple):
 
 class SampleEditWindow(ChildWindow):
     """Окно редактирования/добавление текстового шаблона"""
-    WIN_GEOMETRY = Geometry(394, 441)
-    LIN_GEOMETRY = Geometry(394, 441)
+    width = 394
+    height = 441
 
     def __init__(self, sample_id: int | None = None) -> None:
         self._widgets : SampleWidgets
