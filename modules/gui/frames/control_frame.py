@@ -1,6 +1,7 @@
 from ..source import *
 from .header_label import HeaderLabel
-from ...descriptors import Z_disc, O_disc, T_disc
+from ...descriptors import Z_disc, O_disc, T_disc, Theme, Color
+from ...mytyping import Callable
 
 # from ..windows.library import LibraryWindow
 
@@ -10,13 +11,91 @@ class ControlFrame(ttk.Frame):
 
     def __init__(self, master: Any):
         super().__init__(master, padding=5)
-        self.show_directory_widgets()
+        self.dark_menu = self.light_menu = None
+        self.init_color_menus()
+        self.draw_theme_widgets()
+        self.draw_directory_widgets()
 
-    def show_directory_widgets(self) -> None:
+    def theme_closure(self, name: str) -> Callable:
+        """Замыкание для смены тем"""
+        return lambda: setattr(AppManager.stg, 'color', name)
+
+    def init_color_menus(self) -> None:
+        dark = ('solar', 'superhero', 'darkly', 'cyborg', 'vapor')
+        light = ('cosmo', 'flatly', 'journal', 'litera', 'lumen', 'minty', 'pulse', 'sandstone', 'united', 'yeti', 'morph', 'simplex', 'cerculean')
+
+        self.dark_menu = ttk.Menu(self)
+        for name in dark:
+            self.dark_menu.add_command(
+                label=f'  {name}'.ljust(29, ' '),
+                command=self.theme_closure(name)
+            )
+        self.light_menu = ttk.Menu(self)
+        for name in light:
+            self.light_menu.add_command(
+                label=f'  {name}'.ljust(29, ' '),
+                command=self.theme_closure(name)
+            )
+    
+    def draw_theme_widgets(self) -> None:
+        HeaderLabel(self, 'Оформление').pack(anchor=ttkc.W, fill=ttkc.X)
+
+        # Контейнер для виджетов
+        container = ttk.Frame(self)
+        container.pack(padx=5, anchor=ttkc.W, pady=(0, 15))
+
+        # Свитчер тем
+        ttk.Label(container, text='Тема:').grid(row=0, column=0, sticky=ttkc.W)
+
+        theme_menu = ttk.Menu(container)
+        theme_menu.add_command(
+            label='  light' + ' '*29, 
+            command=lambda: setattr(AppManager.stg, 'theme', 'light')
+        )
+        theme_menu.add_command(
+            label='  dark', 
+            command=lambda: setattr(AppManager.stg, 'theme', 'dark')
+            )
+        theme_btn = ttk.Menubutton(container, menu=theme_menu, style='ts.Outline.TMenubutton')
+        theme_btn.grid(row=1, column=0)
+
+        # Добавление вызова в Дескриптор тем
+        Theme.add_call(lambda v: theme_btn.configure(text=v))   #type: ignore
+
+        # Свитчер палитр
+        ttk.Label(container, text='Палитра:').grid(row=0, column=1, sticky=ttkc.W, padx=10)
+
+        def theme_switch(theme: str) -> None:
+            """Переключает тему в меню"""
+            menu = self.dark_menu
+            if theme == 'light':
+                menu = self.light_menu
+            color_btn.configure(menu=menu)  #type: ignore
+            if Color._value:
+                menu.invoke(0)              #type: ignore
+
+        color_btn = ttk.Menubutton(container, style='ts.Outline.TMenubutton')
+        color_btn.grid(row=1, column=1, padx=10)
+
+        Theme.add_call(theme_switch)
+        Color.add_call(lambda v: color_btn.configure(text=v))   #type: ignore
+        Color.add_call(lambda v: style_init(v))
+
+    def draw_directory_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
-        self.show_directory_frame('Диск загрузки заказов \'Z\'', 'z_disc')
-        self.show_directory_frame('Диск печати заказов \'О\'', 'o_disc')
-        self.show_directory_frame('Диск операторов фотопечати \'Т\'', 't_disc')
+        self.draw_directory_frame('Диск загрузки заказов \'Z\'', 'z_disc')
+        self.draw_directory_frame('Диск печати заказов \'О\'', 'o_disc')
+        self.draw_directory_frame('Диск операторов фотопечати \'Т\'', 't_disc')
+
+    def draw_directory_frame(self, text: str, attr: str) -> None:
+        """Отрисовка виджетов управления рабочими папками"""
+        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
+        btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
+        btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
+
+        # Добавление вызова дескриптору
+        add_call_func = eval(f'{attr.capitalize()}.add_call')
+        add_call_func(lambda e: btn.configure(text=e))
 
     def _update_dir(self, attr: str) -> None:
         """Получение информации из файлового диалога"""
@@ -27,22 +106,6 @@ class ControlFrame(ttk.Frame):
         )
         if path:
             setattr(AppManager.stg, attr, path)
-
-    def show_directory_frame(self, text: str, attr: str) -> None:
-        """Отрисовка виджетов управления рабочими папками"""
-        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
-        btn = ttk.Button(
-            self, 
-            style='l_jf.Outline.TButton',
-            command=lambda: self._update_dir(attr)
-        )
-        btn.pack(
-            fill=ttkc.X, 
-            pady=(0, 15), 
-            padx=5
-        )
-        add_call_func = eval(f'{attr.capitalize()}.add_call')
-        add_call_func(lambda e: btn.configure(text=e))
 
 
     # def show_buttons(self):
