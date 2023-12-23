@@ -17,28 +17,37 @@ class MainWindow(ttk.Window):
         self.set_main_graph_settings()
 
         # Отрисовываем колонку меню
-        menu_column = ttk.Frame(self)
+        menu_column = ttk.Frame(self, padding=10)
         menu_column.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
         self.todo = frames.MenuLabel('todo', menu_column, frames.PlanerFrame)
-        self.todo.pack(anchor=ttkc.N, padx=5, pady=(5, 0))
+        self.todo.pack(anchor=ttkc.N)
 
-        ttk.Frame(menu_column).pack(expand=1)       # Заполнитель
+        self.social = frames.MenuLabel('social', menu_column, ttk.Frame)
+        self.social.pack(anchor=ttkc.N)
+
+        self.info = frames.MenuLabel('info', menu_column, ttk.Frame)
+        self.info.pack(anchor=ttkc.N)
+
+        self.tracker = frames.MenuLabel('tracker', menu_column, ttk.Frame)
+        self.tracker.pack(anchor=ttkc.N)
+
+        self.file = frames.MenuLabel('file', menu_column, ttk.Frame)
+        self.file.pack(anchor=ttkc.N)
 
         self.stg = frames.MenuLabel('settings', menu_column, frames.ControlFrame)
-        self.stg.pack(anchor=ttkc.S, padx=5, pady=(0, 5))
+        self.stg.pack(anchor=ttkc.S)
 
         # Разделитель
         separator = ttk.Separator(self, orient='vertical')
         separator.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
         # Запускаем 1 фрейм - Лист задач
-        frames.MenuLabel.current_frame = self.stg
         self.todo.click(None)
 
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""
-        width, height = 550, 350
+        width, height = 550, 400
         self.geometry(f'{width}x{height}+{(self.winfo_screenwidth()-width)//2}+{(self.winfo_screenheight()-height)//2}')
         self.resizable(False, False)
         self.bind_all('<Control-KeyPress>', self.russian_hotkeys)
