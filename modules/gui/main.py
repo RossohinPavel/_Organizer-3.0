@@ -15,26 +15,26 @@ class MainWindow(ttk.Window):
         self.set_main_graph_settings()
 
         # Отрисовываем колонку меню
-        menu_column = ttk.Frame(self, padding=10)
+        menu_column = ttk.Frame(self, padding=5)
         menu_column.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
         self.todo = frames.MenuLabel('todo', menu_column, frames.PlanerFrame)
-        self.todo.pack(anchor=ttkc.N)
+        self.todo.pack(anchor=ttkc.N, pady=(0, 5))
 
         self.social = frames.MenuLabel('social', menu_column, frames.MailSamplesFrame)
-        self.social.pack(anchor=ttkc.N)
+        self.social.pack(anchor=ttkc.N, pady=(0, 5))
 
         self.info = frames.MenuLabel('info', menu_column, ttk.Frame)
-        self.info.pack(anchor=ttkc.N)
+        self.info.pack(anchor=ttkc.N, pady=(0, 5))
 
         self.tracker = frames.MenuLabel('tracker', menu_column, ttk.Frame)
-        self.tracker.pack(anchor=ttkc.N)
+        self.tracker.pack(anchor=ttkc.N, pady=(0, 5))
 
         self.file = frames.MenuLabel('file', menu_column, ttk.Frame)
-        self.file.pack(anchor=ttkc.N)
+        self.file.pack(anchor=ttkc.N, pady=(0, 5))
 
         self.stg = frames.MenuLabel('settings', menu_column, frames.ControlFrame)
-        self.stg.pack(anchor=ttkc.S)
+        self.stg.pack(anchor=ttkc.S, expand=1)
 
         # Разделитель
         separator = ttk.Separator(self, orient='vertical')

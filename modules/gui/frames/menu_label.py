@@ -48,7 +48,7 @@ class MenuLabel(ttk.Frame):
     
     def change_backlight(self, theme: str) -> None:
         """Меняет изображение, которое оботражается по наведению мыши."""
-        self._under_mouse = IMAGES[f'{self._img_name}_{theme}']
+        self._backlight = IMAGES[f'{self._img_name}_{theme}']
     
     def enter_event(self, _) -> None:
         """Меняет изображение на _img при наведении мыши"""
@@ -57,6 +57,6 @@ class MenuLabel(ttk.Frame):
     
     def leave_event(self, _) -> None:
         if not self._frame.winfo_viewable():
-            self._img.configure(image=self._backlight)    # type: ignore
+            self.image_switcher('off')    # type: ignore
 
 
