@@ -6,12 +6,12 @@ from .assist import AssistWindow
 
 class LibraryWindow(ChildWindow):
     """Окно управления библиотекой"""
-    width = 450
-    height = 500
+    width = 550
+    height = 400
     win_title = 'Библиотека'
 
     def __init__(self, /, **kwargs) -> None:
-        super().__init__(AppManager.mw, **kwargs)
+        super().__init__(**kwargs)
 
         # Основной фрейм с прокруткой
         scroled_frame = ScrolledFrame(self, bootstyle='round')

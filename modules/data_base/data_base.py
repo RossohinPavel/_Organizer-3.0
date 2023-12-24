@@ -1,10 +1,10 @@
 from sqlite3 import connect, Connection, Cursor
 from threading import Lock
-from typing import Self
 
 
 class DataBase:
     """Реализует общую логику работы с базами данных sqlite3"""
+    __slots__ = ()
 
     # Имя базы данных, к которой будет совершено подключение
     data_base: str = 'None'
@@ -18,7 +18,7 @@ class DataBase:
     # Ссылка на Замок, для предотвращения единовременного доступа к бд
     __lock = None
 
-    def __new__(cls) -> Self:
+    def __new__(cls):
         # Определяем атрибуты для классов наследников
         if cls.__lock is None:
             cls.connect = connect(f'data/{cls.data_base}', check_same_thread=False)
@@ -33,8 +33,7 @@ class DataBase:
         
         def wrapper(self, *args, **kwargs):
             with self.__lock:
-                res = func(self, *args, **kwargs)
-            return res
+                return func(self, *args, **kwargs)
 
         wrapper.__name__, wrapper.__doc__ = func.__name__, func.__doc__
         return wrapper

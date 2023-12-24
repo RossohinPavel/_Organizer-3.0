@@ -1,18 +1,19 @@
-import ttkbootstrap as ttk
+from typing import NamedTuple
 
 
-root = ttk.Window('test', themename='litera')
+class Test(NamedTuple):
+    def some_method(self):
+        pass
 
 
-values = ['1', '2', '3']
-
-var = ttk.StringVar(root)
-
-
-o = ttk.OptionMenu(root, var, None, *values)
-o.place(x=10, y=10)
-
+class Subproduct(Test):
+    """Сувенирная, сопровождающая продукция"""
+    full_name: str                # Полное имя продукта
+    segment: str                  # Общие особенности продукта
+    short_name: str
+    cover_print_mat: str          # Печатный материал
 
 
+test = Subproduct('q', 'q', 'q', 'q')
 
-root.mainloop()
+print(test.__dict__)
