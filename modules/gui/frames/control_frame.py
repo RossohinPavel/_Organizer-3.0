@@ -90,7 +90,7 @@ class ControlFrame(ttk.Frame):
             width=19,
             command=lambda: LibraryWindow()
         )
-        btn.pack(pady=(2, 15), padx=5, anchor=ttkc.W)
+        btn.pack(pady=(0, 15), padx=5, anchor=ttkc.W)
 
     def draw_directory_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
@@ -100,9 +100,9 @@ class ControlFrame(ttk.Frame):
 
     def draw_directory_frame(self, text: str, attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
-        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
+        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X)
         btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
-        btn.pack(fill=ttkc.X, pady=(2, 15), padx=5)
+        btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
 
         # Добавление вызова дескриптору
         add_call_func = eval(f'{attr.capitalize()}.add_call')

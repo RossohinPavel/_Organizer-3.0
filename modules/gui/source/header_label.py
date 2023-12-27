@@ -13,6 +13,6 @@ class HeaderLabel(ttk.Frame):
         lbl = ttk.Label(
             self, 
             text=text, 
-            padding=(0, -4, 0, -2)
+            padding=(0, -2, 0, 0)
         )
         lbl.pack(anchor=ttkc.W, padx=(15, 0))

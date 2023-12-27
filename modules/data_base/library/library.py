@@ -1,5 +1,5 @@
 from functools import lru_cache
-from ...mytyping import Type, NoReturn, Product
+from ...mytyping import Type, NoReturn, Categories
 from ..data_base import DataBase
 from .products import *
 from .properties import Properties
@@ -13,7 +13,7 @@ class Library(DataBase):
     properties = Properties
 
     @DataBase.safe_connect
-    def get_headers(self) -> dict[Product, list[tuple[int, str]]]:
+    def get_headers(self) -> dict[Categories, list[tuple[int, str]]]:
         """
             Получение словаря из заголовков продуктов.
             Ключи - Типы продуктов

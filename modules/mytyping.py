@@ -13,4 +13,4 @@ from typing import (
     TypeVar,  
     Self
 )
-from .data_base.library.products import Product
+from .data_base.library.products import Categories

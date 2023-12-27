@@ -144,4 +144,4 @@ class Subproduct(SubproductAttrs, ProductMethods):
 
 
 # Типизация продуктов
-type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
+type Categories = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
