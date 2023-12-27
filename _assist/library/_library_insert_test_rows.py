@@ -1,28 +1,31 @@
+from sys import path as sys_path
+from os import name as os_name
+
+
+match os_name:
+    case 'nt':
+        sys_path.insert(0, __file__.rsplit('\\', maxsplit=3)[0])
+    case 'posix' | _:
+        sys_path.insert(0, __file__.rsplit('/', maxsplit=3)[0])
+
+
 import sqlite3
-import os
-from modules.library.products import *
+from modules.data_base.library.products import *
 
 
 def insert_test_rows():
-    categories = ('Album', 'Canvas', 'Journal', 'Layflat', 'Photobook', 'Photofolder',  'Subproduct')
+    integer = ('carton_length', 'carton_height', 'cover_flap', 'cover_joint', 'dc_top_indent', 'dc_left_indent', 'dc_overlap', 'dc_break')
+
     with sqlite3.connect('../../data/library.db') as lib:
         cursor = lib.cursor()
-        for category in categories:
-            keys = []
-            values = []
-            for k, v in eval(f'{category}(True)').__dict__.items():
-                if k == 'full_name':
-                    v = f'{category}_test_2'
-                if type(v) == tuple:
-                    v = v[0]
-                keys.append(f'\"{k}\"')
-                values.append(f'\"{v}\"')
-            keys = ', '.join(keys)
-            values = ', '.join(values)
-            req = f'INSERT INTO {category} ({keys}) VALUES ({values})'
-            cursor.execute(req)
+
+        for product in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
+            keys = ', '.join(product._fields)
+            values_req = ', '.join('?'*len(product._fields))
+            values = [0 if field in integer else field for field in product._fields]
+            cursor.execute(f'INSERT INTO {product.__name__} ({keys}) VALUES ({values_req})', values)
             lib.commit()
 
 
-# if __name__ == '__main__' and os.path.exists('../data/library.db'):
-#     insert_test_rows()
+if __name__ == '__main__':
+    insert_test_rows()

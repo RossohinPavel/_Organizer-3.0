@@ -1,10 +1,15 @@
-from sys import path
+from sys import path as sys_path
+from os import name as os_name
 
 
-path.insert(0 , __file__.rsplit('\\', maxsplit=3)[0])
+match os_name:
+    case 'nt':
+        sys_path.insert(0, __file__.rsplit('\\', maxsplit=3)[0])
+    case 'posix' | _:
+        sys_path.insert(0, __file__.rsplit('/', maxsplit=3)[0])
 
 
-from modules.library.products import *
+from modules.data_base.library.products import *
 
 
 def product_test(*products) -> None:
@@ -12,7 +17,7 @@ def product_test(*products) -> None:
     for product in products:     # Проверяем на присутсвие атрибутов
         name = product.__name__
         # Общие тесты
-        assert 'full_name' in product._fields, f'Отсутствует атрибут для указания полного имени в {name}'
+        assert 'name' in product._fields, f'Отсутствует атрибут для указания названия в {name}'
         assert 'segment' in product._fields, f'Отсутствует атрибут сегмента продукции в {name}'
         assert 'short_name' in product._fields, f'Отсутствует атрибут списока коротких имен в {name}'
         # Формат книг
