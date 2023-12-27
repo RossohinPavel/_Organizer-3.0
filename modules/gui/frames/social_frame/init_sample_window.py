@@ -1,5 +1,4 @@
 from ...source import *
-from ...windows import ChildWindow
 
 
 class InitSampleWindow(ChildWindow):

@@ -7,8 +7,10 @@ from typing import (
     Callable,
     Iterator,
     Literal,
-    NamedTuple,  
+    NamedTuple,
+    NoReturn,  
     Type,
     TypeVar,  
     Self
 )
+from .data_base.library.products import Product

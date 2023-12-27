@@ -1,3 +1,9 @@
+"""
+    Собирает в себе импотры, 
+    необходимые для работы осноных виджетов.
+"""
+
+
 # Базовый tkinter и его зависимые модули
 import tkinter
 from tkinter import messagebox as tkmb
@@ -9,13 +15,7 @@ import ttkbootstrap.constants as ttkc
 from ttkbootstrap.scrolled import ScrolledFrame
 
 # Типизация, используемая в большинстве виджетов
-from ..mytyping import Any
+from typing import Any
 
 # AppManager управления приложением
-from ..app_manager import AppManager
-
-# Стили
-from .style import style_init
-
-# Иконки
-from .images import IMAGES
+from ...app_manager import AppManager

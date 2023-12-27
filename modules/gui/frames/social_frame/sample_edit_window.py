@@ -1,5 +1,4 @@
 from ...source import *
-from ...windows import ChildWindow
 from ....mytyping import NamedTuple
 from ....data_base import MailSamples
 

@@ -141,3 +141,7 @@ class Photofolder(PhotofolderAttrs, ProductMethods):
 class Subproduct(SubproductAttrs, ProductMethods):
     """Сувенирная, сопровождающая продукция"""
     __slots__ = ()
+
+
+# Типизация продуктов
+type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct

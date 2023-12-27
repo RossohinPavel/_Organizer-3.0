@@ -1,8 +1,8 @@
-from ..source import *
+from .main import ttk, Any, ttkc
 
 
 class HeaderLabel(ttk.Frame):
-    """Фрейм - заголовок, с подчеркиванием."""
+    """Фрейм - заголовок, с надписью и подчеркиванием."""
 
     def __init__(self, master: Any, text: str, /, **kwargs):
         super().__init__(master)

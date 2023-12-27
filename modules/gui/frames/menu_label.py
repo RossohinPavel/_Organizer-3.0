@@ -56,7 +56,6 @@ class MenuLabel(ttk.Frame):
             self._img.configure(image=self._backlight)    # type: ignore
     
     def leave_event(self, _) -> None:
+        """Меняет изображение на _img при перемещении курсора из зоны виджета."""
         if not self._frame.winfo_viewable():
             self.image_switcher('off')    # type: ignore
-
-

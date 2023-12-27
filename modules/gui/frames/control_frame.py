@@ -1,5 +1,4 @@
 from ..source import *
-from .header_label import HeaderLabel
 from ...descriptors import Z_disc, O_disc, T_disc, Theme, Color
 from ...mytyping import Callable
 from ..windows.library import LibraryWindow

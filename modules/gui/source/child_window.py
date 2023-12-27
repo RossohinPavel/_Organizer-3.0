@@ -1,8 +1,4 @@
-from ..source import ttk, tkinter, AppManager
-from ...mytyping import Any
-
-
-__all__ = ('ChildWindow', )
+from .main import ttk, AppManager, Any
 
 
 class ChildWindow(ttk.Toplevel):
@@ -13,7 +9,7 @@ class ChildWindow(ttk.Toplevel):
     # Переменная для хранения имени окна
     win_title = None
 
-    # Список обязательных атирбутов для инициализации tb.Toplevel
+    # Список обязательных атирбутов для инициализации ttk.Toplevel
     __TK_KWARGS = (
         'title', 
         'iconphoto', 
@@ -46,8 +42,11 @@ class ChildWindow(ttk.Toplevel):
         self.grab_set()
         
     def main(self, **kwargs) -> None:
-        """Абстрактная ф-я для сборки других ф-й. Запускается в момент инициализации объекта.
-        В основном, служит для сборки ф-й отрисовки дочерних виджетов."""
+        """
+            Абстрактная ф-я для сборки других ф-й. 
+            Запускается в момент инициализации объекта.
+            В основном, служит для сборки ф-й отрисовки дочерних виджетов.
+        """
         pass
 
     def set_window_geometry(self) -> None:
