@@ -13,6 +13,7 @@ from tkinter import filedialog as tkfd
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 from ttkbootstrap.scrolled import ScrolledFrame
+from ttkbootstrap import Querybox
 
 # Типизация, используемая в большинстве виджетов
 from typing import Any
