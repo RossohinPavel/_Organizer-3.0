@@ -8,7 +8,7 @@ class Properties:
     def __init__(self, category: str):
         self.__product_type = category
 
-    def __call__(self, property: str) -> list[str] | tuple[str]:
+    def __call__(self, property: str) -> tuple[str | int, ...]:
         return eval(f'self._{property}()')
 
     def _segment(self) -> tuple[str, ...]:
@@ -59,13 +59,13 @@ class Properties:
             case 'Album': return ct[:1]
             case 'Photobook' | 'Layflat': return ct
 
-    def _cover_flap(self) -> tuple[str, ...]:
+    def _cover_flap(self) -> tuple[int, ...]:
         """Наделяет продукт кортежем значений клапана обложки"""
-        return ('15', '20')
+        return (15, 20)
 
-    def _cover_joint(self) -> tuple[str, ...]:
+    def _cover_joint(self) -> tuple[int, ...]:
         """Наделяет продукт кортежем значений шарнира обложки"""
-        return ('9', '10', '15', '18')
+        return (9, 10, 15, 18)
 
     def __print_mat(self, pos: Literal['cover', 'page']) -> tuple[str, ...]: # type: ignore
         """Общая ф-я печатного материала"""
@@ -106,3 +106,9 @@ class Properties:
     def _page_canal(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем занчений каналов печати разворотов"""
         return ('201', '203', '204', '205', '207', '214', '271', '274', '275', '276')
+
+    def __zero_return(self) -> tuple[int]:
+        """Заглушка, для возврата 0"""
+        return 0,
+    
+    _carton_length = _carton_height = _dc_top_indent = _dc_left_indent = _dc_overlap = _dc_break = __zero_return

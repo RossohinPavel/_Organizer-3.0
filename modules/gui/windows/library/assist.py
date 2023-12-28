@@ -233,14 +233,15 @@ class AssistWindow(ChildWindow):
             try:
                 # Получаем продукт
                 product = self.get_values_from_widgets()
+                aliases = self._alias.get()
 
                 # Обновляем или добавляем продукт в зависимости от типа обработки
                 if mode == 'change':
                     AppManager.lib.change(product)
-                    title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.name}'
+                    title, message = 'Изменение продукта', f'Данные обновлены для:\n{product.name}'
                 else:
-                    AppManager.lib.add(product)
-                    title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\nуспешно добавлен в библиотеку'
+                    AppManager.lib.add(product, aliases)
+                    title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\n добавлен в библиотеку'
 
                 # Вывод сообщения об успехе операции
                 tkmb.showinfo(title, message, parent=self)

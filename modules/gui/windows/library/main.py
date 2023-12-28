@@ -32,9 +32,8 @@ class LibraryWindow(ChildWindow):
             # Отрисовка виджетов продуктов
             for j, product in enumerate(products):
                 p = ProductInterface(
-                    self, 
+                    lhl, 
                     j == end, 
-                    category,
                     *product
                 )
                 p.pack(fill=ttkc.X, padx=(0, 10))
@@ -62,23 +61,37 @@ class LibHeaderLabel(ttk.Frame):
             self,
             style='Lib+.success.Outline.TButton', 
             text='+', 
-            command=lambda: AssistWindow(self.lib_win, 'add', self.category)
+            command=self.add_command
         )
         btn.pack(side=ttkc.LEFT)
 
         # Лейбл с текстом
         lbl = ttk.Label(self, text=category.__doc__)     # type: ignore
         lbl.pack(anchor=ttkc.W, padx=(0, 0), side=ttkc.LEFT)
+    
+    def add_command(self, base=None) -> None:
+        """Добавление нового продукта в библиотеку."""
+        if base:
+            name = f'Копия {base.name}'
+            values = base[1:]
+        else:
+            name = f'Новый {self.category.__name__}'
+            prop_obj = AppManager.lib.properties(self.category.__name__)
+            values = (prop_obj(x)[0] for x in self.category._fields[1:])
+        try: 
+            AppManager.lib.add(self.category(name, *values)) #type: ignore
+            self.lib_win.redraw()
+        except Exception as e: 
+            tkmb.showwarning('Ошибка', str(e), parent=self.lib_win)
 
 
 class ProductInterface(ttk.Frame):
     """Фрейм для отображения продукта и взаимодействия с ним."""
     
-    def __init__(self, master: LibraryWindow, end: bool, category: Type[Categories], id: int, name: str):
-        self.lib_win = master
-        self.category = category
+    def __init__(self, master: LibHeaderLabel, end: bool, id: int, name: str):
+        self.lhl = master
         self.id = id
-        super().__init__(master.container, padding=(8, 0, 0, 0))
+        super().__init__(master.master, padding=(8, 0, 0, 0))
         self.draw_separators(end)
         lbl = ttk.Label(self, text=name)
         lbl.pack(side=ttkc.LEFT, padx=20, pady=3)
@@ -104,6 +117,6 @@ class ProductInterface(ttk.Frame):
             self, 
             style='Libcopy.success.Outline.TButton',
             text='📑', 
-            command=lambda: AssistWindow(self.lib_win, 'copy', self.category, self.id)
+            command=lambda: self.lhl.add_command(AppManager.lib.from_id(self.lhl.category, self.id))
         )
         copy.pack(side=ttkc.RIGHT, padx=(0, 3))

@@ -61,6 +61,15 @@ class AliasInterface:
             if self.listbox.winfo_viewable() and res:
                 self.insert(res)
         except: pass
+
+    def delete_command(self) -> None:
+        """Удаляет элемент по выбранному индексу"""
+        try: self.listbox.delete(self.listbox.curselection())
+        except: pass
+    
+    def get(self) -> tuple[str]:
+        """Получение списка псевдонимов"""
+        return self.listbox.get(0, ttkc.END)
     
     def insert(self, *args) -> None:
         """Вставка значения в Listbox с проверкой на дубликаты"""
@@ -69,7 +78,3 @@ class AliasInterface:
             if value not in elements:
                 self.listbox.insert(ttkc.END, value)
 
-    def delete_command(self) -> None:
-        """Удаляет элемент по выбранному индексу"""
-        try: self.listbox.delete(self.listbox.curselection())
-        except: pass

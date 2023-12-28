@@ -9,7 +9,7 @@ class Library(DataBase):
     """Класс для работы с библиотекой продуктов"""
     data_base = 'library.db'
 
-    products = (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct)
+    categories = (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct)
     properties = Properties
 
     @DataBase.safe_connect
@@ -21,9 +21,9 @@ class Library(DataBase):
             где перечисленны их id и name атрибуты
         """
         dct = {}
-        for product in self.products:
-            self.cursor.execute(f'SELECT id, name FROM {product.__name__}')
-            dct[product] = self.cursor.fetchall()
+        for category in self.categories:
+            self.cursor.execute(f'SELECT id, name FROM {category.__name__}')
+            dct[category] = self.cursor.fetchall()
         return dct
     
     @DataBase.safe_connect
@@ -42,16 +42,32 @@ class Library(DataBase):
         self.cursor.execute(f'SELECT alias FROM Aliases WHERE category=? AND product_id=?', (category.__name__, id))
         return self.cursor.fetchall()
 
+    @DataBase.safe_connect
+    def add(self, product: Categories) -> None:
+        """Добавление продукта в библиотеку"""
+        # Проверка на уникальность продукта
+        self.__check_unique(product)
+        req = ', '.join('?' * len(product))
+        self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
+        self.connect.commit()
+        # self.__update_product_headers()
+        # self.get.cache_clear()
 
-    # @DataBase.safe_connect
-    # def add(self, product: Product) -> None:
-    #     """Метод добавления продукта в библиотеку"""
-    #     self.__check_unique(product)
-    #     req = ', '.join('?' * len(product))
-    #     self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
-    #     self.connect.commit()
-    #     self.__update_product_headers()
-    #     self.get.cache_clear()
+    def __check_unique(self, product: Categories) -> NoReturn | None:
+        """
+            Проверка имени продукта на уникальность. 
+            Проверка происходит по всем таблицам
+        """
+        n = repr(product.name)
+        self.cursor.execute(f"""
+        SELECT EXISTS (
+            SELECT A.name, C.name, J.name, L.name, Pb.name, Pf.name, S.name
+            FROM Album AS A, Canvas AS C, Journal AS J, Layflat AS L, Photobook AS Pb, Photofolder AS Pf, Subproduct AS S
+            WHERE A.name={n} OR C.name={n} OR J.name={n} OR L.name={n} OR Pb.name={n} OR Pf.name={n} OR S.name={n} 
+        )
+        """)
+        if self.cursor.fetchone()[0]:
+            raise Exception(f'{product.name}\nУже есть в библиотеке')
 
     # @DataBase.safe_connect
     # def change(self, product: Product) -> None:
@@ -61,7 +77,7 @@ class Library(DataBase):
     #     self.connect.commit()
     #     self.get.cache_clear()
 
-    # def __check_unique(self, product: Product) -> NoReturn | None:
+    # def __check_unique(self, product: Categories) -> NoReturn | None:
     #     """Вспомогательная функция для библиотеки. Проверка на уникальность продукта"""
     #     for name in (y for x in self.headers.values() for y in x):
     #         if name == product.full_name:
