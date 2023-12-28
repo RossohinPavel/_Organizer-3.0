@@ -21,9 +21,9 @@ def create_clear_db():
         cursor.execute(
             """CREATE TABLE Aliases 
             (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                alias TEXT,
-                name TEXT
+                alias TEXT PRIMARY KEY,
+                category TEXT,
+                product_id INTEGER
             )"""
         )
 

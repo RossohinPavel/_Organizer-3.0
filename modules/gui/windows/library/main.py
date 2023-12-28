@@ -28,11 +28,12 @@ class LibraryWindow(ChildWindow):
                 pady=(0 if i == 0 else 5, 2)
             )
 
+            end = len(products) - 1
             # Отрисовка виджетов продуктов
             for j, product in enumerate(products):
                 p = ProductInterface(
                     self, 
-                    j == len(product) - 1, 
+                    j == end, 
                     category,
                     *product
                 )

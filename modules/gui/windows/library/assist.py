@@ -192,8 +192,8 @@ class AssistWindow(ChildWindow):
         for i, attr in enumerate(product._fields):
             self._vars[attr].set(product[i])    
 
-        if mode == 'change':
         # Получаем псевдонимы продукта
+        if mode == 'change':
             aliases = AppManager.lib.get_aliases(self._category, id)
             self._alias.insert(*(x[0] for x in aliases))
 
@@ -241,14 +241,13 @@ class AssistWindow(ChildWindow):
                 else:
                     AppManager.lib.add(product)
                     title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\nуспешно добавлен в библиотеку'
-                
-                # Обновляем виджеты в основном окне
-                lib_win.redraw()
 
                 # Вывод сообщения об успехе операции
                 tkmb.showinfo(title, message, parent=self)
             
             # Вывод сообщения об ошибке
             except Exception as e: tkmb.showwarning('Ошибка', str(e), parent=self)
+            # Обновляем виджеты в основном окне
+            lib_win.redraw()
 
         return _func
