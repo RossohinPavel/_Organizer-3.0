@@ -27,18 +27,14 @@ class Library(DataBase):
         return dct
     
     @DataBase.safe_connect
-    def from_id(self, category: str | Type[Categories], id: int) -> Categories:
+    def from_id(self, category: Type[Categories], id: int) -> Categories:
         """Получения объекта продукта по передоваемому id."""
-        if isinstance(category, str):
-            category = eval(category)
         self.cursor.execute(f'SELECT * FROM {category.__name__} WHERE id=?', (id, ))
         return category(*self.cursor.fetchone()[1:])    #type: ignore
     
     @DataBase.safe_connect
-    def get_aliases(self, category: str | Type[Categories], id: int) -> list:
+    def get_aliases(self, category: Type[Categories], id: int) -> list:
         """Получение списка псевдонимов продукта"""
-        if isinstance(category, str):
-            category = eval(category)
         self.cursor.execute(f'SELECT alias FROM Aliases WHERE category=? AND product_id=?', (category.__name__, id))
         return self.cursor.fetchall()
 
@@ -46,14 +42,13 @@ class Library(DataBase):
     def add(self, product: Categories) -> None:
         """Добавление продукта в библиотеку"""
         # Проверка на уникальность продукта
-        self.__check_unique(product)
+        self.__check_unique_name(product)
         req = ', '.join('?' * len(product))
         self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
         self.connect.commit()
-        # self.__update_product_headers()
         # self.get.cache_clear()
 
-    def __check_unique(self, product: Categories) -> NoReturn | None:
+    def __check_unique_name(self, product: Categories) -> NoReturn | None:
         """
             Проверка имени продукта на уникальность. 
             Проверка происходит по всем таблицам
@@ -69,19 +64,14 @@ class Library(DataBase):
         if self.cursor.fetchone()[0]:
             raise Exception(f'{product.name}\nУже есть в библиотеке')
 
-    # @DataBase.safe_connect
-    # def change(self, product: Product) -> None:
-    #     """Внесение изменений в ячейку"""
-    #     req = ', '.join(f'{s}=?' for s in product._fields)
-    #     self.cursor.execute(f'UPDATE {product.category} SET {req} WHERE full_name=\'{product.full_name}\'', product)
-    #     self.connect.commit()
-    #     self.get.cache_clear()
-
-    # def __check_unique(self, product: Categories) -> NoReturn | None:
-    #     """Вспомогательная функция для библиотеки. Проверка на уникальность продукта"""
-    #     for name in (y for x in self.headers.values() for y in x):
-    #         if name == product.full_name:
-    #             raise Exception(f'{product.full_name}\nУже есть в библиотеке')
+    @DataBase.safe_connect
+    def change(self, product: Categories, aliases: list[str]) -> None:
+        """Внесение изменений в продукт"""
+        self.__check_unique_name(product)
+        # req = ', '.join(f'{s}=?' for s in product._fields)
+        # self.cursor.execute(f'UPDATE {product.category} SET {req} WHERE full_name=\'{product.full_name}\'', product)
+        # self.connect.commit()
+        # self.get.cache_clear()
 
     @DataBase.safe_connect
     def delete(self, category: Type[Categories], id: int) -> None:

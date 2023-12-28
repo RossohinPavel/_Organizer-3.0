@@ -1,19 +1,26 @@
-import ttkbootstrap as ttk
-from ttkbootstrap.tableview import Tableview
-
-
-root = ttk.Window()
-
-row = []
-row.append(('test', ))
-row.append(('test', ))
-
-t = Tableview(root, coldata=['Псевдонимы'], rowdata=row)
-t.pack()
+import sqlite3 
 
 
 
-print(*(x.values for x in t.tablerows))
+with sqlite3.connect('../data/library.db') as connect:
+    cursor = connect.cursor()
 
+    val = (0, 'test_Canvas0')
 
-root.mainloop()
+    cursor.execute("""
+    SELECT EXISTS (
+        SELECT id, name FROM(
+            SELECT id, name FROM Album
+            UNION SELECT id, name FROM Canvas
+            UNION SELECT id, name FROM Journal
+            UNION SELECT id, name FROM Layflat
+            UNION SELECT id, name FROM Photobook
+            UNION SELECT id, name FROM Photofolder
+            UNION SELECT id, name FROM Subproduct
+        )
+        WHERE id != ? AND name=?
+    )""",
+    val
+    )
+
+    print(*cursor.fetchone())

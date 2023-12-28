@@ -143,8 +143,7 @@ class ProductFrame(ttk.Frame):
     def change_command(self) -> None:
         """Изменение продукта в библиотеке"""
         args = self.header_frame.lib_win, self.header_frame.category, self.id
-        self.header_frame.lib_win.wait_window(AssistWindow(*args))
-        self.header_frame.lib_win.redraw()
+        AssistWindow(*args)
     
     def copy_command(self) -> None:
         """Копирование продукта"""

@@ -109,26 +109,18 @@ class AssistWindow(ChildWindow):
         'dc_break': ('individual', __draw_checkbutton_widget, 'Раскодировка с разрывом')
         }
 
-    def __init__(
-        self, 
-        master: Any, 
-        mode: Literal['add', 'copy', 'change'], 
-        category: Type[Categories], 
-        id: int | None = None,
-        ) -> None:
-
+    def __init__(self, master: Any, category: Type[Categories], id: int) -> None:
         # Сохраняем значения в объекте
         self._category = category
         self._properties = AppManager.lib.properties(category.__name__)
         self._vars = {}
         self._alias: AliasInterface = None  #type: ignore
+        self._update_func = master.redraw
 
         # Вызываем базовый класс
-        super().__init__(master.master.master.master, id=id, mode=mode, lib_win=master)
+        super().__init__(master, id=id)
 
     def main(self, **kwargs) -> None:
-        self.set_title(kwargs['mode'])
-
         # Рисуем Notebook
         nb = ttk.Notebook(self)
         nb.pack(fill='both', expand=1, padx=5, pady=5)
@@ -142,15 +134,17 @@ class AssistWindow(ChildWindow):
         # Отрисовка остальных фреймов на основе атрибутов категории продукта
         self.draw_main_widgets(nb)
 
+        # Наполняем значениями
+        self.insert_values_from_lib_to_widgets(kwargs['id'])
+
         # Кнопка сохранить
         ttk.Button(
             self, 
             text='Сохранить', 
             width=14, 
-            command=self.write_to_library(kwargs['lib_win'], kwargs['mode'])
+            command=self.write_to_library
         ).pack(pady=(0, 5))
-        # Наполняем значениями, если продукт изменяется или копируется
-        self.insert_values_from_lib_to_widgets(kwargs['mode'], kwargs['id'])
+
 
     def set_title(self, mode: str) -> None:
         """Установка заголовка окна"""
@@ -183,19 +177,20 @@ class AssistWindow(ChildWindow):
             # Отрисовываем связанные виджеты 
             draw_func(self, mark, field, text)
 
-    def insert_values_from_lib_to_widgets(self, mode: str, id: int) -> None:
+    def insert_values_from_lib_to_widgets(self, id: int) -> None:
         """Метод для вставки полученных значений из бд в виджеты"""
-        if mode == 'add': return 
-
         # Получаем продукт из библиотеки и размещаем значения
         product = AppManager.lib.from_id(self._category, id)
+
+        # Изменение название окна
+        self.title(f'Редактирование {product.name}')
+
         for i, attr in enumerate(product._fields):
             self._vars[attr].set(product[i])    
 
         # Получаем псевдонимы продукта
-        if mode == 'change':
-            aliases = AppManager.lib.get_aliases(self._category, id)
-            self._alias.insert(*(x[0] for x in aliases))
+        aliases = AppManager.lib.get_aliases(self._category, id)
+        self._alias.insert(*(x[0] for x in aliases))
 
     def get_values_from_widgets(self) -> Categories:
         """
@@ -225,30 +220,23 @@ class AssistWindow(ChildWindow):
         # Пакуем и возвращаем кортеж
         return self._category(*_handler())  #type: ignore
 
-    def write_to_library(self, lib_win: Any, mode: str) -> Callable[[], None]:
+    def write_to_library(self) -> None:
         """Ф-я для обновления/записи информации библиотеку"""
+        # Обработчик исключений, чтобы прервать логику выполнения в случае ошибки
+        try:
+            # Получаем продукт и псевдонимы
+            product = self.get_values_from_widgets()
+            aliases = self._alias.get()
 
-        def _func() -> None:
-            # Обработчик исключений, чтобы прервать логику выполнения в случае ошибки
-            try:
-                # Получаем продукт
-                product = self.get_values_from_widgets()
-                aliases = self._alias.get()
+            # Обновляем продукт
+            AppManager.lib.change(product, aliases)
 
-                # Обновляем или добавляем продукт в зависимости от типа обработки
-                if mode == 'change':
-                    AppManager.lib.change(product)
-                    title, message = 'Изменение продукта', f'Данные обновлены для:\n{product.name}'
-                else:
-                    AppManager.lib.add(product, aliases)
-                    title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\n добавлен в библиотеку'
-
-                # Вывод сообщения об успехе операции
-                tkmb.showinfo(title, message, parent=self)
-            
-            # Вывод сообщения об ошибке
-            except Exception as e: tkmb.showwarning('Ошибка', str(e), parent=self)
             # Обновляем виджеты в основном окне
-            lib_win.redraw()
+            self._update_func()
 
-        return _func
+            # Вывод сообщения об успехе операции
+            tkmb.showinfo('Редактирование', f'Данные обновлены для:\n{product.name}', parent=self)
+        
+        # Вывод сообщения об ошибке
+        except Exception as e: 
+            tkmb.showwarning('Ошибка', str(e), parent=self)
