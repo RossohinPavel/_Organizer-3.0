@@ -1,6 +1,6 @@
 from ...source import *
 from .alias import AliasInterface
-from ....mytyping import Literal, Type, Iterator, Categories
+from ....mytyping import Literal, Type, Iterator, Categories, Callable
 
 
 class AssistWindow(ChildWindow):
@@ -118,14 +118,13 @@ class AssistWindow(ChildWindow):
         ) -> None:
 
         # Сохраняем значения в объекте
-        self._master = master
         self._category = category
         self._properties = AppManager.lib.properties(category.__name__)
         self._vars = {}
         self._alias: AliasInterface = None  #type: ignore
 
         # Вызываем базовый класс
-        super().__init__(master, id=id, mode=mode)
+        super().__init__(master, id=id, mode=mode, lib_win=master)
 
     def main(self, **kwargs) -> None:
         self.set_title(kwargs['mode'])
@@ -148,7 +147,7 @@ class AssistWindow(ChildWindow):
             self, 
             text='Сохранить', 
             width=14, 
-            command=self.write_to_library
+            command=self.write_to_library(kwargs['lib_win'], kwargs['mode'])
         ).pack(pady=(0, 5))
         # Наполняем значениями, если продукт изменяется или копируется
         self.insert_values_from_lib_to_widgets(kwargs['id'])
@@ -188,12 +187,14 @@ class AssistWindow(ChildWindow):
         """Метод для вставки полученных значений из бд в виджеты"""
         if id is None: return 
 
-        # Получаем продукт из библиотеки
+        # Получаем продукт из библиотеки и размещаем значения
         product = AppManager.lib.from_id(self._category, id)
-
         for i, attr in enumerate(product._fields):
-            # Размещаем значения
-            self._vars[attr].set(product[i])     
+            self._vars[attr].set(product[i])    
+
+        # Получаем псевдонимы продукта
+        aliases = AppManager.lib.get_aliases(self._category, id)
+        self._alias.insert(*(x[0] for x in aliases))
 
     def get_values_from_widgets(self) -> Categories:
         """
@@ -223,26 +224,30 @@ class AssistWindow(ChildWindow):
         # Пакуем и возвращаем кортеж
         return self._category(*_handler())  #type: ignore
 
-    def write_to_library(self) -> None:
+    def write_to_library(self, lib_win: Any, mode: str) -> Callable[[], None]:
         """Ф-я для обновления/записи информации библиотеку"""
-        # Обработчик исключений, чтобы прервать логику выполнения в случае ошибки
-        try:
-            # Получаем продукт
-            product = self.get_values_from_widgets()
 
-            # Обновляем или добавляем продукт в зависимости от типа обработки
-            if self._mode == 'change':
-                AppManager.lib.change(product)
-                title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.name}'
-            else:
-                AppManager.lib.add(product)
-                title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\nуспешно добавлен в библиотеку'
+        def _func() -> None:
+            # Обработчик исключений, чтобы прервать логику выполнения в случае ошибки
+            try:
+                # Получаем продукт
+                product = self.get_values_from_widgets()
+
+                # Обновляем или добавляем продукт в зависимости от типа обработки
+                if mode == 'change':
+                    AppManager.lib.change(product)
+                    title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.name}'
+                else:
+                    AppManager.lib.add(product)
+                    title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\nуспешно добавлен в библиотеку'
+                
+                # Обновляем виджеты в основном окне
+                lib_win.redraw()
+
+                # Вывод сообщения об успехе операции
+                tkmb.showinfo(title, message, parent=self)
             
-            # Если была передана update_func, то обновляем виджеты
-            if update_func: update_func()
+            # Вывод сообщения об ошибке
+            except Exception as e: tkmb.showwarning('Ошибка', str(e), parent=self)
 
-            # Вывод сообщения об успехе операции
-            tkmb.showinfo(title, message, parent=self)
-        
-        # Вывод сообщения об ошибке
-        except Exception as e: tkmb.showwarning('Ошибка', str(e), parent=self)
+        return _func

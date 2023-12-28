@@ -33,6 +33,14 @@ class Library(DataBase):
             category = eval(category)
         self.cursor.execute(f'SELECT * FROM {category.__name__} WHERE id=?', (id, ))
         return category(*self.cursor.fetchone()[1:])    #type: ignore
+    
+    @DataBase.safe_connect
+    def get_aliases(self, category: str | Type[Categories], id: int) -> list:
+        """Получение списка псевдонимов продукта"""
+        if isinstance(category, str):
+            category = eval(category)
+        self.cursor.execute(f'SELECT alias FROM Aliases WHERE category=? AND product_id=?', (category.__name__, id))
+        return self.cursor.fetchall()
 
 
     # @DataBase.safe_connect
