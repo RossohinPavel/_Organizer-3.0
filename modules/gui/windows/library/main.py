@@ -33,6 +33,7 @@ class LibraryWindow(ChildWindow):
                 p = ProductInterface(
                     self, 
                     j == len(product) - 1, 
+                    category,
                     *product
                 )
                 p.pack(fill=ttkc.X, padx=(0, 10))
@@ -72,13 +73,13 @@ class LibHeaderLabel(ttk.Frame):
 class ProductInterface(ttk.Frame):
     """Фрейм для отображения продукта и взаимодействия с ним."""
     
-    def __init__(self, master: LibraryWindow, end: bool, id: int, name: str):
+    def __init__(self, master: LibraryWindow, end: bool, category: Type[Categories], id: int, name: str):
         self.lib_win = master
+        self.category = category
         self.id = id
-        self.name = name
         super().__init__(master.container, padding=(8, 0, 0, 0))
         self.draw_separators(end)
-        lbl = ttk.Label(self, text=name, )
+        lbl = ttk.Label(self, text=name)
         lbl.pack(side=ttkc.LEFT, padx=20, pady=3)
         self.draw_buttons()
     
@@ -91,7 +92,17 @@ class ProductInterface(ttk.Frame):
         """Отрисовка кнопок взаимодействия с объектом"""
         delete = ttk.Button(self, text='🗑', style='Libdelete.danger.Outline.TButton')
         delete.pack(side=ttkc.RIGHT, padx=(0, 3))
-        edit = ttk.Button(self, text='🖊', style='Libedit.warning.Outline.TButton')
+        edit = ttk.Button(
+            self, 
+            style='Libedit.warning.Outline.TButton',
+            text='🖊', 
+            command=lambda: AssistWindow(self.lib_win, 'change', self.category, self.id)
+        )
         edit.pack(side=ttkc.RIGHT, padx=(0, 3))
-        copy = ttk.Button(self, text='📑', style='Libcopy.success.Outline.TButton')
+        copy = ttk.Button(
+            self, 
+            style='Libcopy.success.Outline.TButton',
+            text='📑', 
+            command=lambda: AssistWindow(self.lib_win, 'copy', self.category, self.id)
+        )
         copy.pack(side=ttkc.RIGHT, padx=(0, 3))

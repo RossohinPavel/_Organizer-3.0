@@ -119,17 +119,16 @@ class AssistWindow(ChildWindow):
 
         # Сохраняем значения в объекте
         self._master = master
-        self._mode = mode
         self._category = category
         self._properties = AppManager.lib.properties(category.__name__)
         self._vars = {}
         self._alias: AliasInterface = None  #type: ignore
 
         # Вызываем базовый класс
-        super().__init__(master, id=id)
+        super().__init__(master, id=id, mode=mode)
 
     def main(self, **kwargs) -> None:
-        self.set_title()
+        self.set_title(kwargs['mode'])
 
         # Рисуем Notebook
         nb = ttk.Notebook(self)
@@ -152,12 +151,11 @@ class AssistWindow(ChildWindow):
             command=self.write_to_library
         ).pack(pady=(0, 5))
         # Наполняем значениями, если продукт изменяется или копируется
-        if self._mode != 'add':
-            self.insert_values_from_lib_to_widgets(kwargs['id'])
+        self.insert_values_from_lib_to_widgets(kwargs['id'])
 
-    def set_title(self) -> None:
+    def set_title(self, mode: str) -> None:
         """Установка заголовка окна"""
-        match self._mode:
+        match mode:
             case 'add': title = 'Добавление'
             case 'copy': title = 'Копирование'
             case 'change' | _ : title = 'Изменение'
@@ -186,23 +184,22 @@ class AssistWindow(ChildWindow):
             # Отрисовываем связанные виджеты 
             draw_func(self, mark, field, text)
 
-    def insert_values_from_lib_to_widgets(self, id: int) -> None:
+    def insert_values_from_lib_to_widgets(self, id: int | None) -> None:
         """Метод для вставки полученных значений из бд в виджеты"""
+        if id is None: return 
+
         # Получаем продукт из библиотеки
-        product = AppManager.lib.get(product_name)
+        product = AppManager.lib.from_id(self._category, id)
 
         for i, attr in enumerate(product._fields):
-            # Пропускаем full_name если модуль copy
-            if attr == 'full_name' and self._mode == 'copy': continue
-
             # Размещаем значения
             self._vars[attr].set(product[i])     
 
     def get_values_from_widgets(self) -> Categories:
         """
-        Метод для получения информации из виджетов.\n
-        Возвращает Product если все значения были заполнены,\n
-        генерирует исключение в противном случае.
+            Метод для получения информации из виджетов.\n
+            Возвращает Product если все значения были заполнены,\n
+            генерирует исключение в противном случае.
         """
         # Целочисленные значения для отдельной проверки
         numbered_var = ('carton_length', 'carton_height', 'dc_top_indent', 'dc_left_indent', 'dc_overlap')
@@ -215,7 +212,7 @@ class AssistWindow(ChildWindow):
 
                 # Генерируем исключение, если поле пустое
                 if value == '': 
-                    field = self.FRAMES.get(key, '"__"')[-2] if key != 'full_name' else 'Полное имя'
+                    field = self.FRAMES.get(key, '"__"')[-2] if key != 'name' else 'Полное имя'
                     raise Exception(f'Нет данных в поле: {field}')
 
                 # Переводим в int целочисленные значения
@@ -228,8 +225,6 @@ class AssistWindow(ChildWindow):
 
     def write_to_library(self) -> None:
         """Ф-я для обновления/записи информации библиотеку"""
-        print(self.winfo_geometry())
-        return
         # Обработчик исключений, чтобы прервать логику выполнения в случае ошибки
         try:
             # Получаем продукт
@@ -238,10 +233,10 @@ class AssistWindow(ChildWindow):
             # Обновляем или добавляем продукт в зависимости от типа обработки
             if self._mode == 'change':
                 AppManager.lib.change(product)
-                title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.full_name}'
+                title, message = 'Изменение продукта', f'Данне успешно обновлены для:\n{product.name}'
             else:
                 AppManager.lib.add(product)
-                title, message = 'Добавление  продукта', f'Продукт:\n{product.full_name}\nуспешно добавлен в библиотеку'
+                title, message = 'Добавление  продукта', f'Продукт:\n{product.name}\nуспешно добавлен в библиотеку'
             
             # Если была передана update_func, то обновляем виджеты
             if update_func: update_func()

@@ -25,6 +25,15 @@ class Library(DataBase):
             self.cursor.execute(f'SELECT id, name FROM {product.__name__}')
             dct[product] = self.cursor.fetchall()
         return dct
+    
+    @DataBase.safe_connect
+    def from_id(self, category: str | Type[Categories], id: int) -> Categories:
+        """Получения объекта продукта по передоваемому id."""
+        if isinstance(category, str):
+            category = eval(category)
+        self.cursor.execute(f'SELECT * FROM {category.__name__} WHERE id=?', (id, ))
+        return category(*self.cursor.fetchone()[1:])    #type: ignore
+
 
     # @DataBase.safe_connect
     # def add(self, product: Product) -> None:
