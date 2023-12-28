@@ -150,7 +150,7 @@ class AssistWindow(ChildWindow):
             command=self.write_to_library(kwargs['lib_win'], kwargs['mode'])
         ).pack(pady=(0, 5))
         # Наполняем значениями, если продукт изменяется или копируется
-        self.insert_values_from_lib_to_widgets(kwargs['id'])
+        self.insert_values_from_lib_to_widgets(kwargs['mode'], kwargs['id'])
 
     def set_title(self, mode: str) -> None:
         """Установка заголовка окна"""
@@ -183,18 +183,19 @@ class AssistWindow(ChildWindow):
             # Отрисовываем связанные виджеты 
             draw_func(self, mark, field, text)
 
-    def insert_values_from_lib_to_widgets(self, id: int | None) -> None:
+    def insert_values_from_lib_to_widgets(self, mode: str, id: int) -> None:
         """Метод для вставки полученных значений из бд в виджеты"""
-        if id is None: return 
+        if mode == 'add': return 
 
         # Получаем продукт из библиотеки и размещаем значения
         product = AppManager.lib.from_id(self._category, id)
         for i, attr in enumerate(product._fields):
             self._vars[attr].set(product[i])    
 
+        if mode == 'change':
         # Получаем псевдонимы продукта
-        aliases = AppManager.lib.get_aliases(self._category, id)
-        self._alias.insert(*(x[0] for x in aliases))
+            aliases = AppManager.lib.get_aliases(self._category, id)
+            self._alias.insert(*(x[0] for x in aliases))
 
     def get_values_from_widgets(self) -> Categories:
         """
