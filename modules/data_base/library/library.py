@@ -13,7 +13,7 @@ class Library(DataBase):
     properties = Properties
 
     @DataBase.safe_connect
-    def get_headers(self) -> dict[Categories, list[tuple[int, str]]]:
+    def get_headers(self) -> dict[Type[Categories], list[tuple[int, str]]]:
         """
             Получение словаря из заголовков продуктов.
             Ключи - Типы продуктов

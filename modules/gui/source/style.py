@@ -51,10 +51,10 @@ def style_init(name: str = '') -> None:
     style.configure('ms.info.Outline.TMenubutton', padding=(5, 2, 0, 2),)
 
     # Стиль для кнопки + в библиотеке
-    style.configure('Lib+.success.Outline.TButton', padding=(3, -1, 3, -1))
+    style.configure('Lib+.success.Outline.TButton', padding=(5, 1, 5, 1))
 
     # Стиль для кнопки копировать 📑 в библиотеке
-    style.configure('Libcopy.success.Outline.TButton', padding=1)
+    style.configure('Libcopy.success.Outline.TButton', padding=(1, 1, 2, 1))
 
         # Стиль для кнопки + в библиотеке
     style.configure('Libedit.warning.Outline.TButton', padding=(3, 1, 3, 1))

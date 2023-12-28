@@ -56,9 +56,8 @@ class Properties:
         """Наделяет продукт кортежем значений типов обложки для соответствующей категории"""
         ct = ('Книга', 'Планшет', 'Люкс', 'Кожаный корешок', 'Кожаная обложка')
         match self.__product_type:
-            case 'Photobook': return ct
-            case 'Layflat': return ct[:2]
             case 'Album': return ct[:1]
+            case 'Photobook' | 'Layflat': return ct
 
     def _cover_flap(self) -> tuple[str, ...]:
         """Наделяет продукт кортежем значений клапана обложки"""

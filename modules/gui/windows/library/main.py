@@ -1,6 +1,6 @@
 from ...source import *
-from ....mytyping import Iterator, Type, Categories
-# from .assist import AssistWindow
+from ....mytyping import Categories, Type
+from .assist import AssistWindow
 
 
 class LibraryWindow(ChildWindow):
@@ -24,7 +24,7 @@ class LibraryWindow(ChildWindow):
             lhl = LibHeaderLabel(self, category)
             lhl.pack(
                 fill=ttkc.X, 
-                padx=(0, 10),
+                padx=(1, 10),
                 pady=(0 if i == 0 else 5, 2)
             )
 
@@ -33,10 +33,15 @@ class LibraryWindow(ChildWindow):
                 p = ProductInterface(
                     self, 
                     j == len(product) - 1, 
-                    category, 
                     *product
                 )
                 p.pack(fill=ttkc.X, padx=(0, 10))
+    
+    def redraw(self) -> None:
+        """Перерисовка виджетов в связи с обновлением библиотеки"""
+        for widget in self.container.winfo_children():
+            widget.destroy()
+        self.draw_main_widgets()
  
 
 class LibHeaderLabel(ttk.Frame):
@@ -45,26 +50,30 @@ class LibHeaderLabel(ttk.Frame):
         добавляет конпку добавления продукта в библиотеку.
     """
 
-    def __init__(self, master: LibraryWindow, product: Categories):
+    def __init__(self, master: LibraryWindow, category: Type[Categories]):
         self.lib_win = master
-        self.product = product
+        self.category = category
         super().__init__(master.container)
         
         # Кнопка добавления продукта в библиотеку
-        btn = ttk.Button(self, text='+', style='Lib+.success.Outline.TButton')
+        btn = ttk.Button(
+            self,
+            style='Lib+.success.Outline.TButton', 
+            text='+', 
+            command=lambda: AssistWindow(self.lib_win, 'add', self.category)
+        )
         btn.pack(side=ttkc.LEFT)
 
         # Лейбл с текстом
-        lbl = ttk.Label(self, text=product.__doc__)     # type: ignore
+        lbl = ttk.Label(self, text=category.__doc__)     # type: ignore
         lbl.pack(anchor=ttkc.W, padx=(0, 0), side=ttkc.LEFT)
 
 
 class ProductInterface(ttk.Frame):
     """Фрейм для отображения продукта и взаимодействия с ним."""
     
-    def __init__(self, master: LibraryWindow, end: bool, category: Categories, id: int, name: str):
+    def __init__(self, master: LibraryWindow, end: bool, id: int, name: str):
         self.lib_win = master
-        self.category = category
         self.id = id
         self.name = name
         super().__init__(master.container, padding=(8, 0, 0, 0))
@@ -75,8 +84,8 @@ class ProductInterface(ttk.Frame):
     
     def draw_separators(self, end: bool) -> None:
         """Функция для отрисовки разделителей"""
-        ttk.Separator(self, orient='vertical').place(relheight=0.5 if end else 1)
-        ttk.Separator(self, orient='horizontal').place(relwidth=0.98, rely=0.5)
+        ttk.Separator(self, orient='vertical').place(x=3, relheight=0.5 if end else 1)
+        ttk.Separator(self, orient='horizontal').place(x=3, relwidth=0.98, rely=0.5)
     
     def draw_buttons(self) -> None:
         """Отрисовка кнопок взаимодействия с объектом"""

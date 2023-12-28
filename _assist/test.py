@@ -1,40 +1,19 @@
-from typing import NamedTuple
-from pympler.asizeof import asizeof
+import ttkbootstrap as ttk
+from ttkbootstrap.tableview import Tableview
 
 
-class Methods:
-    __slots__ = ()
+root = ttk.Window()
 
-    @property
-    def category(self): 
-        return self.__class__.__name__
+row = []
+row.append(('test', ))
+row.append(('test', ))
 
-
-class Album(NamedTuple):
-    """Полиграфически Альбомы, Pur, FlexBind"""
-    full_name: str                # Полное имя продукта
-    segment: str                  # Общие особенности продукта  
-    short_name: str
-    product_format: str
-    lamination: str
-    cover_type: str               # Тип сборки обложки
-    carton_length: int            # Технические размеры обложки
-    carton_height: int
-    cover_flap: int
-    cover_joint: int
-    cover_print_mat: str          # Печатный материал
-    page_print_mat: str           
-    dc_top_indent: int            # Индивидуальные особенности продукта
-    dc_left_indent: int
-    dc_overlap: int
-    dc_break: int
+t = Tableview(root, coldata=['Псевдонимы'], rowdata=row)
+t.pack()
 
 
-class NewAlbum(Album, Methods):
-    __slots__ = ()
-    pass
+
+print(*(x.values for x in t.tablerows))
 
 
-print(asizeof(Album('1', '1', '1', '1', '1', '1', 1, 1, 1, 1, '1', '1', 1, 1, 1, 1)))
-
-print(asizeof(NewAlbum('1', '1', '1', '1', '1', '1', 1, 1, 1, 1, '1', '1', 1, 1, 1, 1)))
+root.mainloop()
