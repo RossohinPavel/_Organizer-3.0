@@ -83,13 +83,15 @@ class Library(DataBase):
     #         if name == product.full_name:
     #             raise Exception(f'{product.full_name}\nУже есть в библиотеке')
 
-    # @DataBase.safe_connect
-    # def delete(self, category: str, full_name: str) -> None:
-    #     """Удаление продукта из библиотеки."""
-    #     self.cursor.execute(f'DELETE FROM {category} WHERE full_name=?', (full_name, ))
-    #     self.connect.commit()
-    #     self.__update_product_headers()
-    #     self.get.cache_clear()
+    @DataBase.safe_connect
+    def delete(self, category: Type[Categories], id: int) -> None:
+        """Удаление продукта из библиотеки."""
+        # Удаление продукта из библиотеки
+        self.cursor.execute(f'DELETE FROM {category.__name__} WHERE id=?', (id, ))
+        # Очитска таблицы псевдонимов от удаляемого продукта
+        self.cursor.execute(f'DELETE FROM Aliases WHERE product_id=?', (id, ))
+        self.connect.commit()
+        # self.get.cache_clear()
 
     # @DataBase.safe_connect    
     # def __get(self, category: Type[Product], name: str) -> Product: # type: ignore

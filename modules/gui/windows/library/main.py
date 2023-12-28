@@ -18,26 +18,12 @@ class LibraryWindow(ChildWindow):
     def draw_main_widgets(self) -> None:
         """Отрисовка основных виджетов на основе полученной из библиотеки информации"""
         for i, val in enumerate(AppManager.lib.get_headers().items()):
+            # Отрисовка интерфейса заголовка
             category, products = val
+            h = HeaderFrame(self, category)
+            h.pack(fill=ttkc.X, padx=(1, 10), pady=(0 if i == 0 else 5, 2))
+            h.draw_bound_widgets(products)
 
-            # Отрисовка заголовков
-            lhl = LibHeaderLabel(self, category)
-            lhl.pack(
-                fill=ttkc.X, 
-                padx=(1, 10),
-                pady=(0 if i == 0 else 5, 2)
-            )
-
-            end = len(products) - 1
-            # Отрисовка виджетов продуктов
-            for j, product in enumerate(products):
-                p = ProductInterface(
-                    lhl, 
-                    j == end, 
-                    *product
-                )
-                p.pack(fill=ttkc.X, padx=(0, 10))
-    
     def redraw(self) -> None:
         """Перерисовка виджетов в связи с обновлением библиотеки"""
         for widget in self.container.winfo_children():
@@ -45,16 +31,24 @@ class LibraryWindow(ChildWindow):
         self.draw_main_widgets()
  
 
-class LibHeaderLabel(ttk.Frame):
+class HeaderFrame(ttk.Frame):
     """
         Фрейм - заголовок. Повторяет функционал HeaderLabel. 
         добавляет конпку добавления продукта в библиотеку.
     """
 
-    def __init__(self, master: LibraryWindow, category: Type[Categories]):
+    def __init__(self, master: LibraryWindow, category: Type[Categories]) -> None:
+        super().__init__(master.container)
+
+        # Сохраняем ссылку на LibraryWindow и категорию продукта
         self.lib_win = master
         self.category = category
-        super().__init__(master.container)
+
+        # Отрисовка основных виджетов и зависимых
+        self.draw_main_widgets()
+    
+    def draw_main_widgets(self) -> None:
+        """Отрисовка основных виджетов заголовка"""
         
         # Кнопка добавления продукта в библиотеку
         btn = ttk.Button(
@@ -66,8 +60,20 @@ class LibHeaderLabel(ttk.Frame):
         btn.pack(side=ttkc.LEFT)
 
         # Лейбл с текстом
-        lbl = ttk.Label(self, text=category.__doc__)     # type: ignore
+        lbl = ttk.Label(self, text=self.category.__doc__)       # type: ignore
         lbl.pack(anchor=ttkc.W, padx=(0, 0), side=ttkc.LEFT)
+    
+    def draw_bound_widgets(self, products: list[tuple[int, str]]) -> None:
+        """Отрисовка связанных виджетов по значениям из products"""
+        end = len(products) - 1
+        for j, product in enumerate(products):
+            p = ProductFrame(
+                self.lib_win, 
+                j == end, 
+                self.category, 
+                *product
+            )
+            p.pack(fill=ttkc.X, padx=(0, 10))
     
     def add_command(self, base=None) -> None:
         """Добавление нового продукта в библиотеку."""
@@ -85,16 +91,27 @@ class LibHeaderLabel(ttk.Frame):
             tkmb.showwarning('Ошибка', str(e), parent=self.lib_win)
 
 
-class ProductInterface(ttk.Frame):
+class ProductFrame(ttk.Frame):
     """Фрейм для отображения продукта и взаимодействия с ним."""
     
-    def __init__(self, master: LibHeaderLabel, end: bool, id: int, name: str):
-        self.lhl = master
+    def __init__(
+        self, 
+        master: LibraryWindow, 
+        end: bool,                  # Маркер для отрисовки половины виджета Separator
+        category: Type[Categories],
+        id: int, 
+        name: str
+        ) -> None:
+        super().__init__(master.container, padding=(8, 0, 0, 0))
+
+        # Сохраняем нужные атрибуты
+        self.lib_win = master
+        self.category = category
         self.id = id
-        super().__init__(master.master, padding=(8, 0, 0, 0))
+
+        # Отрисовка основных виджетов
         self.draw_separators(end)
-        lbl = ttk.Label(self, text=name)
-        lbl.pack(side=ttkc.LEFT, padx=20, pady=3)
+        ttk.Label(self, text=name).pack(side=ttkc.LEFT, padx=20, pady=3)
         self.draw_buttons()
     
     def draw_separators(self, end: bool) -> None:
@@ -104,13 +121,18 @@ class ProductInterface(ttk.Frame):
     
     def draw_buttons(self) -> None:
         """Отрисовка кнопок взаимодействия с объектом"""
-        delete = ttk.Button(self, text='🗑', style='Libdelete.danger.Outline.TButton')
+        delete = ttk.Button(
+            self,
+            style='Libdelete.danger.Outline.TButton',
+            text='🗑', 
+            command=self.delete_command
+        )
         delete.pack(side=ttkc.RIGHT, padx=(0, 3))
         edit = ttk.Button(
             self, 
             style='Libedit.warning.Outline.TButton',
             text='🖊', 
-            command=lambda: AssistWindow(self.lib_win, 'change', self.category, self.id)
+            command=lambda: AssistWindow(self.lhl, 'change', self.lhl.category, self.id)
         )
         edit.pack(side=ttkc.RIGHT, padx=(0, 3))
         copy = ttk.Button(
@@ -120,3 +142,8 @@ class ProductInterface(ttk.Frame):
             command=lambda: self.lhl.add_command(AppManager.lib.from_id(self.lhl.category, self.id))
         )
         copy.pack(side=ttkc.RIGHT, padx=(0, 3))
+    
+    def delete_command(self) -> None:
+        """Удаление продукта из библиотеки"""
+        AppManager.lib.delete(self.category, self.id)
+        self.lib_win.redraw()

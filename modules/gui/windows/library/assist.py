@@ -124,7 +124,7 @@ class AssistWindow(ChildWindow):
         self._alias: AliasInterface = None  #type: ignore
 
         # Вызываем базовый класс
-        super().__init__(master, id=id, mode=mode, lib_win=master)
+        super().__init__(master.master.master.master, id=id, mode=mode, lib_win=master)
 
     def main(self, **kwargs) -> None:
         self.set_title(kwargs['mode'])
