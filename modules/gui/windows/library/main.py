@@ -68,9 +68,8 @@ class HeaderFrame(ttk.Frame):
         end = len(products) - 1
         for j, product in enumerate(products):
             p = ProductFrame(
-                self.lib_win, 
-                j == end, 
-                self.category, 
+                self, 
+                j == end,
                 *product
             )
             p.pack(fill=ttkc.X, padx=(0, 10))
@@ -96,17 +95,15 @@ class ProductFrame(ttk.Frame):
     
     def __init__(
         self, 
-        master: LibraryWindow, 
+        master: HeaderFrame, 
         end: bool,                  # Маркер для отрисовки половины виджета Separator
-        category: Type[Categories],
         id: int, 
         name: str
         ) -> None:
-        super().__init__(master.container, padding=(8, 0, 0, 0))
+        super().__init__(master.lib_win.container, padding=(8, 0, 0, 0))
 
         # Сохраняем нужные атрибуты
-        self.lib_win = master
-        self.category = category
+        self.header_frame = master
         self.id = id
 
         # Отрисовка основных виджетов
@@ -132,18 +129,29 @@ class ProductFrame(ttk.Frame):
             self, 
             style='Libedit.warning.Outline.TButton',
             text='🖊', 
-            command=lambda: AssistWindow(self.lhl, 'change', self.lhl.category, self.id)
+            command=self.change_command
         )
         edit.pack(side=ttkc.RIGHT, padx=(0, 3))
         copy = ttk.Button(
             self, 
             style='Libcopy.success.Outline.TButton',
             text='📑', 
-            command=lambda: self.lhl.add_command(AppManager.lib.from_id(self.lhl.category, self.id))
+            command=self.copy_command
         )
         copy.pack(side=ttkc.RIGHT, padx=(0, 3))
+
+    def change_command(self) -> None:
+        """Изменение продукта в библиотеке"""
+        args = self.header_frame.lib_win, self.header_frame.category, self.id
+        self.header_frame.lib_win.wait_window(AssistWindow(*args))
+        self.header_frame.lib_win.redraw()
+    
+    def copy_command(self) -> None:
+        """Копирование продукта"""
+        product = AppManager.lib.from_id(self.header_frame.category, self.id)
+        self.header_frame.add_command(product)
     
     def delete_command(self) -> None:
         """Удаление продукта из библиотеки"""
-        AppManager.lib.delete(self.category, self.id)
-        self.lib_win.redraw()
+        AppManager.lib.delete(self.header_frame.category, self.id)
+        self.header_frame.lib_win.redraw()
