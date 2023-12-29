@@ -66,7 +66,7 @@ class HeaderFrame(ttk.Frame):
     def draw_bound_widgets(self, products: list[tuple[int, str]]) -> None:
         """Отрисовка связанных виджетов по значениям из products"""
         end = len(products) - 1
-        for j, product in enumerate(products):
+        for j, product in enumerate(sorted(products, key=lambda x: x[1])):
             p = ProductFrame(
                 self, 
                 j == end,
