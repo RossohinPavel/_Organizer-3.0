@@ -35,7 +35,13 @@ class Library(DataBase):
     @DataBase.safe_connect
     def get_aliases(self, category: Type[Categories], id: int) -> list:
         """Получение списка псевдонимов продукта"""
-        self.cursor.execute(f'SELECT alias FROM Aliases WHERE category=? AND product_id=?', (category.__name__, id))
+        self.cursor.execute(f"""
+            SELECT alias 
+            FROM Aliases 
+            WHERE product_category=? AND product_id=?
+            """, 
+            (category.__name__, id)
+        )
         return self.cursor.fetchall()
 
     @DataBase.safe_connect
@@ -43,35 +49,80 @@ class Library(DataBase):
         """Добавление продукта в библиотеку"""
         # Проверка на уникальность продукта
         self.__check_unique_name(product)
+
+        # Составление запроса sql и обновление бд
         req = ', '.join('?' * len(product))
         self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
         self.connect.commit()
         # self.get.cache_clear()
+    
+    @DataBase.safe_connect
+    def change(self, id: int, product: Categories, aliases: tuple[str]) -> None:
+        """Внесение изменений в продукт"""
+        # Проверка на уникальность продукта
+        self.__check_unique_name(product, id)
 
-    def __check_unique_name(self, product: Categories) -> NoReturn | None:
+        # Составление запроса sql и обновление бд продукта
+        req = ', '.join(f'{f}=?' for f in product._fields)
+        self.cursor.execute(f'UPDATE {product.category} SET {req} WHERE id={id}', product)
+
+        # Обновление псевдониов для продукции
+        self.__update_aliases(id, product, aliases)
+
+        self.connect.commit()
+        # self.get.cache_clear()
+    
+    def __update_aliases(self, id: int, product: Categories, aliases: tuple[str]) -> None:
+        """Обновление псевдонимов для продукта."""
+        # Получаем множество псевдонимов из базы данных
+        self.cursor.execute(
+            """SELECT alias FROM Aliases WHERE product_category=? AND product_id=?""",
+            (product.category, id)
+        )
+        res = set(x[0] for x in self.cursor.fetchall())
+
+        # Рассчитываем псевдонимы для удаления и для добавления
+        aliases = set(aliases)                          #type: ignore
+        to_del, to_add = res - aliases, aliases - res   #type: ignore
+        try:
+            if to_del:
+                req = ', '.join(repr(x) for x in to_del)
+                self.cursor.execute(
+                    f"""DELETE FROM Aliases WHERE alias IN ({req}) AND product_category=? AND product_id=?""",
+                    (product.category, id)
+                )
+            
+            if to_add:
+                self.cursor.executemany(
+                    'INSERT INTO Aliases (alias, product_category, product_id) VALUES (?, ?, ?)', 
+                    ((x, product.category, id) for x in to_add)
+                )
+        except Exception as e:
+            raise Exception(f'Добавляемые псевдонимы не уникальны\n{e}')
+
+
+    def __check_unique_name(self, product: Categories, id: int = 0) -> NoReturn | None:
         """
             Проверка имени продукта на уникальность. 
             Проверка происходит по всем таблицам
         """
-        n = repr(product.name)
-        self.cursor.execute(f"""
+        self.cursor.execute("""
         SELECT EXISTS (
-            SELECT A.name, C.name, J.name, L.name, Pb.name, Pf.name, S.name
-            FROM Album AS A, Canvas AS C, Journal AS J, Layflat AS L, Photobook AS Pb, Photofolder AS Pf, Subproduct AS S
-            WHERE A.name={n} OR C.name={n} OR J.name={n} OR L.name={n} OR Pb.name={n} OR Pf.name={n} OR S.name={n} 
+            SELECT id, name FROM(
+                SELECT id, name FROM Album
+                UNION SELECT id, name FROM Canvas
+                UNION SELECT id, name FROM Journal
+                UNION SELECT id, name FROM Layflat
+                UNION SELECT id, name FROM Photobook
+                UNION SELECT id, name FROM Photofolder
+                UNION SELECT id, name FROM Subproduct
+            )
+            WHERE id != ? AND name=?
+        )""",
+        (id, product.name)
         )
-        """)
         if self.cursor.fetchone()[0]:
             raise Exception(f'{product.name}\nУже есть в библиотеке')
-
-    @DataBase.safe_connect
-    def change(self, product: Categories, aliases: list[str]) -> None:
-        """Внесение изменений в продукт"""
-        self.__check_unique_name(product)
-        # req = ', '.join(f'{s}=?' for s in product._fields)
-        # self.cursor.execute(f'UPDATE {product.category} SET {req} WHERE full_name=\'{product.full_name}\'', product)
-        # self.connect.commit()
-        # self.get.cache_clear()
 
     @DataBase.safe_connect
     def delete(self, category: Type[Categories], id: int) -> None:

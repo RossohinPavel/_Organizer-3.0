@@ -24,7 +24,7 @@ class AlbumAttrs(NamedTuple):
     name: str               # Название продукта
     segment: str            # Общие особенности продукта  
     short_name: str
-    product_format: str
+    format: str
     lamination: str
     cover_type: str         # Тип сборки обложки
     carton_length: int      # Технические размеры обложки
@@ -43,7 +43,7 @@ class CanvasAttrs(NamedTuple):
     name: str               # Название продукта
     segment: str            # Общие особенности продукта
     short_name: str
-    product_format: str
+    format: str
     cover_print_mat: str    # Печатный материал
 
 
@@ -51,7 +51,7 @@ class JournalAttrs(NamedTuple):
     name: str               # Название продукта
     segment: str            # Общие особенности продукта
     short_name: str
-    product_format: str
+    format: str
     cover_print_mat: str    # Печатный материал
     page_print_mat: str
 
@@ -60,7 +60,7 @@ class LayflatAttrs(NamedTuple):
     name: str               # Название продукта
     segment: str            # Общие особенности продукта
     short_name: str
-    product_format: str
+    format: str
     book_option: str
     lamination: str
     cover_type: str         # Тип сборки обложки
@@ -76,7 +76,7 @@ class PhotobookAttrs(NamedTuple):
     name: str               # Название продукта
     segment: str            # Общие особенности продукта
     short_name: str
-    product_format: str     # Общие особенности продукта
+    format: str             # Общие особенности продукта
     book_option: str
     lamination: str
     cover_type: str         # Тип сборки обложки
@@ -94,7 +94,7 @@ class PhotofolderAttrs(NamedTuple):
     name: str               # Название продукта
     segment: str            # Общие особенности продукта
     short_name: str
-    product_format: str     # Общие особенности продукта
+    format: str             # Общие особенности продукта
     lamination: str
     carton_length: int      # Технические размеры обложки
     carton_height: int

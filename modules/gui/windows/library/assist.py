@@ -38,7 +38,7 @@ class AssistWindow(ChildWindow):
         self._vars[key] = combo = ttk.Combobox(
             master=master, 
             state='readonly', 
-            values=self._properties(key),
+            values=self._properties(key),   #type: ignore
             cursor='hand2'
         )
         combo.pack(fill=ttkc.X, pady=(0, 5))
@@ -61,7 +61,7 @@ class AssistWindow(ChildWindow):
 
         # Получаем свойства и определяем текстовую переменную 
         values = self._properties(key)
-        self._vars[key] = var = ttk.StringVar(master, value=values[0])
+        self._vars[key] = var = ttk.StringVar(master, value=values[0])  #type: ignore
 
         container = None
 
@@ -80,8 +80,8 @@ class AssistWindow(ChildWindow):
             ).pack(
                 padx=(5, 10),
                 pady=5, 
-                anchor='nw', 
-                side='left'
+                anchor=ttkc.NW, 
+                side=ttkc.LEFT
             )
 
     FRAMES = {
@@ -91,7 +91,7 @@ class AssistWindow(ChildWindow):
              'Сегмент продукции'            # Текст для label 
              ),
         'short_name': ('main', __draw_combobox_widget, 'Короткое имя'),
-        'product_format': ('main', __draw_combobox_widget, 'Формат продукта'),
+        'format': ('main', __draw_combobox_widget, 'Формат продукта'),
         'book_option': ('main', __draw_radio_widgets, 'Опция сборки книги'),
         'lamination': ('main', __draw_radio_widgets, 'Ламинация'),
         'cover_type': ('cover', __draw_radio_widgets, 'Тип сборки обложки'),
@@ -111,6 +111,7 @@ class AssistWindow(ChildWindow):
 
     def __init__(self, master: Any, category: Type[Categories], id: int) -> None:
         # Сохраняем значения в объекте
+        self._id = id
         self._category = category
         self._properties = AppManager.lib.properties(category.__name__)
         self._vars = {}
@@ -118,7 +119,7 @@ class AssistWindow(ChildWindow):
         self._update_func = master.redraw
 
         # Вызываем базовый класс
-        super().__init__(master, id=id)
+        super().__init__(master)
 
     def main(self, **kwargs) -> None:
         # Рисуем Notebook
@@ -135,7 +136,7 @@ class AssistWindow(ChildWindow):
         self.draw_main_widgets(nb)
 
         # Наполняем значениями
-        self.insert_values_from_lib_to_widgets(kwargs['id'])
+        self.insert_values_from_lib_to_widgets()
 
         # Кнопка сохранить
         ttk.Button(
@@ -177,10 +178,10 @@ class AssistWindow(ChildWindow):
             # Отрисовываем связанные виджеты 
             draw_func(self, mark, field, text)
 
-    def insert_values_from_lib_to_widgets(self, id: int) -> None:
+    def insert_values_from_lib_to_widgets(self) -> None:
         """Метод для вставки полученных значений из бд в виджеты"""
         # Получаем продукт из библиотеки и размещаем значения
-        product = AppManager.lib.from_id(self._category, id)
+        product = AppManager.lib.from_id(self._category, self._id)
 
         # Изменение название окна
         self.title(f'Редактирование {product.name}')
@@ -189,7 +190,7 @@ class AssistWindow(ChildWindow):
             self._vars[attr].set(product[i])    
 
         # Получаем псевдонимы продукта
-        aliases = AppManager.lib.get_aliases(self._category, id)
+        aliases = AppManager.lib.get_aliases(self._category, self._id)
         self._alias.insert(*(x[0] for x in aliases))
 
     def get_values_from_widgets(self) -> Categories:
@@ -229,7 +230,7 @@ class AssistWindow(ChildWindow):
             aliases = self._alias.get()
 
             # Обновляем продукт
-            AppManager.lib.change(product, aliases)
+            AppManager.lib.change(self._id, product, aliases)
 
             # Обновляем виджеты в основном окне
             self._update_func()
