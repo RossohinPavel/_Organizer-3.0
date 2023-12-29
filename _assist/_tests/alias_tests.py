@@ -9,13 +9,13 @@ import sqlite3
 def delete(aliases):
     req = ', '.join(repr(x) for x in aliases)
     cursor.execute(
-        f"""DELETE FROM Aliases WHERE alias IN ({req}) AND product_category=? AND product_id=?""",
+        f"""DELETE FROM Aliases WHERE alias IN ({req}) AND category=? AND product_id=?""",
         (category, id)
     )
 
 def add(aliases):
     cursor.executemany(
-        'INSERT INTO Aliases (alias, product_category, product_id) VALUES (?, ?, ?)', 
+        'INSERT INTO Aliases (alias, category, product_id) VALUES (?, ?, ?)', 
         ((x, category, id) for x in aliases)
     )
    
@@ -27,14 +27,14 @@ with sqlite3.connect('../data/library.db') as connect:
     category, id = 'Album', 1
 
     # Добавление тестовых псевдонимов
-    cursor.execute('INSERT INTO Aliases (alias, product_category, product_id) VALUES (?, ?, ?)', ('test', category, id))
-    cursor.execute('INSERT INTO Aliases (alias, product_category, product_id) VALUES (?, ?, ?)', ('test1', category, id))
-    cursor.execute('INSERT INTO Aliases (alias, product_category, product_id) VALUES (?, ?, ?)', ('test2', category, id))
+    cursor.execute('INSERT INTO Aliases (alias, category, product_id) VALUES (?, ?, ?)', ('test', category, id))
+    cursor.execute('INSERT INTO Aliases (alias, category, product_id) VALUES (?, ?, ?)', ('test1', category, id))
+    cursor.execute('INSERT INTO Aliases (alias, category, product_id) VALUES (?, ?, ?)', ('test2', category, id))
     cursor.execute('SELECT * FROM Aliases')
     print('--- NEW ---\n', cursor.fetchall())
 
     cursor.execute(
-        """SELECT alias FROM Aliases WHERE product_category=? AND product_id=?""",
+        """SELECT alias FROM Aliases WHERE category=? AND product_id=?""",
         (category, id)
     )
     res = set(x[0] for x in cursor.fetchall())

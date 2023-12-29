@@ -38,7 +38,7 @@ class Library(DataBase):
         self.cursor.execute(f"""
             SELECT alias 
             FROM Aliases 
-            WHERE product_category=? AND product_id=?
+            WHERE category=? AND product_id=?
             """, 
             (category.__name__, id)
         )
@@ -76,7 +76,7 @@ class Library(DataBase):
         """Обновление псевдонимов для продукта."""
         # Получаем множество псевдонимов из базы данных
         self.cursor.execute(
-            """SELECT alias FROM Aliases WHERE product_category=? AND product_id=?""",
+            """SELECT alias FROM Aliases WHERE category=? AND product_id=?""",
             (product.category, id)
         )
         res = set(x[0] for x in self.cursor.fetchall())
@@ -88,18 +88,17 @@ class Library(DataBase):
             if to_del:
                 req = ', '.join(repr(x) for x in to_del)
                 self.cursor.execute(
-                    f"""DELETE FROM Aliases WHERE alias IN ({req}) AND product_category=? AND product_id=?""",
+                    f"""DELETE FROM Aliases WHERE alias IN ({req}) AND category=? AND product_id=?""",
                     (product.category, id)
                 )
             
             if to_add:
                 self.cursor.executemany(
-                    'INSERT INTO Aliases (alias, product_category, product_id) VALUES (?, ?, ?)', 
+                    'INSERT INTO Aliases (alias, category, product_id) VALUES (?, ?, ?)', 
                     ((x, product.category, id) for x in to_add)
                 )
         except Exception as e:
             raise Exception(f'Добавляемые псевдонимы не уникальны\n{e}')
-
 
     def __check_unique_name(self, product: Categories, id: int = 0) -> NoReturn | None:
         """
