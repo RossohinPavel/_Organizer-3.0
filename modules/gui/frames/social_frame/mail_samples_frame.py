@@ -20,7 +20,7 @@ class SampleButton(ttk.Menubutton):
             root, 
             cursor='hand2', 
             text=sample_name, 
-            style='ms.info.Outline.TMenubutton', 
+            style='ts.Outline.TMenubutton', 
             **kwargs
         )
         self._sample_frame = sample_frame
@@ -84,7 +84,13 @@ class MailSamplesFrame(ScrolledFrame):
                 frame = ttk.LabelFrame(self, text=tag)
                 frame.pack(fill='x', padx=(0, 13))
             SampleButton(frame, self, sid, name).pack(fill='x', padx=5, pady=(0, 5))
-        ttk.Button(master=self, text='Добавить', command=self.add_sample).pack(pady=5)
+        ttk.Button(
+            master=self, 
+            width=16,
+            text='Добавить',
+            command=self.add_sample, 
+            style='minibtn.Outline.TButton'
+        ).pack(pady=5)
     
     def add_sample(self) -> None:
         """Добавление семпла в общий список"""

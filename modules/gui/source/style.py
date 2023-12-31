@@ -45,10 +45,7 @@ def style_init(name: str = '') -> None:
     style.configure('minibtn.Outline.TButton', padding=2)
 
     # Стиль для свитчера тем
-    style.configure('ts.Outline.TMenubutton', padding=(5, 2, 0, 2), width=15)
-
-    # Стиль для кнопок текстовых шаблонов 
-    style.configure('ms.info.Outline.TMenubutton', padding=(5, 2, 0, 2))
+    style.configure('ts.Outline.TMenubutton', padding=(5, 2, 0, 2))
 
     # Стиль для кнопки + в библиотеке
     style.configure('Lib+.success.Outline.TButton', padding=(5, 1, 5, 1))
