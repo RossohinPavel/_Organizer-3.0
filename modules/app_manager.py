@@ -7,18 +7,19 @@ if TYPE_CHECKING:
     from .data_base import Library
     from .data_base import Log
     from .gui.main import MainWindow
-    from .gui.frames import ProcessingFrame
-    from ttkbootstrap import StringVar
-    from .task_manager import TaskManager
     from .trackers import OrdersTracker
+    # from .gui.frames import ProcessingFrame
+    from .gui.frames.file_frame.queue_frame import QueueFrame
+    from .task_manager import TaskManager
     from .data_base import Settings
 
 
 class _AppManager:
     """Класс собирающий в себя критические модули приложения"""
+
     __instance = None
-    # Объявляем слоты для ускорения доступа
-    __slots__ = ('SYSTEM', 'lib', 'log', 'mw', 'ot', 'ot_var', 'pf',  'tm', 'stg')
+
+    __slots__ = ('SYSTEM', 'lib', 'log', 'mw', 'ot', 'pf', 'queue', 'tm', 'stg')
     
     def __new__(cls) -> Self:
         if cls.__instance is None:
@@ -31,8 +32,8 @@ class _AppManager:
         self.log: Log
         self.mw: MainWindow
         self.ot: OrdersTracker
-        self.ot_var: StringVar
-        self.pf: ProcessingFrame    # Этот фрейм будет записан в мменеджер при инициализации основного окна
+        # self.pf: ProcessingFrame      # Эти 2 фрейма будет записаны в мменеджер 
+        self.queue: QueueFrame          # при инициализации основного окна
         self.tm: TaskManager
         self.stg: Settings
 

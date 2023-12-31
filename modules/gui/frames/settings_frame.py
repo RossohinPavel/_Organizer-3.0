@@ -37,7 +37,7 @@ class SettingsFrame(ttk.Frame):
             )
     
     def draw_theme_widgets(self) -> None:
-        HeaderLabel(self, 'Оформление').pack(anchor=ttkc.W, fill=ttkc.X)
+        HeaderLabel(self, 'Оформление').pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
 
         container = ttk.Frame(self, padding=(5, 0, 5, 15))
         container.pack(fill=ttkc.X)
