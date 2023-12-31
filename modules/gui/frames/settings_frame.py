@@ -4,7 +4,7 @@ from ...mytyping import Callable
 from ..windows.library import LibraryWindow
 
 
-class ControlFrame(ttk.Frame):
+class SettingsFrame(ttk.Frame):
     """Фрейм основных настроек приложения"""
 
     def __init__(self, master: Any):
@@ -39,58 +39,73 @@ class ControlFrame(ttk.Frame):
     def draw_theme_widgets(self) -> None:
         HeaderLabel(self, 'Оформление').pack(anchor=ttkc.W, fill=ttkc.X)
 
-        # Контейнер для виджетов
-        container = ttk.Frame(self)
-        container.pack(padx=5, anchor=ttkc.W, pady=(0, 15))
+        container = ttk.Frame(self, padding=(5, 0, 5, 15))
+        container.pack(fill=ttkc.X)
 
         # Свитчер тем
-        ttk.Label(container, text='Тема:').grid(row=0, column=0, sticky=ttkc.W)
+        theme_frame = ttk.Frame(container, height=44)
+        theme_frame.pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(0, 3))
 
-        theme_menu = ttk.Menu(container)
+        HeaderLabel(theme_frame, text='Тема:').place(x=0, y=0, relwidth=1)
+
+        theme_menu = ttk.Menu(theme_frame)
         theme_menu.add_command(
-            label='  light' + ' '*29, 
+            label='  light', 
             command=lambda: setattr(AppManager.stg, 'theme', 'light')
         )
         theme_menu.add_command(
             label='  dark', 
             command=lambda: setattr(AppManager.stg, 'theme', 'dark')
             )
-        theme_btn = ttk.Menubutton(container, menu=theme_menu, style='ts.Outline.TMenubutton')
-        theme_btn.grid(row=1, column=0)
+        theme_btn = ttk.Menubutton(theme_frame, menu=theme_menu, style='ts.Outline.TMenubutton')
+        theme_btn.place(x=0, y=18, relwidth=1)
 
         # Добавление вызова в Дескриптор тем
         Theme.add_call(lambda v: theme_btn.configure(text=v))   #type: ignore
 
         # Свитчер палитр
-        ttk.Label(container, text='Палитра:').grid(row=0, column=1, sticky=ttkc.W, padx=10)
+        palette_frame = ttk.Frame(container, height=44)
+        palette_frame.pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(3, 3))
+        ttk.Frame(container, height=44).pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(3, 0))
+
+        HeaderLabel(palette_frame, text='Палитра:').place(x=0, y=0, relwidth=1)
 
         def theme_switch(theme: str) -> None:
             """Переключает тему в меню"""
             menu = self.dark_menu
             if theme == 'light':
                 menu = self.light_menu
-            color_btn.configure(menu=menu)  #type: ignore
+            palette_btn.configure(menu=menu)  #type: ignore
             if Color._value:
                 menu.invoke(0)              #type: ignore
 
-        color_btn = ttk.Menubutton(container, style='ts.Outline.TMenubutton')
-        color_btn.grid(row=1, column=1, padx=10)
+        palette_btn = ttk.Menubutton(palette_frame, style='ts.Outline.TMenubutton')
+        palette_btn.place(x=0, y=18, relwidth=1)
 
+        # Добавление вызова в Дескриптор тем и палитр
         Theme.add_call(theme_switch)
-        Color.add_call(lambda v: color_btn.configure(text=v))   #type: ignore
+        Color.add_call(lambda v: palette_btn.configure(text=v))   #type: ignore
         Color.add_call(lambda v: style_init(v))
 
     def draw_library_widgets(self) -> None:
         """Отрисовка виджетов библиотеки"""
-        HeaderLabel(self, 'Настройка библиотеки').pack(anchor=ttkc.W, fill=ttkc.X)
+        HeaderLabel(self, 'Настройка библиотеки').pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
+
+        container = ttk.Frame(self, padding=(5, 0, 5, 15))
+        container.pack(fill=ttkc.X)
+
+        frame = ttk.Frame(container, height=25)
+        frame.pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(0, 3))
+        ttk.Frame(container, height=25).pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(3, 3))
+        ttk.Frame(container, height=25).pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(3, 0))
+
         btn = ttk.Button(
-            self, 
+            frame, 
             style='minibtn.Outline.TButton', 
             text='Библиотека', 
-            width=19,
             command=lambda: LibraryWindow()
         )
-        btn.pack(pady=(0, 15), padx=5, anchor=ttkc.W)
+        btn.place(x=0, y=0, relwidth=1)
 
     def draw_directory_widgets(self) -> None:
         """Сборная ф-я для отрисовки виджетов управления папками заказов"""
@@ -100,7 +115,7 @@ class ControlFrame(ttk.Frame):
 
     def draw_directory_frame(self, text: str, attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
-        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X)
+        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
         btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
         btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
 

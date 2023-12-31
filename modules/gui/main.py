@@ -30,10 +30,10 @@ class MainWindow(ttk.Window):
         self.tracker = frames.MenuLabel('tracker', menu_column, ttk.Frame)
         self.tracker.pack(anchor=ttkc.N, pady=(0, 5))
 
-        self.file = frames.MenuLabel('file', menu_column, ttk.Frame)
+        self.file = frames.MenuLabel('file', menu_column, frames.FileFrame)
         self.file.pack(anchor=ttkc.N, pady=(0, 5))
 
-        self.stg = frames.MenuLabel('settings', menu_column, frames.ControlFrame)
+        self.stg = frames.MenuLabel('settings', menu_column, frames.SettingsFrame)
         self.stg.pack(anchor=ttkc.S, expand=1)
 
         # Разделитель

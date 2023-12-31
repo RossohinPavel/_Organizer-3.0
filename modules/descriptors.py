@@ -51,3 +51,5 @@ Roddom_dir = MainDescriptor[str]()
 Theme = MainDescriptor[str]()
 Color = MainDescriptor[str]()
 
+# Остальные дескрипторы
+FileQueue = MainDescriptor[int]()
