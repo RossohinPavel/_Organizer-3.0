@@ -65,4 +65,4 @@ def style_init(name: str = '') -> None:
     # --------------Стили текстовых лейблов--------------
 
     # 'Жирный' стиль для текстовой метки
-    style.configure('Bold.TLabel', font='TkDefaultFont 10 bold')
+    style.configure('Bold.TLabel', font='TkDefaultFont 9 bold')

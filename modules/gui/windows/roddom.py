@@ -1,24 +1,25 @@
-from .._source import *
+from ..source import *
+from ...descriptors import Roddom_dir
 from ...file_handlers import RoddomHandler
 
 
 class Roddom(ChildWindow):
     """Окно управления заказами роддома"""
-    WIN_GEOMETRY = Geometry(280, 250)
-    LIN_GEOMETRY = Geometry(315, 282)
+    width = 314
+    height = 228
     win_title='Роддом'
     
     def main(self, **kwargs) -> None:
         # Переменные, необходимые для работы
         self.order_obj = None
 
-        default_text = 'Для подсчета количества\nотпечатков в заказе, нажмите на\nкнопку \'Посчитать заказ\' и\nвыберете нужный.'
+        self.show_directory_widget()
 
+        default_text = 'Для подсчета количества\nотпечатков в заказе, нажмите на\nкнопку \'Посчитать заказ\' и\nвыберете нужную папку.'
         self.info_var = ttk.StringVar(master=self, value=default_text)
         self.txt_sum = ttk.BooleanVar(master=self, value=True)
-
-        self.show_directory_widget()
         self.show_info_widget()
+
         self.show_buttons()
 
     def show_directory_widget(self) -> None:
@@ -28,29 +29,35 @@ class Roddom(ChildWindow):
             path = tkfd.askdirectory()
             if path:
                 AppManager.stg.roddom_dir = path
-                upd_btn.config(text=path)
-
-        frame = ttk.LabelFrame(master=self, text='Папка, где хранятся заказы Роддом\'а')
-        frame.pack(fill='x', padx=5, pady=(5, 0))
+                upd_btn.configure(text=path)
+            
+        HeaderLabel(self, text='Папка с заказами Роддом\'а').pack(fill=ttkc.X, padx=5, pady=(5, 2))
 
         upd_btn = ttk.Button(
-            master=frame, 
-            text=AppManager.stg.roddom_dir, 
+            master=self, 
+            style='l_jf.Outline.TButton', 
             command=update_dir,
-            style='l_jf.TButton'
+            text=AppManager.stg.roddom_dir
             )
-        upd_btn.pack(
-            expand=1, 
-            fill='x', 
-            padx=5, 
-            pady=(0, 5)
-            )
+        upd_btn.pack(fill=ttkc.X, padx=10)
 
     def show_info_widget(self) -> None:
         """Отрисовка виджета информации о заказе"""
-        frame = ttk.LabelFrame(master=self, text='Информация', padding=(3, 0, 3, 3))
-        frame.pack(expand=1, fill='both', padx=5, pady=(5, 0))
-        ttk.Label(master=frame, textvariable=self.info_var, font='12').pack(anchor='w')
+        container = ttk.Frame(self, height=115)
+        container.pack(fill=ttkc.X, padx=5)
+
+        lbl = ttk.Label(container, textvariable=self.info_var, font='TkDefaultFont 11')
+        lbl.place(x=10, y=25)
+
+        HeaderLabel(container, text='Информация').place(x=0, y=10, relwidth=1)
+
+        info = ttk.Button(
+            container,
+            style='Libcopy.success.Outline.TButton',
+            text='  i  ',
+            command=self.info_to_clipboard
+        )
+        info.place(y=5, relx=0.91)
 
     def show_buttons(self):
         """Отрисовка виджетов кнопок"""
@@ -60,32 +67,28 @@ class Roddom(ChildWindow):
             variable=self.txt_sum,
             style='success-round-toggle'
             )
-        chbtn.pack(anchor='w', padx=5, pady=(5, 0))
+        chbtn.pack(anchor=ttkc.W, padx=5, pady=5)
+
+        container = ttk.Frame(self, padding=5)
+        container.pack(fill=ttkc.X)
 
         btn1 = ttk.Button(
-            self, 
+            container, 
+            width=20,
+            style='minibtn.Outline.TButton',
             text='Посчитать заказ', 
-            width=18, 
             command=self.calc_order
             )
-        btn1.pack(anchor='w', padx=5, pady=5)
+        btn1.pack(padx=(0, 3), fill=ttkc.X, side=ttkc.LEFT)
 
         btn2 = ttk.Button(
-            self, 
-            text='Скопировать инфо', 
-            width=18, 
-            command=lambda: print(self.winfo_geometry())
-            # command=self.info_to_clipboard
-            )
-        btn2.pack(side='left', padx=5, pady=(0, 5))
-
-        btn3 = ttk.Button(
-            self, 
+            container, 
+            width=20,
+            style='minibtn.Outline.TButton',
             text='Отправить в печать', 
-            width=18, 
             command=self.to_print
             )
-        btn3.pack(side='right', padx=(0, 5), pady=(0, 5))
+        btn2.pack(padx=(3, 0), fill=ttkc.X, side=ttkc.RIGHT)
 
     def calc_order(self):
         """Инициализация подсчета информации в заказе"""

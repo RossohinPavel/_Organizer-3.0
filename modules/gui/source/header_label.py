@@ -1,6 +1,4 @@
-from .main import ttk, Any, ttkc
-from ...mytyping import Literal
-
+from .main import ttk, Any
 
 class HeaderLabel(ttk.Frame):
     """Фрейм - заголовок, с надписью и подчеркиванием."""
@@ -9,7 +7,7 @@ class HeaderLabel(ttk.Frame):
         self, 
         master: Any, 
         text: str = '', 
-        padx: int = 15
+        padx: int = 15,
         ):
         super().__init__(master, height=16)
 

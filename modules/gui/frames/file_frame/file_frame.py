@@ -1,6 +1,7 @@
 from ...source import *
 from .queue_frame import QueueFrame
 from .processing_frame import ProcessingFrame
+from ....gui import windows
 
 
 class FileFrame(ttk.Frame):
@@ -37,7 +38,7 @@ class FileFrame(ttk.Frame):
     
     def draw_left_column(self, master: Any) -> None:
         """Отрисовка виджетов в левом столбике"""
-        HeaderLabel(master, text='Целевая обработка', padx=17).place(x=0, y=0, relwidth=1)
+        HeaderLabel(master, text='Целевая обработка', padx=16).place(x=0, y=0, relwidth=1)
 
         btn1 = ttk.Button(
             master, 
@@ -65,7 +66,7 @@ class FileFrame(ttk.Frame):
 
     def draw_center_column(self, master: Any) -> None:
         """Отрисовка виджетов в центральном столбике"""
-        HeaderLabel(master, text='Файлы заказа', padx=32).place(x=0, y=0, relwidth=1)
+        HeaderLabel(master, text='Файлы заказа', padx=31).place(x=0, y=0, relwidth=1)
 
         btn1 = ttk.Button(
             master, 
@@ -83,12 +84,12 @@ class FileFrame(ttk.Frame):
 
     def draw_right_column(self, master: Any) -> None:
         """Отрисовка виджетов в правом столбике"""
-        HeaderLabel(master, text='Дополнительно', padx=28).place(x=0, y=0, relwidth=1)
+        HeaderLabel(master, text='Дополнительно', padx=27).place(x=0, y=0, relwidth=1)
 
         btn1 = ttk.Button(
             master, 
             text='Роддом', 
-            # command=lambda:, 
+            command=lambda: windows.Roddom(), 
             )
 
         for i, widget in enumerate((btn1, )):

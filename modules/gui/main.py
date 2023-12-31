@@ -1,6 +1,5 @@
 from .source import *
 from . import frames
-# from . import windows
 
 
 class MainWindow(ttk.Window):
@@ -91,38 +90,4 @@ class MainWindow(ttk.Window):
     #     # Лейбл отрисовки статуса логгера
     #     AppManager.ot_var = orders_trk = ttk.StringVar(master=container, value='Выключен')
     #     ttk.Label(master=container, textvariable=orders_trk).pack(side=ttkc.LEFT)
-    
 
-    # def draw_processing_buttons(self, container: ttk.Labelframe) -> None:
-    #     """Отрисовка фрейма кнопок запуска обработчика файлов"""
-
-
-    #     self.bind('<F1>', lambda _: AppManager.pf.__enter__())
-    #      # # self.bind('<F1>', lambda _: btn1.invoke())
-    #     # # self.bind('<F2>', lambda _: btn2.invoke())
-    #     self.bind('<F2>', lambda _: AppManager.pf.__exit__())
-
-    # def draw_add_btn_menu(self, container: ttk.Labelframe) -> None:
-    #     """Отрисовка кнопки Дополнительно и меню под ней"""
-    #     menu = ttk.Menu(master=container)
-
-    #     menu.add_command(label='Обновить БД', command=lambda: AppManager.ot.manual_init())
-
-    # def draw_common_notebook(self) -> None:
-    #     """Отображение остальных фреймов для работы с заказами, клиентами и др"""
-    #     tab = ttk.Notebook(master=self)
-    #     tab.pack(
-    #         padx=5, 
-    #         pady=5,
-    #         fill=ttkc.BOTH,
-    #         expand=1
-    #         )
-    #     # Закладки
-    #     tab.add(frames.InfoFrame(tab), text='Информация')
-    #     tab.add(
-    #         ttk.Label(tab, text='test', background='red'), 
-    #         text='Планировщик', 
-    #         padding=5
-    #         )
-    #     tab.add(frames.MailSamplesFrame(tab).container, text='Общение')
-    #     tab.add(frames.ControlFrame(tab), text='Управление')    

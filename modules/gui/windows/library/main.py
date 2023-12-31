@@ -60,7 +60,7 @@ class HeaderFrame(ttk.Frame):
         btn.pack(side=ttkc.LEFT)
 
         # Лейбл с текстом
-        lbl = ttk.Label(self, text=self.category.__doc__)       # type: ignore
+        lbl = ttk.Label(self, text=self.category.__doc__, font='TkDefaultFont 9 bold')       # type: ignore
         lbl.pack(anchor=ttkc.W, padx=(0, 0), side=ttkc.LEFT)
     
     def draw_bound_widgets(self, products: list[tuple[int, str]]) -> None:
