@@ -1,6 +1,7 @@
 """
     Иконки, используемые в приложении. 
-    Получены с сайта "https://www.flaticon.com/ru/free-icons/ui" от Rizki Ahmad Fauzi
+    Получены с сайта "https://www.flaticon.com/" от Rizki Ahmad Fauzi
+    https://www.flaticon.com/ru/packs/user-interface-512
 """
 
 
