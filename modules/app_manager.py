@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .data_base import Log
     from .gui.main import MainWindow
     from .trackers import OrdersTracker
-    # from .gui.frames import ProcessingFrame
+    from .gui.frames.file_frame.processing_frame import ProcessingFrame
     from .gui.frames.file_frame.queue_frame import QueueFrame
     from .task_manager import TaskManager
     from .data_base import Settings
@@ -32,7 +32,7 @@ class _AppManager:
         self.log: Log
         self.mw: MainWindow
         self.ot: OrdersTracker
-        # self.pf: ProcessingFrame      # Эти 2 фрейма будет записаны в мменеджер 
+        self.pf: ProcessingFrame      # Эти 2 фрейма будет записаны в мменеджер 
         self.queue: QueueFrame          # при инициализации основного окна
         self.tm: TaskManager
         self.stg: Settings

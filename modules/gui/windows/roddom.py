@@ -1,5 +1,4 @@
 from ..source import *
-from ...descriptors import Roddom_dir
 from ...file_handlers import RoddomHandler
 
 

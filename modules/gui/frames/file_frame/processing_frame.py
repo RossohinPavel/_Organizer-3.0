@@ -73,12 +73,15 @@ class FileBar:
         self.__file_lbl = ttk.Label(master)
 
         # Прогрессбар
-        self.__pb = ttk.Progressbar(master, style='success-striped', maximum=3, value=2)
+        self.__pb = ttk.Progressbar(master, style='success-striped')
 
         # Переменные для прогрессбара и лейблов
-        self.__value = 1
-        self.__delta = 1.0
-        self.__maximum = 100
+        self.__value = 1        # int Переменная для подсчета количества обработанных файлов
+        self.__maximum = 100    # int Переменная для отображения общего количества обрабатываемых фалов
+
+        self.__delta = 1.0      # float Переменная, отображающая значение, на которое увеличивается ProgressBar
+        self.__percent = 0.0    # float переменная, для подсчета пройденных процентов. Для того, чтобы не образаться в прогрессбар
+        
 
     def place(self, x: int = 0, y: int = 0) -> None:
         """Метод, запускающий одноименный метод в лейбле и прогрессбаре"""
@@ -93,30 +96,32 @@ class FileBar:
     def reset(self) -> None:
         """Сбрасывает значения виджетов до начальных"""
         self.__file_lbl.configure(text='__DEBUG__ from FileBar')
-        # self.__pb['value'] = 0
-        # self.__value = 1
-        # self.__delta = 1.0
-        # self.__maximum = 100
-        # self.__lbl.configure(text='0.0%')
+        self.__pb['value'] = self.__percent = 0.0
+        self.__value = 1
+        self.__delta = 1.0
+        self.__maximum = 100
 
-
-    # def maximum(self, value: int, percentage: int = 100) -> None:
-    #     """
-    #     Устанавливает предельное значение
-    #     value: общее количество шагов (файлов, объектов и т.д)
-    #     percentage: Сколько в процентном соотношении от 100, займет прогрессия 
-    #     """
-    #     self.__maximum = value
-    #     self.__delta = percentage / value
-    #     self.__value = 0
+    def maximum(self, value: int, percentage: int = 100) -> None:
+        """
+            Устанавливает предельное значение
+            value: общее количество шагов (файлов, объектов и т.д)
+            percentage: Сколько в процентном соотношении от 100, займет прогрессия 
+        """
+        self.__maximum = value
+        self.__delta = percentage / value
+        self.__value = 0
     
-    # def step(self, value: str) -> None:
-    #     """Начало шага. Устанавливает значение в текстовую переменную"""
-    #     self.__value += 1
-    #     prefix = f'{self.__value} / {self.__maximum} -- ' if self.__maximum > 1 else ''
-    #     self.__lbl.configure(text=f'{prefix}{value}')
+    def step(self, value: str) -> None:
+        """Начало шага. Устанавливает значение в текстовую переменную"""
+        self.__value += 1
+        self.__percent += self.__delta
+        if self.__maximum > 1:
+            percent = str(round(self.__percent, 1)) + '% '
+            prefix = f'({self.__value} / {self.__maximum}) -- '
+        else:
+            percent = prefix = ''
+        self.__file_lbl.configure(text=f'{percent}{prefix}{value}')
         
-    # def step_end(self) -> None:
-    #     """Конец шага. Продвигает прогрессбар"""
-    #     self.__pb['value'] += self.__delta
-    #     self.__lbl1.configure(text=str(round(self.__pb['value'], 1)) + '%')
+    def step_end(self) -> None:
+        """Конец шага. Продвигает прогрессбар"""
+        self.__pb['value'] += self.__delta

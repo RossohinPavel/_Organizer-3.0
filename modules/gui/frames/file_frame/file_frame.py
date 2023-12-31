@@ -21,9 +21,6 @@ class FileFrame(ttk.Frame):
         AppManager.pf = pf = ProcessingFrame(self)
         pf.pack(fill=ttkc.X, padx=5, pady=(0, 15))
 
-        pf.__exit__()
-        pf.__enter__()
-
         left = ttk.Frame(self)
         left.pack(side=ttkc.LEFT, fill=ttkc.BOTH, expand=1, padx=(0, 3))
         self.draw_left_column(left)
