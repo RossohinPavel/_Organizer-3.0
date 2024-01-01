@@ -21,12 +21,14 @@ class ProcessingFrame(ttk.Frame):
 
     def __enter__(self) -> None:
         """При входе в менеджер, размещаем виджеты"""
+        AppManager.mw.file.show_badge()
         self.header.place(x=0, y=0)
         self.operation.place(x=0, y=20)
         self.filebar.place(x=0, y=40)
 
     def __exit__(self, *args) -> None:
         """При выходе - сбрасываем текстовые переменные и скрываем их виджеты"""
+        AppManager.mw.file.hide_badge()
         for widget in (self.header, self.operation, self.filebar):
             widget.reset()
             widget.place_forget()

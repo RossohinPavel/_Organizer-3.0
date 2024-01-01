@@ -8,13 +8,16 @@ class MenuLabel(ttk.Frame):
     current_frame = None
 
     def __init__(self, img_name: str, master: Any, frame: Type[ttk.Frame | ttk.LabelFrame]) -> None:
-        super().__init__(master)
+        super().__init__(master, padding=(5, 5, 5, 0))
         MenuLabel.current_frame = self
         # Основное изображение кнопки
         self._img_name = img_name
         self._img = ttk.Label(self, image=IMAGES[img_name + '_off'])
         self._img.pack()
         self._img.bind('<Button-1>', self.click)
+
+        # Лейбл с уведомлением
+        self._badge = ttk.Frame(self, width=3)
 
         # Подсветка неактивной кнопки. Зависит от выбранной темы
         self._backlight = None
@@ -59,3 +62,12 @@ class MenuLabel(ttk.Frame):
         """Меняет изображение на _img при перемещении курсора из зоны виджета."""
         if not self._frame.winfo_viewable():
             self.image_switcher('off')    # type: ignore
+    
+    def show_badge(self, style: Literal['success', 'danger'] = 'success') -> None:
+        """Показывает всплывающий фреймБ показывающий активность модуля."""
+        self._badge.configure(bootstyle=style)          # type: ignore
+        self._badge.place(relx=1.03, relheight=0.95)
+    
+    def hide_badge(self) -> None:
+        """Скрывает уведомление"""
+        self._badge.place_forget()
