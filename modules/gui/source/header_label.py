@@ -1,4 +1,6 @@
 from .main import ttk, Any
+from ...mytyping import Literal
+
 
 class HeaderLabel(ttk.Frame):
     """Фрейм - заголовок, с надписью и подчеркиванием."""
@@ -7,15 +9,18 @@ class HeaderLabel(ttk.Frame):
         self, 
         master: Any, 
         text: str = '', 
-        padx: int = 15,
+        anchor: Literal['w', 'n', 'e'] = 'w',
+        padx: int = 15
         ):
-        super().__init__(master, height=16)
+        super().__init__(master)
 
         # Разделитель
-        sep = ttk.Separator(self, orient='horizontal')
-        sep.place(relwidth=1.0, rely=0.40)
+        ttk.Separator(self, orient='horizontal').place(relwidth=1.0, rely=0.39)
 
         # Лейбл с текстом
-        self.lbl = ttk.Label(self, text=text, padding=(0, -4, 0, 0))
-        self.lbl.place(x=padx, y=0)
-
+        self.lbl = ttk.Label(self, text=text, padding=(0, -5, 0, -2))
+        match anchor:
+            case 'n': justify = 0
+            case 'e': justify = (0, padx)
+            case 'w' | _ : justify = (padx, 0)
+        self.lbl.pack(anchor=anchor, padx=justify)

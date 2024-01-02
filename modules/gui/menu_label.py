@@ -1,6 +1,6 @@
-from ..source import *
-from ...mytyping import Any, Type, Literal
-from ...descriptors import Theme
+from .source import *
+from ..mytyping import Any, Type, Literal
+from ..descriptors import Theme
 
 
 class MenuLabel(ttk.Frame):

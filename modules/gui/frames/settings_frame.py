@@ -46,7 +46,7 @@ class SettingsFrame(ttk.Frame):
         theme_frame = ttk.Frame(container, height=44)
         theme_frame.pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(0, 3))
 
-        HeaderLabel(theme_frame, text='Тема:').place(x=0, y=0, relwidth=1)
+        HeaderLabel(theme_frame, text='Тема', anchor='n').place(x=0, y=0, relwidth=1)
 
         theme_menu = ttk.Menu(theme_frame)
         theme_menu.add_command(
@@ -58,7 +58,7 @@ class SettingsFrame(ttk.Frame):
             command=lambda: setattr(AppManager.stg, 'theme', 'dark')
             )
         theme_btn = ttk.Menubutton(theme_frame, menu=theme_menu, style='ts.Outline.TMenubutton')
-        theme_btn.place(x=0, y=18, relwidth=1)
+        theme_btn.place(x=0, y=15, relwidth=1)
 
         # Добавление вызова в Дескриптор тем
         Theme.add_call(lambda v: theme_btn.configure(text=v))   #type: ignore
@@ -68,7 +68,7 @@ class SettingsFrame(ttk.Frame):
         palette_frame.pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(3, 3))
         ttk.Frame(container, height=44).pack(fill=ttkc.X, side=ttkc.LEFT, expand=1, padx=(3, 0))
 
-        HeaderLabel(palette_frame, text='Палитра:').place(x=0, y=0, relwidth=1)
+        HeaderLabel(palette_frame, text='Палитра', anchor='n').place(x=0, y=0, relwidth=1)
 
         def theme_switch(theme: str) -> None:
             """Переключает тему в меню"""
@@ -80,7 +80,7 @@ class SettingsFrame(ttk.Frame):
                 menu.invoke(0)              #type: ignore
 
         palette_btn = ttk.Menubutton(palette_frame, style='ts.Outline.TMenubutton')
-        palette_btn.place(x=0, y=18, relwidth=1)
+        palette_btn.place(x=0, y=15, relwidth=1)
 
         # Добавление вызова в Дескриптор тем и палитр
         Theme.add_call(theme_switch)
@@ -116,6 +116,8 @@ class SettingsFrame(ttk.Frame):
     def draw_directory_frame(self, text: str, attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
         HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
+        # btn = SettingLine(self, lambda: self._update_dir(attr))
+        # btn.pack(pady=(0, 15), padx=5, anchor=ttkc.W)
         btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
         btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
 

@@ -41,6 +41,9 @@ def style_init(name: str = '') -> None:
         ]
     )
 
+    # Стиль для кнопочки меню
+    style.configure('stg.Outline.TButton', padding=(-1, -7, -1, -6), font='TkDefaultFont 16')
+
     # Стиль для маленьких кнопок в меню
     style.configure('minibtn.Outline.TButton', padding=2)
 
@@ -63,3 +66,6 @@ def style_init(name: str = '') -> None:
 
     # 'Жирный' стиль для текстовой метки
     style.configure('Bold.TLabel', font='TkDefaultFont 9 bold')
+    
+    # Стиль для текстовой метки с небольшими отступами
+    style.configure('minipadding.TLabel', padding=(0, -4, 0, -3))

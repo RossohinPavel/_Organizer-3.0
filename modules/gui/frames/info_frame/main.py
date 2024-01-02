@@ -1,71 +1,89 @@
-from ..._source import *
-from ..order_name_validate_entry import ONVEntry
-from .proxy import StickerGenProxy
+from ...source import *
+from .stickergen_frame import StickerGenFrame
 
 
 class InfoFrame(ttk.Frame):
-    """Общий фрейм информации о заказе"""
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs, padding=(5, 0, 5, 5))
+    """Фрейм с отображением различной информации."""
 
-        # Фрейм генерации наклеек
-        StickerGenFrame(self).pack(expand=1, fill='both')
+    def __init__(self, master: Any) -> None:
+        super().__init__(master)
 
-        # Кнопки получения информации
-        ttk.Button(self, text='Заказы', width=13).pack(side='left', padx=10, pady=(5, 0))
-        ttk.Button(self, text='Клиенты', width=13).pack(side='right', padx=10, pady=(5, 0))
+        left = ttk.Frame(self, padding=(5, 5, 3, 5))
+        left.place(x=0, y=0, relwidth=0.6, relheight=1)
+        StickerGenFrame(left).pack(fill=ttkc.X)
 
-
-class StickerGenFrame(ttk.LabelFrame):
-    """Фрейм генерации стикера"""
-
-    def __init__(self, master: Any, /, **kwargs):
-        super().__init__(master, text='Генератор наклеек')
-        # Верхнаяя чать. Поле ввода и кнопка
-        container = ttk.Frame(self, padding=(5, 3, 5, 5))
-        container.pack(fill=ttkc.X)
-
-        onvf = ONVEntry(container, func=self.main)
-        onvf.pack(
-            padx=(0, 3), 
-            fill=ttkc.X,
-            side=ttkc.LEFT,
-            expand=1
-            )
+        right = ttk.Frame(self, padding=(3, 5, 5, 5))
+        right.place(relx=0.6, rely=0, relwidth=0.4, relheight=1)
+        self.draw_tracker_frame(right)
+        self.draw_info_frame(right)
+    
+    def _draw_separator_frame(self, master: Any) -> ttk.Frame:
+        """Вспомогательня ф-я для отрисовки фрема с черточкой в начале"""
+        frame = ttk.Frame(master, padding=(15, 0, 0, 0))
+        frame.pack(anchor=ttkc.W)
+        ttk.Separator(frame, orient='horizontal').place(width=15, rely=0.44, x=-15)
+        return frame
+    
+    def draw_tracker_frame(self, master: Any) -> None:
+        """Отрисовка виджетов управления Трекером заказов"""
+        HeaderLabel(master, text='Трекер заказов', anchor='n').pack(fill=ttkc.X, pady=(0, 2))
+        self.draw_status_line(master)
+        self.draw_tracker_mode_line(master)
+        self.draw_log_depth_line(master)
         btn = ttk.Button(
-            master=container, 
-            text='Скопировать инфо', 
-            command=self.to_clipboard,
-            style='info-outline'
+            master, 
+            style='minibtn.Outline.TButton',
+            text='Ручное обновление',
+            # command=None,
+        )
+        btn.pack(fill=ttkc.X, pady=10)
+    
+    def draw_status_line(self, master: Any) -> None:
+        """Группа фреймов отображения статуса трекера"""
+        ttk.Label(master, text='Статус:', style='minipadding.TLabel').pack(anchor=ttkc.W)
+        frame = self._draw_separator_frame(master)
+        status_var = ttk.StringVar(frame, value='Повтор в 11:25')
+        ttk.Label(frame, text='Повтор в 11:25', style='minipadding.TLabel').pack(pady=(2, 0))
+    
+    def draw_tracker_mode_line(self, master: Any) -> None:
+        """Отрисовка группы фреймов управления режимом трекера"""
+        ttk.Label(master, text='Режим:', style='minipadding.TLabel').pack(anchor=ttkc.W, pady=(10, 0))
+        frame = self._draw_separator_frame(master)
+        var = ttk.IntVar(self)
+        chbtn = ttk.Checkbutton(
+            master=frame, 
+            text='Автоматический', 
+            style='success-round-toggle', 
+            onvalue=1, 
+            offvalue=0,
+            variable=var,
+            # command=init
             )
-        btn.pack(
-            padx=(2, 0), 
-            fill=ttkc.X,
-            side=ttkc.RIGHT,
-            expand=1
-            )
-        # Разделитель
-        ttk.Frame(master=self, borderwidth=1, relief='solid').pack(fill='x')
-
-        # Переменные и лейблы под них
-        self.header_var = ttk.StringVar(master=self)
-        ttk.Label(master=self, textvariable=self.header_var).pack(anchor='nw', fill='x')
-
-        self.info_var = ttk.StringVar(master=self)
-        ttk.Label(master=self, textvariable=self.info_var).pack(anchor='nw', fill='both')
-        
-    def main(self, order_name: str) -> None:
-        """После валидации введенного номера, обновляет лейбл"""
-        proxy = StickerGenProxy(order_name)
-        if proxy is None:
-            self.header_var.set(f'Не могу найти заказ {order_name}')
-            self.info_var.set('')
-            return
-        self.header_var.set(f'{proxy.order.name} - {proxy.order.customer_name}')
-        self.info_var.set(proxy.create_sticker())
-        self.to_clipboard()
-
-    def to_clipboard(self):
-        """Копирования информации в буфер обмена"""
-        self.clipboard_clear()
-        self.clipboard_append(self.info_var.get())
+        chbtn.pack(anchor=ttkc.W, padx=(2, 0), pady=(2, 0))
+    
+    def draw_log_depth_line(self, master: Any) -> None:
+        """Отрисовка группы фреймов управления глубиной проверки заказов"""
+        ttk.Label(master, text='Глубина проверки:').pack(anchor=ttkc.W, pady=(10, 0))
+        frame = self._draw_separator_frame(master)
+        s = SettingLine(frame, None, _postfix='-  Заказов')
+        s.pack(anchor=ttkc.W, padx=(2, 0))
+        s._var.set(str(30))
+    
+    def draw_info_frame(self, master: Any) -> None:
+        """Отрисовка кнопок информации"""
+        lbl = HeaderLabel(master, text='Информация', anchor='n')
+        lbl.pack(fill=ttkc.X, expand=1, anchor=ttkc.S)
+        b1 = ttk.Button(
+            master, 
+            style='minibtn.Outline.TButton',
+            text='Заказы', 
+            # command=None
+        )
+        b1.pack(fill=ttkc.X, pady=(2, 5))
+        b2 = ttk.Button(
+            master, 
+            style='minibtn.Outline.TButton',
+            text='Клиенты', 
+            command=lambda: print(b1.winfo_geometry())
+        )
+        b2.pack(fill=ttkc.X)

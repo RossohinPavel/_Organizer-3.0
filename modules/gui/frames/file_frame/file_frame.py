@@ -35,7 +35,7 @@ class FileFrame(ttk.Frame):
     
     def draw_left_column(self, master: Any) -> None:
         """Отрисовка виджетов в левом столбике"""
-        HeaderLabel(master, text='Целевая обработка', padx=16).place(x=0, y=0, relwidth=1)
+        HeaderLabel(master, text='Целевая обработка', anchor='n').place(x=0, y=0, relwidth=1)
 
         btn1 = ttk.Button(
             master, 
@@ -59,11 +59,11 @@ class FileFrame(ttk.Frame):
             )
         for i, widget in enumerate((btn1, btn2, btn3, btn4)):
             widget.configure(style='minibtn.Outline.TButton')
-            widget.place(x=0, relwidth=1, y=20 + i * 30)
+            widget.place(x=0, relwidth=1, y=15 + i * 30)
 
     def draw_center_column(self, master: Any) -> None:
         """Отрисовка виджетов в центральном столбике"""
-        HeaderLabel(master, text='Файлы заказа', padx=31).place(x=0, y=0, relwidth=1)
+        HeaderLabel(master, text='Файлы заказа', anchor='n').place(x=0, y=0, relwidth=1)
 
         btn1 = ttk.Button(
             master, 
@@ -77,11 +77,11 @@ class FileFrame(ttk.Frame):
             )
         for i, widget in enumerate((btn1, btn2)):
             widget.configure(style='minibtn.Outline.TButton')
-            widget.place(x=0, relwidth=1, y=20 + i * 30)
+            widget.place(x=0, relwidth=1, y=15 + i * 30)
 
     def draw_right_column(self, master: Any) -> None:
         """Отрисовка виджетов в правом столбике"""
-        HeaderLabel(master, text='Дополнительно', padx=27).place(x=0, y=0, relwidth=1)
+        HeaderLabel(master, text='Дополнительно', anchor='n').place(x=0, y=0, relwidth=1)
 
         btn1 = ttk.Button(
             master, 
@@ -91,4 +91,4 @@ class FileFrame(ttk.Frame):
 
         for i, widget in enumerate((btn1, )):
             widget.configure(style='minibtn.Outline.TButton')
-            widget.place(x=0, relwidth=1, y=20 + i * 30)
+            widget.place(x=0, relwidth=1, y=15 + i * 30)
