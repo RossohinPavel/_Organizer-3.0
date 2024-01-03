@@ -54,7 +54,7 @@ class Library(DataBase):
         req = ', '.join('?' * len(product))
         self.cursor.execute(f'INSERT INTO {product.category} {product._fields} VALUES ({req})', product)
         self.connect.commit()
-        # self.get.cache_clear()
+        self.get.cache_clear()
     
     @DataBase.safe_connect
     def change(self, id: int, product: Categories, aliases: tuple[str]) -> None:
@@ -70,7 +70,7 @@ class Library(DataBase):
         self.__update_aliases(id, product, aliases)
 
         self.connect.commit()
-        # self.get.cache_clear()
+        self.get.cache_clear()
     
     def __update_aliases(self, id: int, product: Categories, aliases: tuple[str]) -> None:
         """Обновление псевдонимов для продукта."""
@@ -131,27 +131,20 @@ class Library(DataBase):
         # Очитска таблицы псевдонимов от удаляемого продукта
         self.cursor.execute(f'DELETE FROM Aliases WHERE product_id=?', (id, ))
         self.connect.commit()
-        # self.get.cache_clear()
+        self.get.cache_clear()
 
-    # @DataBase.safe_connect    
-    # def __get(self, category: Type[Product], name: str) -> Product: # type: ignore
-    #     """Метод для получения объекта продукта по передоваемому имени. Возрващает объект или None."""
-    #     self.cursor.execute(f'SELECT * FROM {category.__name__} WHERE full_name=?', (name, ))
-    #     return category(*self.cursor.fetchone()[1:])
+    @lru_cache
+    @DataBase.safe_connect
+    def get(self, name: str) -> Categories | None: 
+        """
+            Возвращает объект продукта с которым связан тираж, 
+            если этот продукт есть в библиотеке.
+        """
+        _, name = name.rsplit('-', maxsplit=1)
+        self.cursor.execute('SELECT category, product_id FROM Aliases WHERE alias=?', (name, ))
+        res = self.cursor.fetchone()
 
-    # @lru_cache
-    # def get(self, name: str) -> Product:    # type: ignore
-    #     """Возвращает объект продукта с которым связан тираж, если этот продукт есть в библиотеке"""
-    #     for category, products in self.headers.items():
-    #         for product in products:
-    #             if name.endswith(product): 
-    #                 return self.__get(category, product)
-
-    # def __update_product_headers(self) -> None:
-    #     """
-    #         Обновляет словрь имен продуктов в виде {имя продукта: категория}. 
-    #         Использовать только внутри менеджера
-    #     """
-    #     for category in (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct):
-    #         self.cursor.execute(f'SELECT full_name FROM {category.__name__}')
-    #         self.headers[category] = tuple(n[0] for n in self.cursor.fetchall())
+        if res:
+            category, id = res
+            self.cursor.execute(f'SELECT * FROM {category} WHERE id=?', (id, ))
+            return eval(f'{category}(*self.cursor.fetchone()[1:])')

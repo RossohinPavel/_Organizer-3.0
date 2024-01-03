@@ -1,0 +1,1 @@
+from .stickergen import StickerGenProxy
