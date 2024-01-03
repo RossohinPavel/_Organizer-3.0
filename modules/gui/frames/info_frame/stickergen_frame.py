@@ -4,8 +4,8 @@ from ...source import *
 class StickerGenFrame(ttk.Frame):
     """Фрейм генерации стикера"""
 
-    def __init__(self, master: Any):
-        super().__init__(master)
+    def __init__(self, master: Any, padding: int | tuple[int, ...]):
+        super().__init__(master, padding=padding)   # type:  ignore
         HeaderLabel(self, text='Генератор наклеек').pack(fill=ttkc.X, pady=(0, 2))
 
         # Верхнаяя чать. Поле ввода и кнопка

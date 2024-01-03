@@ -1,8 +1,5 @@
 from .main import *
-from ...mytyping import Callable, Type, TypeVar
-
-
-V = TypeVar('V')
+from ...mytyping import Callable, Type
 
 
 class SettingLine(ttk.Frame):
@@ -11,7 +8,7 @@ class SettingLine(ttk.Frame):
     def __init__(
         self,
         master: Any, 
-        _func: Type[Callable[[], V]],
+        _func: Type[Callable[[], None]],
         _prefix: str = '',
         _postfix: str = ''
         ):
@@ -24,11 +21,10 @@ class SettingLine(ttk.Frame):
             text='⚙️',  
             command=_func
         )
+        btn.pack(anchor=ttkc.W, side=ttkc.LEFT, padx=(0, 1))
 
         if _func is None:
             btn.configure(command=lambda: print(btn.winfo_geometry()))
-            
-        btn.pack(anchor=ttkc.W, side=ttkc.LEFT, padx=(0, 1))
 
         # Лейбл для отображения текста приставки, поясняющей суть настройки
         if _prefix:
