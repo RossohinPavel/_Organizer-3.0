@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from ..tracker import Tracker
+from ..tracker import Tracker, AppManager
 from ...file_iterators import ot_iterator
 from .tracker_proxies import *
 
@@ -12,10 +12,10 @@ class OrdersTracker(Tracker):
         super().__init__()
         self._orders: dict[str, OrderInfoProxy] = {}
         self._proxies: set[EditionProxy | PhotoProxy] = set()
-        self._border_name = self.appm.log.get_newest_order_name()
+        self._border_name = AppManager.log.get_newest_order_name()
 
         # Получаем значения из настроек и запускаем автолог
-        self.auto = self.appm.stg.autolog
+        AppManager._desc.autolog.add_call(self.auto)
 
     def run(self) -> None:
         """Основная ф-я предостовляющая логику работы трекера"""

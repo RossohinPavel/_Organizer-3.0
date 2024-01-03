@@ -1,5 +1,4 @@
 from ...source import *
-from ....descriptors import Autolog, Log_check_depth
 
 
 class TrackerFrame(ttk.Frame):
@@ -63,8 +62,8 @@ class TrackerFrame(ttk.Frame):
             command=lambda: setattr(AppManager.stg, 'autolog', var.get())
             )
         chbtn.pack(anchor=ttkc.W, padx=(2, 0), pady=(2, 0))
-        Autolog.add_call(var.set)
-        Autolog.add_call(change_text)
+        AppManager._desc.autolog.add_call(var.set)              #type: ignore
+        AppManager._desc.autolog.add_call(change_text)          #type: ignore
 
     def draw_log_depth_line(self) -> None:
         """Отрисовка группы фреймов управления глубиной проверки заказов"""
@@ -75,7 +74,7 @@ class TrackerFrame(ttk.Frame):
         s = SettingLine(frame, self._change_log_check_depth, _postfix='-  Заказов')
         s.pack(anchor=ttkc.W, padx=(2, 0))
 
-        Log_check_depth.add_call(s._var.set)    #type: ignore
+        AppManager._desc.log_check_depth.add_call(s._var.set)   #type: ignore
 
     def _change_log_check_depth(self) -> None:
         """Запрос на изменения настроек."""

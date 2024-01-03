@@ -1,5 +1,4 @@
 from ..source import *
-from ...descriptors import Z_disc, O_disc, T_disc, Theme, Color
 from ...mytyping import Callable
 from ..windows.library import LibraryWindow
 
@@ -61,7 +60,7 @@ class SettingsFrame(ttk.Frame):
         theme_btn.place(x=0, y=15, relwidth=1)
 
         # Добавление вызова в Дескриптор тем
-        Theme.add_call(lambda v: theme_btn.configure(text=v))   #type: ignore
+        AppManager._desc.theme.add_call(lambda v: theme_btn.configure(text=v))      #type: ignore
 
         # Свитчер палитр
         palette_frame = ttk.Frame(container, height=44)
@@ -75,17 +74,17 @@ class SettingsFrame(ttk.Frame):
             menu = self.dark_menu
             if theme == 'light':
                 menu = self.light_menu
-            palette_btn.configure(menu=menu)  #type: ignore
-            if Color._value:
-                menu.invoke(0)              #type: ignore
+            palette_btn.configure(menu=menu)    #type: ignore
+            if AppManager._desc.color._value:   #type: ignore
+                menu.invoke(0)                  #type: ignore
 
         palette_btn = ttk.Menubutton(palette_frame, style='ts.Outline.TMenubutton')
         palette_btn.place(x=0, y=15, relwidth=1)
 
         # Добавление вызова в Дескриптор тем и палитр
-        Theme.add_call(theme_switch)
-        Color.add_call(lambda v: palette_btn.configure(text=v))   #type: ignore
-        Color.add_call(lambda v: style_init(v))
+        AppManager._desc.theme.add_call(theme_switch)                               #type: ignore
+        AppManager._desc.color.add_call(lambda v: palette_btn.configure(text=v))    #type: ignore
+        AppManager._desc.color.add_call(lambda v: style_init(v))                    #type: ignore
 
     def draw_library_widgets(self) -> None:
         """Отрисовка виджетов библиотеки"""
@@ -116,13 +115,11 @@ class SettingsFrame(ttk.Frame):
     def draw_directory_frame(self, text: str, attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
         HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
-        # btn = SettingLine(self, lambda: self._update_dir(attr))
-        # btn.pack(pady=(0, 15), padx=5, anchor=ttkc.W)
         btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
         btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
 
         # Добавление вызова дескриптору
-        add_call_func = eval(f'{attr.capitalize()}.add_call')
+        add_call_func = eval(f'AppManager._desc.{attr}.add_call')
         add_call_func(lambda e: btn.configure(text=e))
 
     def _update_dir(self, attr: str) -> None:
@@ -134,53 +131,3 @@ class SettingsFrame(ttk.Frame):
         )
         if path:
             setattr(AppManager.stg, attr, path)
-
-    # def show_log_check_depth_widgets(self) -> None:
-    #     """Отрисовка виджетов для настройки глубины проверки лога"""
-    #     def get_entry_value(event: tkinter.Event | None = None) -> None:
-    #         """Получение информации из entry виджета и сохранение их в настроки"""
-    #         value = entry_var.get()
-    #         if value.isdigit():
-    #             AppManager.stg.log_check_depth = int(value)
-    #             update_label()
-    #         entry.delete(0, ttkc.END)
-
-    #     def update_label() -> None:
-    #         """Обновление информации на лейбле"""
-    #         value_lbl.configure(text=f'Глубина проверки лога: {AppManager.stg.log_check_depth} заказов (папок)')
-        
-    #     # Контейнер для виджетов
-    #     log_frm = ttk.LabelFrame(
-    #         self, 
-    #         text='Трекер заказов',
-    #         padding=(5, 0, 5 ,5)
-    #         )
-    #     log_frm.pack(fill=ttkc.BOTH)
-
-    #     # Отрисовка лейбла для отображения информации
-    #     value_lbl = ttk.Label(log_frm)
-    #     value_lbl.pack(anchor=ttkc.NW, padx=5)
-    #     update_label()
-
-    #     # Энтри виджет
-    #     entry_var = ttk.StringVar(master=log_frm)
-    #     entry = ttk.Entry(log_frm, textvariable=entry_var)
-    #     entry.pack(
-    #         side=ttkc.LEFT, 
-    #         padx=(0, 5), 
-    #         fill=ttkc.X, 
-    #         expand=1
-    #         )
-    #     entry.bind('<Return>', get_entry_value)
-
-    #     # Кнопка для получения значений из энтри
-    #     btn = ttk.Button(
-    #         log_frm, 
-    #         text='Задать', 
-    #         command=get_entry_value
-    #         )
-    #     btn.pack(
-    #         side=ttkc.RIGHT, 
-    #         expand=1, 
-    #         fill=ttkc.X, 
-    #         )

@@ -10,6 +10,7 @@ from typing import (
     NamedTuple,
     NoReturn,  
     Type,
+    TYPE_CHECKING,
     TypeVar,  
     Self
 )

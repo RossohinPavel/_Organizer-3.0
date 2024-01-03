@@ -1,5 +1,5 @@
 from .data_base import DataBase
-from ..descriptors import *
+from ..app_manager import AppManager
 from ..mytyping import Callable
 
 
@@ -19,19 +19,19 @@ class Settings(DataBase):
     data_base = 'app.db'
 
     # Дескрипторы атрибутов
-    autolog = Autolog
-    log_check_depth = Log_check_depth
-    z_disc = Z_disc
-    o_disc = O_disc
-    t_disc = T_disc
-    roddom_dir = Roddom_dir
-    theme = Theme
-    color = Color
+    autolog = AppManager._desc.autolog
+    log_check_depth = AppManager._desc.log_check_depth
+    z_disc = AppManager._desc.z_disc
+    o_disc = AppManager._desc.o_disc
+    t_disc = AppManager._desc.t_disc
+    roddom_dir = AppManager._desc.roddom_dir
+    theme = AppManager._desc.theme
+    color = AppManager._desc.color
 
     def __init__(self) -> None:
         for name, value in self.__get_saving_values():
             setattr(self, name, value)
-            eval(f'{name.capitalize()}.add_call(self.closure(name))')
+            eval(f'AppManager._desc.{name}.add_call(self.closure(name))')
 
     @DataBase.safe_connect
     def __get_saving_values(self) -> list[tuple[str, str | int]]:

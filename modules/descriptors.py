@@ -1,22 +1,10 @@
-from typing import Callable, TypeVar
+from typing import Callable, Self
 
 
-__all__ = (
-    'Autolog', 
-    'Log_check_depth',
-    'Z_disc',
-    'O_disc',
-    'T_disc',
-    'Roddom_dir',
-    'Theme',
-    'Color'
-)
+type V = int | float | str | None
 
 
-V = TypeVar('V')
-
-
-class MainDescriptor[V]:
+class DescriptorConstructor:
     """
         Класс, реализующий логику работы дескриптора.
         Помимо этого, при получении значения, вызывает
@@ -26,7 +14,7 @@ class MainDescriptor[V]:
     __slots__ = '_value', '_funcs'
 
     def __init__(self):
-        self._value: V = None   #type: ignore
+        self._value: V = None
         self._funcs = ()
 
     def __get__(self, *_) -> V:
@@ -41,12 +29,34 @@ class MainDescriptor[V]:
         self._funcs += (func, )
 
 
-# Дескрипторы настроек
-Autolog = MainDescriptor[int]()
-Log_check_depth = MainDescriptor[int]()
-Z_disc = MainDescriptor[str]()
-O_disc = MainDescriptor[str]()
-T_disc = MainDescriptor[str]()
-Roddom_dir = MainDescriptor[str]()
-Theme = MainDescriptor[str]()
-Color = MainDescriptor[str]()
+class Descriptors:
+    """Объект, который содержит в себе все дескрипторы"""
+
+    __instance = None
+
+    __slots__ = (
+        'autolog',
+        'log_check_depth',
+        'z_disc',
+        'o_disc',
+        't_disc',
+        'roddom_dir',
+        'theme',
+        'color'
+    )
+
+    def __new__(cls) -> Self:
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
+
+    def __init__(self) -> None:
+        # Дескрипторы настроек
+        self.autolog = DescriptorConstructor()
+        self.log_check_depth = DescriptorConstructor()
+        self.z_disc = DescriptorConstructor()
+        self.o_disc = DescriptorConstructor()
+        self.t_disc = DescriptorConstructor()
+        self.roddom_dir = DescriptorConstructor()
+        self.theme = DescriptorConstructor()
+        self.color = DescriptorConstructor()

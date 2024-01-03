@@ -1,9 +1,10 @@
-from typing import TYPE_CHECKING, Self, Literal
 from os import name as osname
+from typing import TYPE_CHECKING, Self, Literal
 
 
 # Импорты для типизации менеджера
 if TYPE_CHECKING:   
+    from .descriptors import Descriptors
     from .data_base import Library
     from .data_base import Log
     from .gui.main import MainWindow
@@ -19,7 +20,7 @@ class _AppManager:
 
     __instance = None
 
-    __slots__ = ('SYSTEM', 'lib', 'log', 'mw', 'ot', 'pf', 'queue', 'tm', 'stg')
+    __slots__ = ('_os', '_desc', 'lib', 'log', 'mw', 'ot', 'pf', 'queue', 'tm', 'stg')
     
     def __new__(cls) -> Self:
         if cls.__instance is None:
@@ -27,12 +28,13 @@ class _AppManager:
         return cls.__instance
 
     def __init__(self) -> None:
-        self.SYSTEM: Literal['win', 'lin', 'other']
+        self._os: Literal['win', 'lin', 'other']     #
+        self._desc: Descriptors
         self.lib: Library
         self.log: Log
         self.mw: MainWindow
         self.ot: OrdersTracker
-        self.pf: ProcessingFrame      # Эти 2 фрейма будет записаны в мменеджер 
+        self.pf: ProcessingFrame        # Эти 2 фрейма будет записаны в мменеджер 
         self.queue: QueueFrame          # при инициализации основного окна
         self.tm: TaskManager
         self.stg: Settings
@@ -43,12 +45,14 @@ AppManager = _AppManager()
 
 # Определяем тип ос
 match osname:
-    case 'nt': AppManager.SYSTEM = 'win'
-    case 'posix': AppManager.SYSTEM = 'lin'
-    case _: AppManager.SYSTEM = 'other'
+    case 'nt': AppManager._os = 'win'
+    case 'posix': AppManager._os = 'lin'
+    case _: AppManager._os = 'other'
 
 
 # Наполняем менеджер реальными объектами
+from .descriptors import Descriptors
+AppManager._desc = Descriptors()
 
 from .data_base import Library
 AppManager.lib = Library()
@@ -62,8 +66,8 @@ AppManager.tm = TaskManager()
 from .gui.main import MainWindow
 AppManager.mw = MainWindow()   
 
-# from .trackers import OrdersTracker
-# AppManager.ot = OrdersTracker()
+from .trackers import OrdersTracker
+AppManager.ot = OrdersTracker()
 
 from .data_base import Settings
 AppManager.stg = Settings()
