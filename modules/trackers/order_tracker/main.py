@@ -15,7 +15,7 @@ class OrdersTracker(Tracker):
         self._border_name = AppManager.log.get_newest_order_name()
 
         # Получаем значения из настроек и запускаем автолог
-        AppManager._desc.autolog.add_call(self.auto)
+        AppManager._desc.autolog.add_call(self.auto)    #type: ignore
 
     def run(self) -> None:
         """Основная ф-я предостовляющая логику работы трекера"""

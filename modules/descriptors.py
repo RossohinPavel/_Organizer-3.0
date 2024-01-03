@@ -1,10 +1,10 @@
-from typing import Callable, Self
+from typing import Callable, Self, TypeVar, Generic
 
 
-type V = int | float | str | None
+T = TypeVar('T')
 
 
-class DescriptorConstructor:
+class DescriptorConstructor(Generic[T]):
     """
         Класс, реализующий логику работы дескриптора.
         Помимо этого, при получении значения, вызывает
@@ -14,17 +14,17 @@ class DescriptorConstructor:
     __slots__ = '_value', '_funcs'
 
     def __init__(self):
-        self._value: V = None
+        self._value: T = None   #type: ignore
         self._funcs = ()
 
-    def __get__(self, *_) -> V:
+    def __get__(self, *_) -> T:
         return self._value
 
-    def __set__(self, _, value: V) -> None:
+    def __set__(self, _, value: T) -> None:
         self._value = value
         for func in self._funcs: func(value)
 
-    def add_call(self, func: Callable[[V], None]) -> None:
+    def add_call(self, func: Callable[[T], None]) -> None:
         """Добавление функции в коллекцию вызовов"""
         self._funcs += (func, )
 
@@ -52,11 +52,11 @@ class Descriptors:
 
     def __init__(self) -> None:
         # Дескрипторы настроек
-        self.autolog = DescriptorConstructor()
-        self.log_check_depth = DescriptorConstructor()
-        self.z_disc = DescriptorConstructor()
-        self.o_disc = DescriptorConstructor()
-        self.t_disc = DescriptorConstructor()
-        self.roddom_dir = DescriptorConstructor()
-        self.theme = DescriptorConstructor()
-        self.color = DescriptorConstructor()
+        self.autolog = DescriptorConstructor[int]()
+        self.log_check_depth = DescriptorConstructor[int]()
+        self.z_disc = DescriptorConstructor[str]()
+        self.o_disc = DescriptorConstructor[str]()
+        self.t_disc = DescriptorConstructor[str]()
+        self.roddom_dir = DescriptorConstructor[str]()
+        self.theme = DescriptorConstructor[str]()
+        self.color = DescriptorConstructor[str]()
