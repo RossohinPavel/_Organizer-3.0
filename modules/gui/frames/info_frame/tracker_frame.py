@@ -17,7 +17,7 @@ class TrackerFrame(ttk.Frame):
             self, 
             style='minibtn.Outline.TButton',
             text='Ручное обновление',
-            # command=None,
+            command=lambda: AppManager.ot.manual_init(),
         )
         btn.pack(fill=ttkc.X, pady=15)
 
@@ -36,11 +36,10 @@ class TrackerFrame(ttk.Frame):
         lbl = ttk.Label(self, text='Статус:', style='minipadding.TLabel')
         lbl.pack(anchor=ttkc.W, pady=(0, 3))
 
-        status_var = ttk.StringVar(self, value='Повтор в 11:25')
-
         frame = self._draw_separator_frame()
-        lbl = ttk.Label(frame, text='Повтор в 11:25', style='minipadding.TLabel')
+        lbl = ttk.Label(frame, style='minipadding.TLabel')
         lbl.pack()
+        AppManager._desc.ot_status.add_call(lambda v: lbl.configure(text=v))    #type: ignore
 
     def draw_tracker_mode_line(self) -> None:
         """Отрисовка группы фреймов управления режимом трекера"""

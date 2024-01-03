@@ -42,7 +42,8 @@ class Descriptors:
         't_disc',
         'roddom_dir',
         'theme',
-        'color'
+        'color',
+        'ot_status'
     )
 
     def __new__(cls) -> Self:
@@ -60,3 +61,6 @@ class Descriptors:
         self.roddom_dir = DescriptorConstructor[str]()
         self.theme = DescriptorConstructor[str]()
         self.color = DescriptorConstructor[str]()
+
+        # Остальные дескрипторы
+        self.ot_status = DescriptorConstructor[str]()
