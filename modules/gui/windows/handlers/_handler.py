@@ -1,4 +1,5 @@
 from ...source import *
+from ttkbootstrap.tooltip import ToolTip
 from ...source.images import IMAGES
 from ...source.order_name_validate_entry import ONVEntry
 # from ...orders_repr.proxy_file_handler import FileHandlerProxy
@@ -43,6 +44,13 @@ class HandlerWindow(ChildWindow):
         """Отрисовка лейбла с информацией - подсказкой"""
         info = ttk.Label(master=self, image=IMAGES['question'])
         info.place(x=260, y=0)
+        ToolTip(
+            info, 
+            bootstyle='primary-inverse', 
+            text=self.handler_description, 
+            width=1, 
+            height=1
+        )
 
     def show_order_name_validate_widgets(self) -> None:
         """Отрисовка виджета ввода имени заказа"""
