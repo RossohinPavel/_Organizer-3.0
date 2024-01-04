@@ -1,9 +1,8 @@
 from collections import Counter
 from re import findall, fullmatch
-
 from typing import Iterator
 from ._proxy import *
-from ....file_iterators import edition_iterator
+from ....file_handlers._iterators import edition_iterator
 
 
 class EditionProxy(FileObserver):

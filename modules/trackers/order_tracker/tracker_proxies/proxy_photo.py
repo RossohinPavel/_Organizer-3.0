@@ -1,5 +1,5 @@
 from ._proxy import *
-from ....file_iterators import photo_iterator
+from ....file_handlers._iterators import photo_iterator
 
 
 class PhotoProxy(FileObserver):

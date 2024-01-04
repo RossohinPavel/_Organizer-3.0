@@ -1,8 +1,13 @@
+# Импорты для конструкции визуала
 from ...source import *
 from ttkbootstrap.tooltip import ToolTip
 from ...source.images import IMAGES
 from ...source.order_name_validate_entry import ONVEntry
-from ....file_handlers.proxy import FileHandlerProxy
+
+# Прокси объект для обработки файлов
+from ....file_handlers._proxy import FileHandlerProxy
+
+# Типизация
 from ....mytyping import Callable, Categories, Self
 
 
@@ -131,13 +136,13 @@ class HandlerWindow(ChildWindow):
 
     def get_order(self, order_name: str) -> None:
         """Получение прокси объекта и выведение его элементов в виджете"""
+        self.reset_to_default()
         proxy = FileHandlerProxy(order_name, self.handler_predicate)
 
         if proxy is None:
             self.text_var.set(f'Не могу найти заказ {order_name}')
             return
 
-        self.reset_to_default()
         self.update_combo(proxy)
 
     def handler_predicate(self, product_obj: Categories) -> Categories | None:
@@ -155,13 +160,14 @@ class HandlerWindow(ChildWindow):
         target, miss = [], []
         for i in range(len(proxy.content)):
             target.append(proxy.content[i].name) if proxy.products[i] else miss.append(proxy.content[i].name)
+
         if target:
             self.text_var.set(f'Обработка {proxy.name}')
             self.target_combo.config(values=target, state='readonly')
             self.proxy = proxy
         else:
             self.text_var.set(f'В заказе {proxy.name} нет целевых тиражей')
-            self.proxy = None
+
         if miss:
             self.miss_combo.config(values=miss, state='readonly')
 
@@ -179,7 +185,7 @@ class HandlerWindow(ChildWindow):
         AppManager.tm.create_task(
             self.file_handler, #type: ignore
             self.proxy, 
-            kwargs={'handler_option': self.handler_option.get()}
+            self.handler_option.get()
         ) 
         # Сообщение о успехе
         tkmb.showinfo(
@@ -195,5 +201,3 @@ class HandlerWindow(ChildWindow):
         self.text_var.set('')
         self.target_combo.config(values=tuple(), state='disabled')
         self.miss_combo.config(values=tuple(), state='disabled')
-
-

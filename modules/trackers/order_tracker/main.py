@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from ..tracker import Tracker, AppManager
-from ...file_iterators import ot_iterator
+from ...file_handlers._iterators import ot_iterator
 from .tracker_proxies import *
 
 

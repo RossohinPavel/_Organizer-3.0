@@ -44,7 +44,6 @@ def edition_iterator(
     path: str, 
     *mode: Literal['Exemplar', 'Constant', 'Covers', 'Variable']
     )-> Iterator[tuple[str, Iterator[str]]]:
-
     """
         Предоставляет итератор по именам каталогов и именам файлов в тираже.
         Возвращает значения в виде кортежа, (<имя каталога>, итератор по именам файлов)

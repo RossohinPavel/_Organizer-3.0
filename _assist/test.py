@@ -18,6 +18,13 @@ lbl.pack()
 btn = ttk.Button(app, image=img)
 btn.pack()
 
+lst = ['value1', 'value2']
+
+cb = ttk.Combobox(app, values=lst)
+cb.pack()
+
+
+lst.pop(0)
 # chbtn = ttk.Checkbutton(
 #     master=app,
 #     text='test',

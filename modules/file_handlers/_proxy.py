@@ -27,15 +27,12 @@ class FileHandlerProxy:
         obj.name = order.name
         obj.creation_date = order.creation_date
 
-        # Списки для работы обработчика
-        obj.content = []        # Список, в котором хранитятся оригинальные объекты тирежей
-        obj.products = []       # Список, в котором хранятся объекты продуктов, соответствующие тиражам
-        obj.files = []          # Список файловых объектов. Будет заполнен конкретным обрабочиком
+        # Коллекции для работы прокси объекта
+        obj.content = order.content     # Ссылка на коллекцию тиражей заказа
+        obj.products = tuple()          # Ссылка на коллекцию продуктов, соответсвующих тиражам
 
-        # Наполняем списки объектами тиражей и соответствующими продуктами
+        # Наполняем obj.products объектами продуктов
         if order.content:
-            for e in order.content:
-                obj.content.append(e)
-                obj.products.append(predicate(AppManager.lib.get(e.name)))  #type: ignore
+            obj.products = tuple(predicate(AppManager.lib.get(e.name)) for e in order.content)  #type: ignore
 
         return obj
