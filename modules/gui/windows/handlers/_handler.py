@@ -1,81 +1,92 @@
-from ..source import *
-from ..frames.order_name_validate_frame import ONVFrame
-from ...orders_repr.proxy_file_handler import FileHandlerProxy
+from ...source import *
+from ...source.images import IMAGES
+from ...source.order_name_validate_entry import ONVEntry
+# from ...orders_repr.proxy_file_handler import FileHandlerProxy
 
 
 class HandlerWindow(ChildWindow):
     """Конструктор для окон обработчиков файлов"""
-    width = 277
-    height = 153
+    # Геометрия окна
+    width, height = 280, 194
+
+    # Название окна и текстовая информация, используемая обработчиком
     win_title = 'Обработчик'
-    file_handler = None
     handler_description = 'Описание того, что делает обработчик'
     handler_option_text = 'Опция обработчика'
 
-    def __init__(self, *args, **kwargs):
+    # Ссылка на объект - обработчик 
+    file_handler = None
+
+    def __init__(self):
         self.widget_dct = {}
-        super().__init__(*args, **kwargs)
-        self.widget_dct['onvf']._entry.focus_set()
+        super().__init__()
+        self.widget_dct['onve'].focus_set()
         self.bind('<Return>', self.run_handler)
 
-    def main(self, *args, **kwargs):
-        frame = LabeledFrame(master=self)
-        frame.pack(expand=1, fill='both')
-        self.show_info_label(frame)
-        self.show_order_name_validate_widgets(frame.container)
-        self.show_handler_option_widget(frame.container)
-        self.show_target_edition_widgets(frame.container)
-        self.show_miss_edition_widgets(frame.container)
-        self.show_buttons(frame.container)
+    def main(self, **kwargs):
+        self.show_info_label()
+        self.show_order_name_validate_widgets()
+        self.show_handler_option_widget()
+        self.show_target_edition_widgets()
+        self.show_miss_edition_widgets()
+        self.show_buttons()
         self.bind('<KeyPress>', self.__enter_event)
 
     def __enter_event(self, event):
-        entry = self.widget_dct['onvf']._entry
+        """Событие, перемещающее фокус на энтри виджет, при нажатии кнопки"""
+        entry = self.widget_dct['onve']
         if entry != self.focus_get():
             entry.focus_set()
             entry.event_generate('<KeyPress>', keysym=event.keysym)
+        
+    def show_info_label(self) -> None:
+        """Отрисовка лейбла с информацией - подсказкой"""
+        info = ttk.Label(master=self, image=IMAGES['question'])
+        info.place(x=260, y=0)
 
-    def show_info_label(self, frame):
-        """Отрисовка лейбла с подсказкой о том, что делает обработчик"""
-        info = ttk.Label(master=frame, image=self.master.question_ico)
-        info.place(x=249, y=1)
-        info.bind('<Button-1>', lambda event: TipWindow(self, mouse_event=event, text=self.handler_description))
-
-    def show_order_name_validate_widgets(self, container):
+    def show_order_name_validate_widgets(self) -> None:
         """Отрисовка виджета ввода имени заказа"""
-        onvf = ONVFrame(master=container, func=self.get_order)
-        onvf.pack(pady=(1, 0))
-        self.widget_dct['onvf'] = onvf
-        self.widget_dct['text_var'] = tk.StringVar(master=self)
-        ttk.Label(master=container, textvariable=self.widget_dct['text_var']).pack()
-        ttk.Frame(master=container, relief='solid').pack(fill='x')
+        self.widget_dct['onve'] = onve = ONVEntry(self, _func=self.get_order)
+        onve.pack(pady=(5, 0), padx=60, fill=ttkc.X)
 
-    def show_handler_option_widget(self, container):
+        self.widget_dct['text_var'] = var = ttk.StringVar(master=self, value='test')
+        ttk.Label(self, textvariable=var).pack(pady=(5, 0))
+        
+        ttk.Separator(self, orient='horizontal').pack(fill=ttkc.X, padx=5)
+
+    def show_handler_option_widget(self) -> None:
         """Отрисовка виджета управления опциями обработчика"""
-        handler_option = tk.BooleanVar(master=self, value=True)
-        self.widget_dct['handler_option'] = handler_option
-        ttk.Checkbutton(master=container, text=self.handler_option_text, variable=handler_option).pack(anchor='nw')
+        self.widget_dct['handler_option'] = h_o = ttk.BooleanVar(master=self, value=True)
 
-    def show_target_edition_widgets(self, container):
+        chbtn = ttk.Checkbutton(self, text=self.handler_option_text, variable=h_o)
+        chbtn.pack(anchor=ttkc.NW, padx=5, pady=5)
+
+    def show_target_edition_widgets(self) -> None:
         """Отрисовка виджета тиражей, который будут обработаны"""
-        combo = ttk.Combobox(master=container, state='disabled', width=40)
-        combo.set('Целевые тиражи:')
-        combo.pack(padx=1)
-        combo.bind('<<ComboboxSelected>>', lambda event: combo.set('Целевые тиражи:'))
-        self.widget_dct['target_combo'] = combo
+        self.widget_dct['target_combo'] = combo = ttk.Combobox(self, state='disabled', width=36)
+        combo.pack(padx=5)
 
-    def show_miss_edition_widgets(self, container):
+        combo.set('Целевые тиражи:') 
+        combo.bind('<<ComboboxSelected>>', lambda _: combo.set('Целевые тиражи:'))
+
+    def show_miss_edition_widgets(self) -> None:
         """Отрисовка виджета тиражей, которые будут пропущены обработчиком"""
-        combo = ttk.Combobox(master=container, state='disabled', width=40)
-        combo.set('Будут пропущенны:')
-        combo.bind('<<ComboboxSelected>>', lambda event: combo.set('Будут пропущенны:'))
-        combo.pack(padx=1, pady=3)
-        self.widget_dct['miss_combo'] = combo
+        self.widget_dct['miss_combo'] = combo = ttk.Combobox(self, state='disabled', width=36)
+        combo.pack(padx=5, pady=3)
 
-    def show_buttons(self, frame):
+        combo.set('Будут пропущенны:')
+        combo.bind('<<ComboboxSelected>>', lambda _: combo.set('Будут пропущенны:'))
+
+    def show_buttons(self) -> None:
         """Отрисовка кнопок"""
-        MyButton(master=frame, text='Запуск', command=self.run_handler, width=10).pack(side='left', padx=1, pady=(0, 1))
-        MyButton(master=frame, text='Выход', command=self.destroy, width=10).pack(side='right', padx=1, pady=(0, 1))
+        start = ttk.Button(
+            self, 
+            style='minibtn.Outline.TButton',
+            text='Запуск', 
+            command=lambda: print(self.winfo_geometry())
+            # command=self.run_handler
+        )
+        start.pack(pady=5, fill=ttkc.X, padx=60)
 
     def get_order(self, order_name):
         """Получение прокси объекта и выведение его элементов в виджете"""
@@ -87,15 +98,24 @@ class HandlerWindow(ChildWindow):
         self.update_combo(proxy)
 
     def __predicate(self, product_obj) -> object | None:
-        """Возвращает результат работы ф-ии handler_predicate или None, если продукта нет в библиотеке"""
+        """
+            Возвращает результат работы ф-ии handler_predicate 
+            или None, если продукта нет в библиотеке
+        """
         return self.handler_predicate(product_obj) if product_obj else None
 
     def handler_predicate(self, product_obj) -> object | None:
-        """Возвращает продукт, если он соответсвует типу обработчика. Иначе - возвращает None"""
+        """
+            Возвращает продукт, если он соответсвует типу 
+            обработчика. Иначе - возвращает None
+        """
         raise Exception('Функция handler_predicate не переопределена в дочернем классе')
 
     def update_combo(self, proxy):
-        """Обновление значений виджета целевых тиражей. Так же записывает прокси объект в общий словарь"""
+        """
+            Обновление значений виджета целевых тиражей. 
+            Так же записывает прокси объект в общий словарь.
+        """
         target, miss = [], []
         for i in range(len(proxy.content)):
             target.append(proxy.content[i].name) if proxy.products[i] else miss.append(proxy.content[i].name)

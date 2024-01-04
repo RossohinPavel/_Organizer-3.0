@@ -1,6 +1,6 @@
 from ...source import *
 from ...source.order_name_validate_entry import ONVEntry
-from ....info import StickerGenProxy
+from ....data_base.info_proxy import StickerGenProxy
 
 
 class StickerGenFrame(ttk.Frame):

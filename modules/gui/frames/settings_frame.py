@@ -1,6 +1,7 @@
 from ..source import *
+from ..source.style import style_init
 from ...mytyping import Callable
-from ..windows.library import LibraryWindow
+from ..windows import LibraryWindow
 
 
 class SettingsFrame(ttk.Frame):
@@ -20,7 +21,10 @@ class SettingsFrame(ttk.Frame):
 
     def init_color_menus(self) -> None:
         dark = ('solar', 'superhero', 'darkly', 'cyborg', 'vapor')
-        light = ('cosmo', 'flatly', 'journal', 'litera', 'lumen', 'minty', 'pulse', 'sandstone', 'united', 'yeti', 'morph', 'simplex', 'cerculean')
+        light = (
+            'cosmo', 'flatly', 'journal', 'litera', 'lumen', 'minty', 
+            'pulse', 'sandstone', 'united', 'yeti', 'morph', 'simplex', 'cerculean'
+        )
 
         self.dark_menu = ttk.Menu(self)
         for name in dark:

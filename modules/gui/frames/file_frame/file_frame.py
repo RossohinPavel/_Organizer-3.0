@@ -55,7 +55,7 @@ class FileFrame(ttk.Frame):
         btn4 = ttk.Button(
             master, 
             text='Холсты', 
-            # command=lambda:, 
+            command=lambda: windows.CanvasHandlerWindow(), 
             )
         for i, widget in enumerate((btn1, btn2, btn3, btn4)):
             widget.configure(style='minibtn.Outline.TButton')

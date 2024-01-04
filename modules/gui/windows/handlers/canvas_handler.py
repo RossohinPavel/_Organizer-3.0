@@ -1,5 +1,5 @@
 from ._handler import HandlerWindow
-from ...file_handlers import CanvasHandler
+# from ...file_handlers import CanvasHandler
 
 
 class CanvasHandlerWindow(HandlerWindow):
@@ -11,7 +11,7 @@ class CanvasHandlerWindow(HandlerWindow):
                           'Изображения будут сохранены в корневом\nкаталоге заказа и переименованы '\
                           'согласно спецификации продукта.'
     handler_option_text = 'Дополнительная подрезка изображения'
-    file_handler = CanvasHandler()
+    # file_handler = CanvasHandler()
 
     def handler_predicate(self, product_obj) -> object | None:
         return product_obj if product_obj.category == 'Canvas' else None

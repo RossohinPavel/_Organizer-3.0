@@ -6,6 +6,7 @@
 
 
 IMAGES = {
+    'question': 'data/assets/question.png',
     'file_dark': 'data/assets/file_dark.png',
     'file_light': 'data/assets/file_light.png',
     'file_off': 'data/assets/file_off.png',

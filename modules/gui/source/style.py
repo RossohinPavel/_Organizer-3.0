@@ -41,7 +41,7 @@ def style_init(name: str = '') -> None:
         ]
     )
 
-    # Стиль для кнопочки меню
+    # Стиль для кнопочки шестеренки, для фрейма settings_line
     style.configure('stg.Outline.TButton', padding=(-1, -7, -1, -6), font='TkDefaultFont 16')
 
     # Стиль для маленьких кнопок в меню

@@ -40,7 +40,6 @@ def photo_iterator(path: str) -> Iterator[tuple[str, str, Iterator[str]]]:
             yield paper, format, (x for x in os.listdir(f'{paper_path}/{paper}/{format}'))
 
 
-
 def edition_iterator(
     path: str, 
     *mode: Literal['Exemplar', 'Constant', 'Covers', 'Variable']
