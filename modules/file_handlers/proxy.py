@@ -1,12 +1,15 @@
 from ..app_manager import AppManager
-from ..mytyping import Callable, Self
+from ..mytyping import Callable, Self, TypeVar
+
+
+V = TypeVar('V')
 
 
 class FileHandlerProxy:
     """Представление заказа для обработчиков файлов"""
     __slots__ = 'name', 'creation_date', 'content', 'products', 'files'
 
-    def __new__(cls, order_name: str, predicate: callable) -> Self:
+    def __new__(cls, order_name: str, predicate: Callable[[V], V | None]) -> Self | None:
         """
             Пытаемся получить объект заказа из лога. 
             Если удается, то на его основе создаем прокси объект.
@@ -16,12 +19,23 @@ class FileHandlerProxy:
         order = AppManager.log.get(order_name)
 
         if order is None: 
-            return None   # type: ignore
+            return None
 
         obj = super().__new__(cls)
+
+        # Атрибуты информации
         obj.name = order.name
         obj.creation_date = order.creation_date
-        obj.content = list(order.content)   # type: ignore
-        obj.products = list(predicate(AppManager.lib.get(e.name)) for e in order.content)   # type: ignore
-        obj.files = list()
+
+        # Списки для работы обработчика
+        obj.content = []        # Список, в котором хранитятся оригинальные объекты тирежей
+        obj.products = []       # Список, в котором хранятся объекты продуктов, соответствующие тиражам
+        obj.files = []          # Список файловых объектов. Будет заполнен конкретным обрабочиком
+
+        # Наполняем списки объектами тиражей и соответствующими продуктами
+        if order.content:
+            for e in order.content:
+                obj.content.append(e)
+                obj.products.append(predicate(AppManager.lib.get(e.name)))  #type: ignore
+
         return obj
