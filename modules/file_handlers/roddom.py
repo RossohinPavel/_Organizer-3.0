@@ -30,7 +30,7 @@ class RoddomHandler:
             if search(r'\d{1,2}x\d{2}', rel_path):
                 yield rel_path, root[-1]
 
-    def to_print(self, path):
+    def to_print(self, path) -> None:
         """Отправка в печать (копирование файлов в указанную папку)"""
         AppManager.pf.header.step(f'Роддом: {self.order}')
         AppManager.pf.operation.step('Копирование на печать')
