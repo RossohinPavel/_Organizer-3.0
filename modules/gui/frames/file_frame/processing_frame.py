@@ -82,9 +82,8 @@ class FileBar:
         self.__maximum = 100    # int Переменная для отображения общего количества обрабатываемых фалов
 
         self.__delta = 1.0      # float Переменная, отображающая значение, на которое увеличивается ProgressBar
-        self.__percent = 0.0    # float переменная, для подсчета пройденных процентов. Для того, чтобы не образаться в прогрессбар
+        self.__percent = 0.0    # float переменная, для подсчета пройденных процентов. Для того, чтобы не обращаться в прогрессбар
         
-
     def place(self, x: int = 0, y: int = 0) -> None:
         """Метод, запускающий одноименный метод в лейбле и прогрессбаре"""
         self.__file_lbl.place(x=x, y=y)
@@ -116,7 +115,6 @@ class FileBar:
     def step(self, value: str) -> None:
         """Начало шага. Устанавливает значение в текстовую переменную"""
         self.__value += 1
-        self.__percent += self.__delta
         if self.__maximum > 1:
             percent = str(round(self.__percent, 1)) + '% '
             prefix = f'({self.__value} / {self.__maximum}) -- '
@@ -126,4 +124,5 @@ class FileBar:
         
     def step_end(self) -> None:
         """Конец шага. Продвигает прогрессбар"""
+        self.__percent += self.__delta
         self.__pb['value'] += self.__delta

@@ -41,15 +41,16 @@ class CanvasHandler(Handler):
                 quality = 100
 
             # Формируем имя холста
-            name = f'{self.order_name} холст {product.format} натяжка в короб'
+            cover_name = f'{self.order_name} холст {product.format} натяжка в короб'
 
             # По необходимости формируем уникальные имена и добавляем имя в self.assist
+            
             while True:
-                if name in self.assist:
-                    name = name + '_'
+                if cover_name in self.assist:
+                    cover_name = cover_name + '_'
                 else:
                     break
-            self.assist[name] = None
+            self.assist[cover_name] = None
 
             # Сохраняем изображение
             canvas_img.save(f'{self.destination}/{cover_name}.jpg', quality=quality, dpi=(300, 300))
