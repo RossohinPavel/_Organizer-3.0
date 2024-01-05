@@ -1,5 +1,5 @@
 from ..source import *
-from ...file_handlers import RoddomHandler
+from ...file_handlers.roddom import RoddomHandler
 
 
 class Roddom(ChildWindow):

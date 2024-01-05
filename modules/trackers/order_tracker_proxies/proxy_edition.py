@@ -1,8 +1,12 @@
+from ._proxy import FileObserver
+
+# Необходимые импорты для работы прокси объекта
 from collections import Counter
 from re import findall, fullmatch
-from typing import Iterator
-from ._proxy import *
-from ....file_handlers._iterators import edition_iterator
+from ...file_handlers._iterators import edition_iterator
+
+# Типизация
+from typing import Any, Iterable
 
 
 class EditionProxy(FileObserver):
@@ -54,7 +58,7 @@ class EditionProxy(FileObserver):
         return ' '.join(f'{v}/{k}' for k, v in sorted(Counter(ex_list).items(), key=lambda x: (x[1], x[0])))
 
     @staticmethod
-    def get_comparison(cover_count: int, page_count: int | None, const_list: Iterator | tuple) -> str | None:
+    def get_comparison(cover_count: int, page_count: int | None, const_list: Iterable) -> str | None:
         """
             Метод для определения типа совмещения обложек и блоков.
             Анализ на основе подсчета постоянных изображений.

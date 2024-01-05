@@ -1,6 +1,6 @@
 from ...source import *
-from ....mytyping import NamedTuple
-from ....data_base import MailSamples
+from typing import NamedTuple
+from ....data_base.mail_samples import MailSamples
 
 
 SAMPLES = MailSamples()

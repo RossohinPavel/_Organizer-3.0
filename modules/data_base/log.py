@@ -1,6 +1,7 @@
-from typing import NamedTuple
 from .data_base import DataBase
-from ..trackers.order_tracker.tracker_proxies import *
+from ..app_manager import AppManager
+from typing import NamedTuple
+from ..trackers.order_tracker_proxies import *
 
 
 class Photo(NamedTuple):
@@ -34,6 +35,10 @@ class Log(DataBase):
     __slots__ = ()
 
     data_base = 'log.db'
+
+    def __init__(self) -> None:
+        super().__init__()
+        AppManager.ot._border_name = self.get_newest_order_name()
 
     @DataBase.safe_connect
     def update_records(self, proxies: set[EditionProxy | PhotoProxy]) -> None:

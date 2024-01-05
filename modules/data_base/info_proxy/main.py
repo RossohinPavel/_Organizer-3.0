@@ -1,5 +1,8 @@
 from ...app_manager import AppManager
-from ...mytyping import Self, Iterator, Categories
+
+# Типизация
+from typing import Iterator, Self
+from ..library import Product
 from ..log import Order, Edition
 
 
@@ -27,4 +30,4 @@ class InfoProxy:
     
     def __init__(self, order_name: str) -> None:
         self.order: Order
-        self.product_comp: tuple[Categories, ...]
+        self.product_comp: tuple[Product, ...]

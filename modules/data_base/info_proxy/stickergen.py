@@ -40,7 +40,7 @@ class StickerGenProxy(InfoProxy):
         return '\n'.join((*main, *(f'{k} {f"{v}шт" if v else ""}' for k, v in sub.items())))
 
     @staticmethod
-    def __create_line(edition: Edition, prod_obj: Categories) -> Iterator[str]:
+    def __create_line(edition: Edition, prod_obj: Product) -> Iterator[str]:
         """Вспомагательная генераторная ф-я для формирования информации о тираже"""
         # 1) Получаем и передаем короткое имя
         short_name = prod_obj.short_name

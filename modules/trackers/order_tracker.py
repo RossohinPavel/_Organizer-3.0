@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
-from ..tracker import Tracker, AppManager
-from ...file_handlers._iterators import ot_iterator
-from .tracker_proxies import *
+from ._tracker import Tracker, AppManager
+from ..file_handlers._iterators import ot_iterator
+
+# Прокси объекты
+from .order_tracker_proxies import *
 
 
 class OrdersTracker(Tracker):
@@ -14,7 +16,7 @@ class OrdersTracker(Tracker):
         super().__init__()
         self._orders: dict[str, OrderInfoProxy] = {}
         self._proxies: set[EditionProxy | PhotoProxy] = set()
-        self._border_name = AppManager.log.get_newest_order_name()
+        self._border_name: str
         self.ot_status = 'Ожидание'
 
         # Добавляем дескриптору вызов автоматической ф-ии трекера

@@ -77,4 +77,3 @@ class AliasInterface:
         for value in args:
             if value not in elements:
                 self.listbox.insert(ttkc.END, value)
-

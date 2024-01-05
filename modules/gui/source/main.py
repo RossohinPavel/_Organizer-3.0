@@ -16,7 +16,7 @@ from ttkbootstrap.scrolled import ScrolledFrame
 from ttkbootstrap import Querybox
 
 # Типизация, используемая в большинстве виджетов
-from typing import Any
+from typing import Any, Callable, Literal, Type
 
 # AppManager управления приложением
 from ...app_manager import AppManager

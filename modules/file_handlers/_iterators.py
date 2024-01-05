@@ -1,6 +1,6 @@
 import os
 from re import fullmatch
-from typing import Iterator, Literal
+from typing import Literal, Iterator
 
 
 # Паттерны для проверки модулем re
@@ -8,6 +8,9 @@ DAY_PATTERN = r'\d{4}(-\d{2}){2}'
 ORDER_PATTERN = r'\d{6}'
 IMG_SAMPLE = r'(cover|\d{3})_{1,2}(\d{3}|-?\d+_pcs){1,2}\.jpg'
 EXEMPLAR = r'\d{3}(-\d+_pcs)?'
+
+
+it_mode = Literal['Exemplar', 'Constant', 'Covers', 'Variable']
 
 
 def ot_iterator(path: str) -> Iterator[tuple[str, str, Iterator[str]]]:
@@ -40,10 +43,7 @@ def photo_iterator(path: str) -> Iterator[tuple[str, str, Iterator[str]]]:
             yield paper, format, (x for x in os.listdir(f'{paper_path}/{paper}/{format}'))
 
 
-def edition_iterator(
-    path: str, 
-    *mode: Literal['Exemplar', 'Constant', 'Covers', 'Variable']
-    )-> Iterator[tuple[str, Iterator[str]]]:
+def edition_iterator(path: str, *mode: it_mode)-> Iterator[tuple[str, Iterator[str]]]:
     """
         Предоставляет итератор по именам каталогов и именам файлов в тираже.
         Возвращает значения в виде кортежа, (<имя каталога>, итератор по именам файлов)

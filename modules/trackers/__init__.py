@@ -1,1 +1,1 @@
-from .order_tracker.main import OrdersTracker
+from .order_tracker import OrdersTracker

@@ -9,12 +9,13 @@ from os import makedirs as os_makedirs
 from PIL import Image, ImageDraw, ImageFont
 
 # Импорты для типизации
-from ...mytyping import Edition, Categories
+from ...data_base.library import Product
+from ...data_base.log import Edition
 
 
 class Handler:
     """Абстрактный класс предостовляющий реализующий основную логику обработчиков"""
-    __slots__ = '__name__', 'order_name', 'option', 'source', 'destination', 'files'
+    __slots__ = '__name__', 'order_name', 'option', 'assist', 'source', 'destination', 'files'
 
     grabber_mode = tuple()  # Режим, в котором работает EditionGrabber. Свой для каждого обработчика
 
@@ -29,6 +30,9 @@ class Handler:
         # Переменные пути
         self.source: str                        # Переменная для хранения пути, источника файлов
         self.destination: str                   # Переменная для хранения пути назначения
+
+        # Вспомогательный атрибут
+        self.assist = {}
         
         # Список для хранения файловых объектов
         self.files: list[EditionGrabber | None] = []   
@@ -38,7 +42,7 @@ class Handler:
         """Возвращает значение в пикселях при разрешении в 300 dpi."""
         return mm * 11.811
 
-    def _update_files(self, content: tuple[Edition], products: tuple[Categories | None]) -> None:
+    def _update_files(self, content: tuple[Edition], products: tuple[Product | None]) -> None:
         """
             Итерируется по тиражам и наполняет список self.files объектами EditionGrabber.
             Добавлет этот объект, если для тиража есть определившийся продукт, 
@@ -47,16 +51,20 @@ class Handler:
         for i, edition in enumerate(content):
             file_obj = None
             if products[i]:
-                file_obj = EditionGrabber(f'{self.source}/{edition.name}', self.grabber_mode)
-            self.files.append(file_obj) 
+                file_obj = EditionGrabber(f'{self.source}/{edition.name}', *self.grabber_mode)
+            self.files.append(file_obj)
 
     def get_total_sum_of_images(self) -> int:
         """В дочернем классе должна возвращать сумму изображений"""
         raise Exception('Функция get_total_sum_of_images должна быть переопределена в дочернем классе')
+    
+    def get_handler_header(self, order_name: str) -> str:
+        """Возварщает заголовок, который будет использоваться в процессинг фрейме."""
+        return f'Обработка {order_name}'
 
     def __call__(self, proxy: FileHandlerProxy, option: bool) -> None:
         # Общая конфигурация прокси объекта
-        AppManager.pf.header.step(proxy.name)
+        AppManager.pf.header.step(self.get_handler_header(proxy.name))
         AppManager.pf.operation.step('Подготовка изображений')
 
         # Устанавливаем имя заказа
@@ -90,11 +98,12 @@ class Handler:
         # Сброс значений
         self._reset_to_default()
 
-    def handler_run(self, edition: Edition, product: Categories, file_grabber: EditionGrabber):
+    def handler_run(self, edition: Edition, product: Product, file_grabber: EditionGrabber) -> None:
         """Запускает основную логику обработчика файлов"""
         raise Exception('Функция handler_run должна быть переопределена в дочернем классе')
     
     def _reset_to_default(self) -> None:
         """Сброс значений на начальные"""
         self.source = self.destination = self.order_name = ''
+        self.assist.clear()
         self.files.clear()

@@ -1,8 +1,13 @@
-from functools import lru_cache
-from ...mytyping import Type, NoReturn, Categories
+# Импорты для работы библиотеки
 from ..data_base import DataBase
 from .products import *
 from .properties import Properties
+
+# Кэш
+from functools import lru_cache
+
+# Типизация
+from typing import Type
 
 
 class Library(DataBase):
@@ -13,7 +18,7 @@ class Library(DataBase):
     properties = Properties
 
     @DataBase.safe_connect
-    def get_headers(self) -> dict[Type[Categories], list[tuple[int, str]]]:
+    def get_headers(self) -> dict[Type[Product], list[tuple[int, str]]]:
         """
             Получение словаря из заголовков продуктов.
             Ключи - Типы продуктов
@@ -27,13 +32,13 @@ class Library(DataBase):
         return dct
     
     @DataBase.safe_connect
-    def from_id(self, category: Type[Categories], id: int) -> Categories:
+    def from_id(self, category: Type[Product], id: int) -> Product:
         """Получения объекта продукта по передоваемому id."""
         self.cursor.execute(f'SELECT * FROM {category.__name__} WHERE id=?', (id, ))
         return category(*self.cursor.fetchone()[1:])    #type: ignore
     
     @DataBase.safe_connect
-    def get_aliases(self, category: Type[Categories], id: int) -> list:
+    def get_aliases(self, category: Type[Product], id: int) -> list:
         """Получение списка псевдонимов продукта"""
         self.cursor.execute(f"""
             SELECT alias 
@@ -45,7 +50,7 @@ class Library(DataBase):
         return self.cursor.fetchall()
 
     @DataBase.safe_connect
-    def add(self, product: Categories) -> None:
+    def add(self, product: Product) -> None:
         """Добавление продукта в библиотеку"""
         # Проверка на уникальность продукта
         self.__check_unique_name(product)
@@ -57,7 +62,7 @@ class Library(DataBase):
         self.get.cache_clear()
     
     @DataBase.safe_connect
-    def change(self, id: int, product: Categories, aliases: tuple[str]) -> None:
+    def change(self, id: int, product: Product, aliases: tuple[str]) -> None:
         """Внесение изменений в продукт"""
         # Проверка на уникальность продукта
         self.__check_unique_name(product, id)
@@ -72,7 +77,7 @@ class Library(DataBase):
         self.connect.commit()
         self.get.cache_clear()
     
-    def __update_aliases(self, id: int, product: Categories, aliases: tuple[str]) -> None:
+    def __update_aliases(self, id: int, product: Product, aliases: tuple[str]) -> None:
         """Обновление псевдонимов для продукта."""
         # Получаем множество псевдонимов из базы данных
         self.cursor.execute(
@@ -100,7 +105,7 @@ class Library(DataBase):
         except Exception as e:
             raise Exception(f'Добавляемые псевдонимы не уникальны\n{e}')
 
-    def __check_unique_name(self, product: Categories, id: int = 0) -> NoReturn | None:
+    def __check_unique_name(self, product: Product, id: int = 0) -> None:
         """
             Проверка имени продукта на уникальность. 
             Проверка происходит по всем таблицам
@@ -124,7 +129,7 @@ class Library(DataBase):
             raise Exception(f'{product.name}\nУже есть в библиотеке')
 
     @DataBase.safe_connect
-    def delete(self, category: Type[Categories], id: int) -> None:
+    def delete(self, category: Type[Product], id: int) -> None:
         """Удаление продукта из библиотеки."""
         # Удаление продукта из библиотеки
         self.cursor.execute(f'DELETE FROM {category.__name__} WHERE id=?', (id, ))
@@ -135,7 +140,7 @@ class Library(DataBase):
 
     @lru_cache
     @DataBase.safe_connect
-    def get(self, name: str) -> Categories | None: 
+    def get(self, name: str) -> Product | None: 
         """
             Возвращает объект продукта с которым связан тираж, 
             если этот продукт есть в библиотеке.

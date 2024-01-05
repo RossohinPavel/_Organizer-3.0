@@ -1,5 +1,5 @@
 from ..app_manager import AppManager
-from ..mytyping import Callable, Self, TypeVar
+from typing import Callable, Self, TypeVar
 
 
 V = TypeVar('V')
@@ -7,7 +7,7 @@ V = TypeVar('V')
 
 class FileHandlerProxy:
     """Представление заказа для обработчиков файлов"""
-    __slots__ = 'name', 'creation_date', 'content', 'products', 'files'
+    __slots__ = ('name', 'creation_date', 'content', 'products', 'files')
 
     def __new__(cls, order_name: str, predicate: Callable[[V], V | None]) -> Self | None:
         """

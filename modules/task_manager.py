@@ -1,10 +1,7 @@
 from threading import Thread, Lock
-from typing import Callable, Any, Mapping, Type
 from .gui.source import tkmb
 from .app_manager import AppManager
-
-
-__all__ = ('TaskManager', )
+from typing import Any, Callable, Mapping, Type
 
 
 class TaskManager:
@@ -28,9 +25,10 @@ class TaskManager:
 
     def create_task(self, func: Type[Callable[[Any], None]], *args: Any, **kwargs: Mapping[str, Any]) -> None:
         """Создание задачи. Задача будет поставлена в очередь вызовов. Если очередь пуста, задача запустится немедленно."""
-        Thread(
+        t = Thread(
             target=self.__get_task(func), 
             args=args, 
             kwargs=kwargs, 
             daemon=True
-            ).start()
+        )
+        t.start()

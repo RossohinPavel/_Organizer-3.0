@@ -1,6 +1,5 @@
 from ...source import *
-from ....mytyping import Categories, Type
-from .assist import AssistWindow
+from .assist import AssistWindow, Type, Product
 
 
 class LibraryWindow(ChildWindow):
@@ -37,7 +36,7 @@ class HeaderFrame(ttk.Frame):
         добавляет конпку добавления продукта в библиотеку.
     """
 
-    def __init__(self, master: LibraryWindow, category: Type[Categories]) -> None:
+    def __init__(self, master: LibraryWindow, category: Type[Product]) -> None:
         super().__init__(master.container)
 
         # Сохраняем ссылку на LibraryWindow и категорию продукта

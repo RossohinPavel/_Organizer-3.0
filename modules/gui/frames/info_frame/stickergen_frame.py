@@ -1,5 +1,4 @@
 from ...source import *
-from ...source.order_name_validate_entry import ONVEntry
 from ....data_base.info_proxy import StickerGenProxy
 
 

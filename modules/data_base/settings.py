@@ -1,6 +1,6 @@
 from .data_base import DataBase
 from ..app_manager import AppManager
-from ..mytyping import Callable
+from typing import Callable
 
 
 class Settings(DataBase):

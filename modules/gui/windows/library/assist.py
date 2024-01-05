@@ -1,6 +1,9 @@
 from ...source import *
 from .alias import AliasInterface
-from ....mytyping import Literal, Type, Iterator, Categories, Callable
+
+# Типизация
+from typing import Iterator, Type
+from ....data_base.library import Product
 
 
 class AssistWindow(ChildWindow):
@@ -109,7 +112,7 @@ class AssistWindow(ChildWindow):
         'dc_break': ('individual', __draw_checkbutton_widget, 'Раскодировка с разрывом')
         }
 
-    def __init__(self, master: Any, category: Type[Categories], id: int) -> None:
+    def __init__(self, master: Any, category: Type[Product], id: int) -> None:
         # Сохраняем значения в объекте
         self._id = id
         self._category = category
@@ -193,7 +196,7 @@ class AssistWindow(ChildWindow):
         aliases = AppManager.lib.get_aliases(self._category, self._id)
         self._alias.insert(*(x[0] for x in aliases))
 
-    def get_values_from_widgets(self) -> Categories:
+    def get_values_from_widgets(self) -> Product:
         """
             Метод для получения информации из виджетов.\n
             Возвращает Product если все значения были заполнены,\n

@@ -1,6 +1,5 @@
 from ..source import *
 from ..source.style import style_init
-from ...mytyping import Callable
 from ..windows import LibraryWindow
 
 

@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 
-__all__ = ('Album', 'Canvas', 'Journal', 'Layflat', 'Photobook', 'Photofolder', 'Subproduct')
+__all__ = ('Album', 'Canvas', 'Journal', 'Layflat', 'Photobook', 'Photofolder', 'Subproduct', 'Product')
 
 
 class ProductMethods:
@@ -144,4 +144,4 @@ class Subproduct(SubproductAttrs, ProductMethods):
 
 
 # Типизация продуктов
-type Categories = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
+type Product = Album | Canvas | Journal | Layflat | Photobook | Photofolder | Subproduct
