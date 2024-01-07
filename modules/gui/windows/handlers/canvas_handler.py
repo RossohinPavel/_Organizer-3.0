@@ -14,5 +14,5 @@ class CanvasHandlerWindow(HandlerWindow):
     handler_option_text = 'Дополнительная подрезка изображения'
     file_handler = CanvasHandler()
 
-    def handler_predicate(self, product: Product) -> Product | None:
+    def handler_predicate(self, product):
         return product if product.category == 'Canvas' else None

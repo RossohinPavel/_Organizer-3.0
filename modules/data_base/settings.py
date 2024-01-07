@@ -1,5 +1,5 @@
 from .data_base import DataBase
-from ..app_manager import AppManager
+from ..descriptors import *
 from typing import Callable
 
 
@@ -16,22 +16,22 @@ class Settings(DataBase):
         - color - Цветовая палитра, которая используется в приложении
     """
     __slots__ = ()
-    data_base = 'app.db'
+    data_base = 'settings.db'
 
     # Дескрипторы атрибутов
-    autolog = AppManager._desc.autolog
-    log_check_depth = AppManager._desc.log_check_depth
-    z_disc = AppManager._desc.z_disc
-    o_disc = AppManager._desc.o_disc
-    t_disc = AppManager._desc.t_disc
-    roddom_dir = AppManager._desc.roddom_dir
-    theme = AppManager._desc.theme
-    color = AppManager._desc.color
+    autolog = autolog
+    log_check_depth = log_check_depth
+    z_disc = z_disc
+    o_disc = o_disc
+    t_disc = t_disc
+    roddom_dir = roddom_dir
+    theme = theme
+    color = color
 
     def __init__(self) -> None:
         for name, value in self.__get_saving_values():
             setattr(self, name, value)
-            eval(f'AppManager._desc.{name}.add_call(self.closure(name))')
+            eval(f'{name}.add_call(self.closure(name))')
 
     @DataBase.safe_connect
     def __get_saving_values(self) -> list[tuple[str, str | int]]:

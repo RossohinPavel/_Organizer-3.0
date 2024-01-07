@@ -1,6 +1,6 @@
 from ..source import *
 from ..source.style import style_init
-from ..windows import LibraryWindow
+# from ..windows import LibraryWindow
 
 
 class SettingsFrame(ttk.Frame):
@@ -63,7 +63,7 @@ class SettingsFrame(ttk.Frame):
         theme_btn.place(x=0, y=15, relwidth=1)
 
         # Добавление вызова в Дескриптор тем
-        AppManager._desc.theme.add_call(lambda v: theme_btn.configure(text=v))      #type: ignore
+        AppManager.desc.theme.add_call(lambda v: theme_btn.configure(text=v))      #type: ignore
 
         # Свитчер палитр
         palette_frame = ttk.Frame(container, height=44)
@@ -78,16 +78,16 @@ class SettingsFrame(ttk.Frame):
             if theme == 'light':
                 menu = self.light_menu
             palette_btn.configure(menu=menu)    #type: ignore
-            if AppManager._desc.color._value:   #type: ignore
+            if AppManager.desc.color._value:    #type: ignore
                 menu.invoke(0)                  #type: ignore
 
         palette_btn = ttk.Menubutton(palette_frame, style='ts.Outline.TMenubutton')
         palette_btn.place(x=0, y=15, relwidth=1)
 
         # Добавление вызова в Дескриптор тем и палитр
-        AppManager._desc.theme.add_call(theme_switch)                               #type: ignore
-        AppManager._desc.color.add_call(lambda v: palette_btn.configure(text=v))    #type: ignore
-        AppManager._desc.color.add_call(lambda v: style_init(v))                    #type: ignore
+        AppManager.desc.theme.add_call(theme_switch)                               #type: ignore
+        AppManager.desc.color.add_call(lambda v: palette_btn.configure(text=v))    #type: ignore
+        AppManager.desc.color.add_call(lambda v: style_init(v))                    #type: ignore
 
     def draw_library_widgets(self) -> None:
         """Отрисовка виджетов библиотеки"""
@@ -122,7 +122,7 @@ class SettingsFrame(ttk.Frame):
         btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
 
         # Добавление вызова дескриптору
-        add_call_func = eval(f'AppManager._desc.{attr}.add_call')
+        add_call_func = eval(f'AppManager.desc.{attr}.add_call')
         add_call_func(lambda e: btn.configure(text=e))
 
     def _update_dir(self, attr: str) -> None:

@@ -8,10 +8,10 @@ from ....file_handlers._proxy import FileHandlerProxy
 
 # Типизация
 from typing import Callable, Self
-from ....data_base.library import Product
+# from ....data_base.library import Product
 
 
-__all__ = ('HandlerWindow', 'Product')
+__all__ = ('HandlerWindow', )
 
 
 class AbstractFileHandler:
@@ -145,7 +145,7 @@ class HandlerWindow(ChildWindow):
 
         self.update_combo(proxy)
 
-    def handler_predicate(self, product: Product) -> Product | None:
+    def handler_predicate(self, product):
         """
             Возвращает продукт, если он соответсвует типу 
             обработчика. Иначе - возвращает None

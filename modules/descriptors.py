@@ -1,4 +1,12 @@
-from typing import Callable, Generic, Self, TypeVar
+"""
+    Содержит 'дескрипторы' - объекты, которые хранят
+    некоторую информацию и могут вызывать связанные с 
+    ними функции, помещая в них это значение.
+"""
+from typing import Callable, Generic, TypeVar
+
+
+__all__ = ('autolog', 'log_check_depth', 'z_disc', 'o_disc', 't_disc', 'roddom_dir', 'theme', 'color')
 
 
 T = TypeVar('T')
@@ -29,38 +37,15 @@ class DescriptorConstructor(Generic[T]):
         self._funcs += (func, )
 
 
-class Descriptors:
-    """Объект, который содержит в себе все дескрипторы"""
+# Дескрипторы настроек. Они импортируются по *
+autolog = DescriptorConstructor[int]()
+log_check_depth = DescriptorConstructor[int]()
+z_disc = DescriptorConstructor[str]()
+o_disc = DescriptorConstructor[str]()
+t_disc = DescriptorConstructor[str]()
+roddom_dir = DescriptorConstructor[str]()
+theme = DescriptorConstructor[str]()
+color = DescriptorConstructor[str]()
 
-    __instance = None
-
-    __slots__ = (
-        'autolog',
-        'log_check_depth',
-        'z_disc',
-        'o_disc',
-        't_disc',
-        'roddom_dir',
-        'theme',
-        'color',
-        'ot_status'
-    )
-
-    def __new__(cls) -> Self:
-        if cls.__instance is None:
-            cls.__instance = super().__new__(cls)
-        return cls.__instance
-
-    def __init__(self) -> None:
-        # Дескрипторы настроек
-        self.autolog = DescriptorConstructor[int]()
-        self.log_check_depth = DescriptorConstructor[int]()
-        self.z_disc = DescriptorConstructor[str]()
-        self.o_disc = DescriptorConstructor[str]()
-        self.t_disc = DescriptorConstructor[str]()
-        self.roddom_dir = DescriptorConstructor[str]()
-        self.theme = DescriptorConstructor[str]()
-        self.color = DescriptorConstructor[str]()
-
-        # Остальные дескрипторы
-        self.ot_status = DescriptorConstructor[str]()
+# Остальные дескрипторы
+ot_status = DescriptorConstructor[str]()

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from ._tracker import Tracker, AppManager
 from ..file_handlers._iterators import ot_iterator
+from ..descriptors import autolog, ot_status
 
 # Прокси объекты
 from .order_tracker_proxies import *
@@ -10,7 +11,7 @@ class OrdersTracker(Tracker):
     """Основной объект слежения за файлами заказов"""
     __slots__ = '_orders', '_proxies','_border_name'
 
-    ot_status = AppManager._desc.ot_status
+    ot_status = ot_status
 
     def __init__(self) -> None:
         super().__init__()
@@ -20,7 +21,7 @@ class OrdersTracker(Tracker):
         self.ot_status = 'Ожидание'
 
         # Добавляем дескриптору вызов автоматической ф-ии трекера
-        AppManager._desc.autolog.add_call(self.auto)    #type: ignore
+        autolog.add_call(self.auto)    #type: ignore
 
     def run(self) -> None:
         """Основная ф-я предостовляющая логику работы трекера"""

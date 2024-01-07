@@ -7,7 +7,7 @@ class DataBase:
     __slots__ = ()
 
     # Имя базы данных, к которой будет совершено подключение
-    data_base: str = 'None'
+    data_base = 'None'
 
     # Ссылка на объект подключения к базе данных
     connect: Connection = None      #type: ignore

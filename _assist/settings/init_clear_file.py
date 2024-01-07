@@ -2,14 +2,13 @@ import sqlite3
 
 
 def create_clear_app_db():
-    with sqlite3.connect('../../data/app.db') as connect:
+    with sqlite3.connect('../../data/settings.db') as connect:
         cursor = connect.cursor()
-        cursor.execute('CREATE TABLE Samples (id INTEGER PRIMARY KEY AUTOINCREMENT, tag TEXT, name TEXT, data TEXT)')
-        cursor.execute('CREATE TABLE Settings (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, data INT)')
+        cursor.execute('CREATE TABLE Settings (name PRIMARY KEY, data INT)')
 
 
 def fill_settings_table():
-    with sqlite3.connect('../../data/app.db') as connect:
+    with sqlite3.connect('../../data/settings.db') as connect:
         cursor = connect.cursor()
         values = (
             ('autolog', 0), 
@@ -18,7 +17,8 @@ def fill_settings_table():
             ('o_disc', '/mnt/HDD/_Dest'), 
             ('t_disc', '/mnt/HDD/_Dest'), 
             ('roddom_dir', '/mnt/HDD/Tests/Роддом'),
-            ('theme', 'cosmo')
+            ('theme', 'light'),
+            ('color', 'flatly')
             )
         cursor.executemany('INSERT INTO Settings (name, data) VALUES (?, ?)', values)
         connect.commit()

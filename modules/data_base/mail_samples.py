@@ -2,9 +2,11 @@ from .data_base import DataBase
 
 
 class MailSamples(DataBase):
+    """Предостовляет доступ для работы с базой данных текстовых шаблонов."""
+
     __slots__ = ()
 
-    data_base = 'app.db'
+    data_base = 'mail_samples.db'
 
     @DataBase.safe_connect
     def create(self, tag: str, name: str, text: str) -> None:

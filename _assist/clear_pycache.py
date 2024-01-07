@@ -11,9 +11,9 @@ def recursive_deleting() -> None:
             else:
                 if isdir(path + '/' + cat):
                     inner(path + '/' + cat)
-    inner('../../_assist')
-    inner('../../data')
-    inner('../../modules')
+    inner('../_assist')
+    inner('../data')
+    inner('../modules')
 
 if __name__ == '__main__':
     recursive_deleting()

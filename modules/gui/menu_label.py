@@ -20,7 +20,7 @@ class MenuLabel(ttk.Frame):
 
         # Подсветка неактивной кнопки. Зависит от выбранной темы
         self._backlight = None
-        AppManager._desc.theme.add_call(self.change_backlight)  #type: ignore
+        AppManager.desc.theme.add_call(self.change_backlight)  #type: ignore
         self.bind('<Enter>', self.enter_event)
         self.bind('<Leave>', self.leave_event)
 

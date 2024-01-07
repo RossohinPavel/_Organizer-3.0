@@ -4,41 +4,15 @@ from typing import NamedTuple
 from ..trackers.order_tracker_proxies import *
 
 
-class Photo(NamedTuple):
-    """Инофрмация о фотопечати."""
-    name: str                               # Имя тиража
-    value: int                              # Счетчик отпечатков
-
-
-class Edition(NamedTuple):
-    """Информация о тираже."""
-    name: str                               # Имя тиража
-    covers: int                             # Счетчик обложек
-    pages: int | None                       # Счетчик разворотов
-    ccount: str | None                      # Комплексный счетчик обложек/разворотов
-    comp: str | None                        # Тип совмещения тиража (актуально для книг)
-
-
-class Order(NamedTuple):
-    """Информация о заказе."""
-    name: str                               # Имя заказа, он же его номер
-    creation_date: str                      # Дата загрузки заказа на сервер
-    customer_name: str                      # Имя заказчика
-    customer_address: str                   # Адрес заказчика
-    price: float                            # Общая сумма заказа
-    photo: tuple[Photo, ...] | None         # Кортеж объектов фотопечати заказа
-    content: tuple[Edition, ...] | None     # Кортеж объектов тиражей заказа
-
-
 class Log(DataBase):
     """Класс предостовляющий доступ к чтению и записи лога заказов"""
     __slots__ = ()
 
     data_base = 'log.db'
 
-    def __init__(self) -> None:
-        super().__init__()
-        AppManager.ot._border_name = self.get_newest_order_name()
+    # def __init__(self) -> None:
+    #     super().__init__()
+    #     AppManager.ot._border_name = self.get_newest_order_name()
 
     @DataBase.safe_connect
     def update_records(self, proxies: set[EditionProxy | PhotoProxy]) -> None:

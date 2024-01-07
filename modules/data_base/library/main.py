@@ -1,6 +1,6 @@
 # Импорты для работы библиотеки
 from ..data_base import DataBase
-from .products import *
+from .product import Product
 from .properties import Properties
 
 # Кэш
@@ -14,8 +14,8 @@ class Library(DataBase):
     """Класс для работы с библиотекой продуктов"""
     data_base = 'library.db'
 
-    categories = (Album, Canvas, Journal, Layflat, Photobook, Photofolder, Subproduct)
-    properties = Properties
+    Product = Product
+    Properties = Properties
 
     @DataBase.safe_connect
     def get_headers(self) -> dict[Type[Product], list[tuple[int, str]]]:

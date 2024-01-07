@@ -20,16 +20,36 @@ class MainWindow(ttk.Window):
         menu_column = ttk.Frame(self)
         menu_column.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
-        self.todo = MenuLabel('todo', menu_column, frames.PlanerFrame)
+        self.todo = MenuLabel(
+            'todo', 
+            menu_column, 
+            # frames.PlanerFrame,
+            ttk.Frame
+        )
         self.todo.pack(anchor=ttkc.N)
 
-        self.social = MenuLabel('social', menu_column, frames.MailSamplesFrame)
+        self.social = MenuLabel(
+            'social', 
+            menu_column, 
+            # frames.MailSamplesFrame,
+            ttk.Frame
+        )
         self.social.pack(anchor=ttkc.N)
 
-        self.info = MenuLabel('info', menu_column, frames.InfoFrame)
+        self.info = MenuLabel(
+            'info', 
+            menu_column, 
+            # frames.InfoFrame
+            ttk.Frame
+            )
         self.info.pack(anchor=ttkc.N)
 
-        self.file = MenuLabel('file', menu_column, frames.FileFrame)
+        self.file = MenuLabel(
+            'file', 
+            menu_column, 
+            # frames.FileFrame
+            ttk.Frame
+        )
         self.file.pack(anchor=ttkc.N)
 
         self.stg = MenuLabel('settings', menu_column, frames.SettingsFrame)

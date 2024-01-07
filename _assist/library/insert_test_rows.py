@@ -10,7 +10,7 @@ match os_name:
 
 
 import sqlite3
-from modules.data_base.library.products import *
+from modules.data_base.library.product import *
 
 
 def insert_test_rows():
