@@ -37,12 +37,6 @@ class LibraryWindow(ChildWindow):
                 p = ProductFrame(self.container, i == len(lst), name)
                 p.pack(fill=ttkc.X, padx=(10, 10))
 
-        #     # Отрисовка интерфейса заголовка
-        #     category, products = val
-        #     h = HeaderFrame(self, category)
-        #     h.pack(fill=ttkc.X, padx=(1, 10), pady=(0 if i == 0 else 5, 2))
-        #     h.draw_bound_widgets(products)
-
     def redraw(self) -> None:
         """Перерисовка виджетов в связи с обновлением библиотеки"""
         for widget in self.container.winfo_children():

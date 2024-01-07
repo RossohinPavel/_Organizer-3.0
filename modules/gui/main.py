@@ -8,7 +8,7 @@ class MainWindow(ttk.Window):
     """Основное окно приложения"""
 
     def __init__(self) -> None:
-        super().__init__(title='Органайзер 3.5.0 BETA', iconphoto='data/assets/ico.png')
+        super().__init__(title='Органайзер 3.6.1 BETA', iconphoto='data/assets/ico.png')
         # Запускаем определение стилей и получения изображений после __init__
         style_init()
         self.init_images()
