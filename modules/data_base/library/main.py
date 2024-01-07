@@ -12,24 +12,16 @@ from typing import Type
 
 class Library(DataBase):
     """Класс для работы с библиотекой продуктов"""
+
     data_base = 'library.db'
 
     Product = Product
     Properties = Properties
 
     @DataBase.safe_connect
-    def get_headers(self) -> dict[Type[Product], list[tuple[int, str]]]:
-        """
-            Получение словаря из заголовков продуктов.
-            Ключи - Типы продуктов
-            Значения - Список из кортежей продуктов, 
-            где перечисленны их id и name атрибуты
-        """
-        dct = {}
-        for category in self.categories:
-            self.cursor.execute(f'SELECT id, name FROM {category.__name__}')
-            dct[category] = self.cursor.fetchall()
-        return dct
+    def get_headers(self) -> list[tuple[str, str]]:
+        """Получение заголовков продуктов."""
+        return self.cursor.execute('SELECT type, name FROM Products').fetchall()
     
     @DataBase.safe_connect
     def from_id(self, category: Type[Product], id: int) -> Product:

@@ -1,6 +1,6 @@
 from ..source import *
 from ..source.style import style_init
-# from ..windows import LibraryWindow
+from ..windows import LibraryWindow
 
 
 class SettingsFrame(ttk.Frame):
@@ -105,8 +105,7 @@ class SettingsFrame(ttk.Frame):
             frame, 
             style='btn.TButton', 
             text='Библиотека', 
-            # command=lambda: LibraryWindow()
-            command=lambda: print(btn.winfo_geometry())
+            command=lambda: LibraryWindow()
         )
         btn.place(x=0, y=0, relwidth=1)
 
@@ -118,8 +117,8 @@ class SettingsFrame(ttk.Frame):
 
     def draw_directory_frame(self, text: str, attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
-        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
-        btn = SettingLine(self, lambda: self._update_dir(attr), _postfix=attr)
+        HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 3))
+        btn = SettingLine(self, lambda: self._update_dir(attr))
         btn.pack(padx=5, pady=(0, 15), anchor=ttkc.W)
 
         # Добавление вызова дескриптору

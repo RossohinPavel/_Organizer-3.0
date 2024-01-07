@@ -12,14 +12,19 @@ def style_init(name: str = '') -> None:
     if name:
         style.theme_use(name)
     # --------------Стили кнопок--------------
-    # Стиль для кнопочки с рисунком (19х19 пикселей)
+    # Стиль для кнопочки с рисунком (15х15 пикселей)
     style.configure('image.TButton', padding=1)
+    style.configure('image.success.TButton', padding=1)
+    style.configure('image.warning.TButton', padding=1)
+    style.configure('image.danger.TButton', padding=1)
 
     # Стиль для свитчера тем
     style.configure('ts.Outline.TMenubutton', padding=(5, 2, 0, 2))
 
     # Стиль для всех нажимаемых кнопок
-    style.configure('btn.TButton', padding=(5, 2, 0, 2))
+    style.configure('btn.TButton', padding=(2, 2, 2, 2))
+    style.configure('btn.success.TButton', padding=(2, 2, 2, 2))
+
 
 
     # # Стиль для кнопок выбора папок в меню. выравнивает текст по левому краю

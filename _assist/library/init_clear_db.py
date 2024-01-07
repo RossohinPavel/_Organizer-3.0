@@ -10,7 +10,7 @@ match os_name:
 
 
 import sqlite3
-from modules.data_handlers.library.product import Product
+from modules.data_base.library.product import Product
 
 
 def create_clear_db():
@@ -22,13 +22,12 @@ def create_clear_db():
             """CREATE TABLE Aliases 
             (
                 alias TEXT PRIMARY KEY,
-                category TEXT,
-                product_id INTEGER
+                product TEXT
             )"""
         )
 
-        req = 'id INTEGER PRIMARY KEY AUTOINCREMENT'
-        for field in Product._fields:
+        req = 'name TEXT PRIMARY KEY'
+        for field in Product._fields[1:]:
             # определение типа ячейки
             field_type = 'TEXT'
             if field in (
@@ -41,7 +40,7 @@ def create_clear_db():
             req += f',\n{field} {field_type}'
 
         # Создаем таблицу
-        cursor.execute(f'CREATE TABLE Product ({req})')
+        cursor.execute(f'CREATE TABLE Products ({req})')
 
 
 if __name__ == '__main__':

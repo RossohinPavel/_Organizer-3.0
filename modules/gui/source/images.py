@@ -35,3 +35,6 @@ TRACKER_ON = 'data/assets/tracker_on.png'
 # Иконки для различных кнопок, лейблов и тд
 GEAR = 'data/assets/gear.png'
 QUESTION = 'data/assets/question.png'
+COPY = 'data/assets/copy.png'
+EDIT = 'data/assets/edit.png'
+DELETE = 'data/assets/delete.png'
