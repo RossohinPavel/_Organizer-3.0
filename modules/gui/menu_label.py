@@ -1,5 +1,5 @@
 from .source import *
-from .source.images import IMAGES
+from .source import images
 
 
 class MenuLabel(ttk.Frame):
@@ -11,7 +11,7 @@ class MenuLabel(ttk.Frame):
         MenuLabel.current_frame = self
         # Основное изображение кнопки
         self._img_name = img_name
-        self._img = ttk.Label(self, image=IMAGES[img_name + '_off'])
+        self._img = ttk.Label(self, image=getattr(images, img_name + '_OFF'))
         self._img.pack()
         self._img.bind('<Button-1>', self.click)
 
@@ -35,22 +35,22 @@ class MenuLabel(ttk.Frame):
             self.current_frame._frame.pack_forget()     #type: ignore
 
             # Меняем положение кнопки на выключенный
-            self.current_frame.image_switcher('off')    #type: ignore
+            self.current_frame.image_switcher('OFF')    #type: ignore
 
             # В классе меняем ссылку на лейбл, для правильной работы виджетов
             MenuLabel.current_frame = self
 
             # Включаем текущий виджет
-            self.image_switcher('on')
+            self.image_switcher('ON')
             self._frame.pack(side=ttkc.LEFT, expand=1, fill=ttkc.BOTH)
     
-    def image_switcher(self, mode: Literal['on', 'off']) -> None:
+    def image_switcher(self, mode: Literal['ON', 'OFF']) -> None:
         """Меняет изображение на кнопке"""
-        self._img.configure(image=IMAGES[f'{self._img_name}_{mode}'])
+        self._img.configure(image=getattr(images, f'{self._img_name}_{mode}'))
     
     def change_backlight(self, theme: str) -> None:
         """Меняет изображение, которое оботражается по наведению мыши."""
-        self._backlight = IMAGES[f'{self._img_name}_{theme}']
+        self._backlight = getattr(images, f'{self._img_name}_{theme.upper()}')
     
     def enter_event(self, _) -> None:
         """Меняет изображение на _img при наведении мыши"""
@@ -60,9 +60,9 @@ class MenuLabel(ttk.Frame):
     def leave_event(self, _) -> None:
         """Меняет изображение на _img при перемещении курсора из зоны виджета."""
         if not self._frame.winfo_viewable():
-            self.image_switcher('off')    # type: ignore
+            self.image_switcher('OFF')    # type: ignore
     
-    def show_badge(self, style: Literal['success', 'danger'] = 'success') -> None:
+    def show_badge(self, style: Literal['success', 'danger', 'warning'] = 'success') -> None:
         """Показывает всплывающий фреймБ показывающий активность модуля."""
         self._badge.configure(bootstyle=style)          # type: ignore
         self._badge.place(relx=1.03, relheight=0.95)

@@ -103,9 +103,10 @@ class SettingsFrame(ttk.Frame):
 
         btn = ttk.Button(
             frame, 
-            style='minibtn.Outline.TButton', 
+            style='btn.TButton', 
             text='Библиотека', 
-            command=lambda: LibraryWindow()
+            # command=lambda: LibraryWindow()
+            command=lambda: print(btn.winfo_geometry())
         )
         btn.place(x=0, y=0, relwidth=1)
 
@@ -118,12 +119,12 @@ class SettingsFrame(ttk.Frame):
     def draw_directory_frame(self, text: str, attr: str) -> None:
         """Отрисовка виджетов управления рабочими папками"""
         HeaderLabel(self, text).pack(anchor=ttkc.W, fill=ttkc.X, pady=(0, 2))
-        btn = ttk.Button(self, style='l_jf.Outline.TButton', command=lambda: self._update_dir(attr))
-        btn.pack(fill=ttkc.X, pady=(0, 15), padx=5)
+        btn = SettingLine(self, lambda: self._update_dir(attr), _postfix=attr)
+        btn.pack(padx=5, pady=(0, 15), anchor=ttkc.W)
 
         # Добавление вызова дескриптору
         add_call_func = eval(f'AppManager.desc.{attr}.add_call')
-        add_call_func(lambda e: btn.configure(text=e))
+        add_call_func(lambda e: btn.var.set(e))
 
     def _update_dir(self, attr: str) -> None:
         """Получение информации из файлового диалога"""

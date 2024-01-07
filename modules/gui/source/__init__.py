@@ -1,3 +1,3 @@
 from .main import *
 from .child_window import ChildWindow
-from .widgets import HeaderLabel, ONVEntry, SettingLine
+from .widgets import *

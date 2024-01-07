@@ -1,6 +1,5 @@
 from .source import *
 from .source.style import style_init
-from .source.images import IMAGES
 from . import frames
 from .menu_label import MenuLabel
 
@@ -12,8 +11,7 @@ class MainWindow(ttk.Window):
         super().__init__(title='Органайзер 3.5.0 BETA', iconphoto='data/assets/ico.png')
         # Запускаем определение стилей и получения изображений после __init__
         style_init()
-        for k, v in IMAGES.items():
-            IMAGES[k] = ttk.PhotoImage(master=self, file=v) #type: ignore
+        self.init_images()
         self.set_main_graph_settings()
 
         # Отрисовываем колонку меню
@@ -21,7 +19,7 @@ class MainWindow(ttk.Window):
         menu_column.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
         self.todo = MenuLabel(
-            'todo', 
+            'TODO', 
             menu_column, 
             # frames.PlanerFrame,
             ttk.Frame
@@ -29,7 +27,7 @@ class MainWindow(ttk.Window):
         self.todo.pack(anchor=ttkc.N)
 
         self.social = MenuLabel(
-            'social', 
+            'SOCIAL', 
             menu_column, 
             # frames.MailSamplesFrame,
             ttk.Frame
@@ -37,7 +35,7 @@ class MainWindow(ttk.Window):
         self.social.pack(anchor=ttkc.N)
 
         self.info = MenuLabel(
-            'info', 
+            'INFO', 
             menu_column, 
             # frames.InfoFrame
             ttk.Frame
@@ -45,14 +43,14 @@ class MainWindow(ttk.Window):
         self.info.pack(anchor=ttkc.N)
 
         self.file = MenuLabel(
-            'file', 
+            'FILE', 
             menu_column, 
             # frames.FileFrame
             ttk.Frame
         )
         self.file.pack(anchor=ttkc.N)
 
-        self.stg = MenuLabel('settings', menu_column, frames.SettingsFrame)
+        self.stg = MenuLabel('SETTINGS', menu_column, frames.SettingsFrame)
         self.stg.pack(anchor=ttkc.S, expand=1, pady=(0, 5))
 
         # Разделитель
@@ -60,6 +58,14 @@ class MainWindow(ttk.Window):
 
         # Запускаем 1 фрейм - Лист задач
         self.todo.click(None)
+    
+    def init_images(self) -> None:
+        """Ф-я, загружающая изображения."""
+        from .source import images
+        for k, v in images.__dict__.items():
+            if not k.startswith('__'):
+                setattr(images, k, ttk.PhotoImage(master=self, file=v))
+
 
     def set_main_graph_settings(self) -> None:
         """Основные настройки окна, положения и размера."""
@@ -75,11 +81,11 @@ class MainWindow(ttk.Window):
         if event.keycode == 86 and event.keysym == '??':
             event.widget.event_generate('<<Paste>>')
 
-    def destroy(self) -> None:
-        """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
-        ttl = 'Очередь задач не пуста'
-        msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
-        if AppManager.queue.value > 0:
-            if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
-                return
-        super().destroy()
+    # def destroy(self) -> None:
+    #     """Дополнительная логика при закрытии приложения. Проверяет есть ли активные задачи."""
+    #     ttl = 'Очередь задач не пуста'
+    #     msg = 'Закрытие программы во время обработки может привести к повреждению файлов.\nВы точно хотите это сделать?'
+    #     if AppManager.queue.value > 0:
+    #         if not tkmb.askokcancel(parent=self, title=ttl, message=msg):
+    #             return
+    #     super().destroy()

@@ -5,30 +5,33 @@
 """
 
 
-IMAGES = {
-    'question': 'data/assets/question.png',
-    'file_dark': 'data/assets/file_dark.png',
-    'file_light': 'data/assets/file_light.png',
-    'file_off': 'data/assets/file_off.png',
-    'file_on': 'data/assets/file_on.png',
-    'info_dark': 'data/assets/info_dark.png',
-    'info_light': 'data/assets/info_light.png',
-    'info_off': 'data/assets/info_off.png',
-    'info_on': 'data/assets/info_on.png',
-    'settings_dark': 'data/assets/settings_dark.png',
-    'settings_light': 'data/assets/settings_light.png',
-    'settings_off': 'data/assets/settings_off.png',
-    'settings_on': 'data/assets/settings_on.png',
-    'social_dark': 'data/assets/social_dark.png',
-    'social_light': 'data/assets/social_light.png',
-    'social_off': 'data/assets/social_off.png',
-    'social_on': 'data/assets/social_on.png',
-    'todo_dark': 'data/assets/todo_dark.png',
-    'todo_light': 'data/assets/todo_light.png',
-    'todo_off': 'data/assets/todo_off.png',
-    'todo_on': 'data/assets/todo_on.png',
-    'tracker_dark': 'data/assets/tracker_dark.png',
-    'tracker_light': 'data/assets/tracker_light.png',
-    'tracker_off': 'data/assets/tracker_off.png',
-    'tracker_on': 'data/assets/tracker_on.png',
-}
+# Иконки для основного меню приложения
+FILE_DARK = 'data/assets/file_dark.png'
+FILE_LIGHT = 'data/assets/file_light.png'
+FILE_OFF = 'data/assets/file_off.png'
+FILE_ON = 'data/assets/file_on.png'
+INFO_DARK = 'data/assets/info_dark.png'
+INFO_LIGHT = 'data/assets/info_light.png'
+INFO_OFF = 'data/assets/info_off.png'
+INFO_ON = 'data/assets/info_on.png'
+SETTINGS_DARK = 'data/assets/settings_dark.png'
+SETTINGS_LIGHT = 'data/assets/settings_light.png'
+SETTINGS_OFF = 'data/assets/settings_off.png'
+SETTINGS_ON = 'data/assets/settings_on.png'
+SOCIAL_DARK = 'data/assets/social_dark.png'
+SOCIAL_LIGHT = 'data/assets/social_light.png'
+SOCIAL_OFF = 'data/assets/social_off.png'
+SOCIAL_ON = 'data/assets/social_on.png'
+TODO_DARK = 'data/assets/todo_dark.png'
+TODO_LIGHT = 'data/assets/todo_light.png'
+TODO_OFF = 'data/assets/todo_off.png'
+TODO_ON = 'data/assets/todo_on.png'
+TRACKER_DARK = 'data/assets/tracker_dark.png'
+TRACKER_LIGHT = 'data/assets/tracker_light.png'
+TRACKER_OFF = 'data/assets/tracker_off.png'
+TRACKER_ON = 'data/assets/tracker_on.png'
+
+
+# Иконки для различных кнопок, лейблов и тд
+GEAR = 'data/assets/gear.png'
+QUESTION = 'data/assets/question.png'

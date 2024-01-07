@@ -7,15 +7,21 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.tooltip import ToolTip
 
 
-app = ttk.Window(size=(500, 500), themename='flatly')
 
-img = ttk.PhotoImage(master=app, file='../data/assets/question.png')
+
+app = ttk.Window(size=(500, 500), themename='pulse')
+
+
+style = ttk.Style()
+style.configure('stg.TButton', padding=1)
+
+img = ttk.PhotoImage(master=app, file='../data/assets/gear.png')
 
 
 lbl = ttk.Label(app, image=img)
 lbl.pack()
 
-btn = ttk.Button(app, image=img)
+btn = ttk.Button(app, image=img, command=lambda: print(btn.winfo_geometry()), style='stg.TButton')
 btn.pack()
 
 lst = ['value1', 'value2']
